@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Kunde {
+  id          String      @id @default(cuid())
+  name        String
+  email       String
+  phone       String
+  address     String
+  rechnungen  Rechnung[]
+  sepaMandat  SepaMandat?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+// IMPORTANT: In production, encrypt IBAN at rest (e.g. AWS KMS, field-level encryption)
+// before storing. Plaintext IBAN in a DB violates PCI-DSS and GDPR best practices.
+//
+// Stripe SEPA: use Stripe.js SetupIntent with payment_method_types: ["sepa_debit"]
+//   → store the resulting PaymentMethod ID here instead of raw IBAN
+// GoCardless:  use the GoCardless API to create a RedirectFlow, then store the mandate_id
+//   → https://developer.gocardless.com/api-reference/#mandates
+// Neither is configured yet. Add the chosen provider's SDK and credentials to .env,
+// then replace the iban/bic fields with provider-specific identifiers.
+model SepaMandat {
+  id           String   @id @default(cuid())
+  kundeId      String   @unique
+  kontoinhaber String
+  iban         String
+  bic          String
+  datum        DateTime
+  unterschrift Boolean
+  kunde        Kunde    @relation(fields: [kundeId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// status: "offen" | "gemahnt" | "bezahlt"
+model Rechnung {
+  id                String    @id @default(cuid())
+  kundeId           String
+  kunde             Kunde     @relation(fields: [kundeId], references: [id], onDelete: Cascade)
+  betrag            Float
+  faelligkeitsdatum DateTime
+  rechnungsnummer   String    @unique
+  zahlungsToken     String    @unique @default(cuid())
+  status            String    @default("offen")
+  mahnungen         Mahnung[]
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+// stufe: 1 | 2 | 3
+// kanal: "email" | "whatsapp"
+// status: "ausstehend" | "gesendet" | "bezahlt"
+model Mahnung {
+  id         String    @id @default(cuid())
+  rechnungId String
+  rechnung   Rechnung  @relation(fields: [rechnungId], references: [id], onDelete: Cascade)
+  stufe      Int
+  versandtAm DateTime?
+  kanal      String
+  status     String    @default("ausstehend")
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}

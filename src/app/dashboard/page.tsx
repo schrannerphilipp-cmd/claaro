@@ -40,23 +40,23 @@ const tiles = [
     icon: "🔒",
     name: "Compliance",
     description: "Vorschriften & Pflichten einfach im Blick behalten",
-    available: false,
+    available: true,
   },
   {
     id: "dienstplan",
     icon: "📅",
     name: "Dienstplan",
     description: "Schichten planen & Team koordinieren",
-    available: false,
+    available: true,
   },
 ];
 
-const accountItems: { label: string; danger?: boolean }[] = [
-  { label: "Profil bearbeiten" },
-  { label: "Firmendaten" },
-  { label: "Abo & Abrechnung" },
-  { label: "Benachrichtigungen" },
-  { label: "Passwort & Sicherheit" },
+const accountLinks: { label: string; href?: string; danger?: boolean }[] = [
+  { label: "Profil bearbeiten",   href: "/dashboard/konto#profil" },
+  { label: "Firmendaten",         href: "/dashboard/einstellungen" },
+  { label: "Abo & Abrechnung",    href: "/dashboard/konto#abo" },
+  { label: "Benachrichtigungen",  href: "/dashboard/konto#benachrichtigungen" },
+  { label: "Passwort & Sicherheit", href: "/dashboard/konto#sicherheit" },
   { label: "Abmelden", danger: true },
 ];
 
@@ -95,6 +95,9 @@ export default function DashboardPage() {
   const [accountOpen, setAccountOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [greeting, setGreeting] = useState("Hallo");
+  const [displayName, setDisplayName] = useState("Philipp");
+  const [displayAvatar, setDisplayAvatar] = useState<string | null>(null);
+  const [chatUnread, setChatUnread] = useState(0);
 
   const accountRef = useRef<HTMLDivElement>(null);
   const helpRef = useRef<HTMLDivElement>(null);
@@ -112,6 +115,35 @@ export default function DashboardPage() {
 
   useEffect(() => {
     setGreeting(getGreeting());
+
+    // Load profile from localStorage
+    try {
+      const raw = localStorage.getItem("claaro-profil");
+      if (raw) {
+        const p = JSON.parse(raw);
+        if (p.username) setDisplayName(p.username);
+        if (p.avatarUrl) setDisplayAvatar(p.avatarUrl);
+      }
+    } catch {/* ignore */}
+
+    // Load unread count
+    const stored = parseInt(localStorage.getItem("claaro-chat-unread") ?? "0", 10);
+    if (stored > 0) setChatUnread(stored);
+
+    function onProfilUpdate(e: Event) {
+      const d = (e as CustomEvent).detail;
+      if (d.username) setDisplayName(d.username);
+      setDisplayAvatar(d.avatarUrl ?? null);
+    }
+    function onChatUnread(e: Event) {
+      setChatUnread((e as CustomEvent).detail.count ?? 0);
+    }
+    window.addEventListener("claaro:profil-updated", onProfilUpdate);
+    window.addEventListener("claaro:chat-unread", onChatUnread);
+    return () => {
+      window.removeEventListener("claaro:profil-updated", onProfilUpdate);
+      window.removeEventListener("claaro:chat-unread", onChatUnread);
+    };
   }, []);
 
   // Slide in from left when returning from a feature page
@@ -234,50 +266,82 @@ export default function DashboardPage() {
 
           <p className="flex-1 text-center text-sm text-white/50">
             {greeting},{" "}
-            <span className="text-white font-medium">Philipp</span>
+            <span className="text-white font-medium">{displayName}</span>
           </p>
+
+          <Link
+            href="/dashboard/einstellungen"
+            className="flex-none text-white/50 hover:text-white/80 transition-colors border border-white/10 rounded-lg p-2 hover:bg-white/5"
+            aria-label="Einstellungen"
+            title="Einstellungen"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16">
+              <path d="M8 10a2 2 0 100-4 2 2 0 000 4z" stroke="currentColor" strokeWidth="1.3"/>
+              <path d="M13.3 7a5.7 5.7 0 00-.1-.9l1.3-1-1.3-2.2-1.5.6a5.5 5.5 0 00-1.5-.9L10 2H6l-.2 1.6a5.5 5.5 0 00-1.5.9L2.8 4 1.5 6.1l1.3 1A5.7 5.7 0 002.7 8a5.7 5.7 0 00.1.9l-1.3 1 1.3 2.2 1.5-.6c.5.4 1 .7 1.5.9L6 14h4l.2-1.6c.5-.2 1-.5 1.5-.9l1.5.6 1.3-2.2-1.3-1c.1-.3.1-.6.1-.9z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/>
+            </svg>
+          </Link>
 
           <div className="flex-none relative" ref={accountRef}>
             <button
               onClick={() => setAccountOpen((o) => !o)}
-              className="flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors border border-white/10 rounded-lg px-3.5 py-2 hover:bg-white/5"
+              className="relative flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors border border-white/10 rounded-lg px-3.5 py-2 hover:bg-white/5"
             >
-              <span className="w-6 h-6 rounded-full bg-[#c84b2f]/20 flex items-center justify-center text-xs text-[#c84b2f] font-bold">
-                P
-              </span>
+              {/* Avatar */}
+              {displayAvatar ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={displayAvatar} alt="" className="w-6 h-6 rounded-full object-cover" />
+              ) : (
+                <span className="w-6 h-6 rounded-full bg-[#c84b2f]/20 flex items-center justify-center text-xs text-[#c84b2f] font-bold">
+                  {displayName.slice(0, 1).toUpperCase()}
+                </span>
+              )}
               Mein Konto
+              {/* Unread badge */}
+              {chatUnread > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[10px] font-bold flex items-center justify-center text-white"
+                  style={{ backgroundColor: "var(--c-accent)" }}>
+                  {chatUnread > 9 ? "9+" : chatUnread}
+                </span>
+              )}
               <svg
-                className={`w-3 h-3 text-white/30 transition-transform duration-150 ${
-                  accountOpen ? "rotate-180" : ""
-                }`}
+                className={`w-3 h-3 text-white/30 transition-transform duration-150 ${accountOpen ? "rotate-180" : ""}`}
                 viewBox="0 0 12 12"
                 fill="none"
               >
-                <path
-                  d="M2 4l4 4 4-4"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
+                <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
 
             {accountOpen && (
               <div className="absolute right-0 top-full mt-2 w-56 bg-white/5 border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden py-1 backdrop-blur">
-                {accountItems.map(({ label, danger }) => (
-                  <button
-                    key={label}
-                    onClick={() => setAccountOpen(false)}
-                    className={`w-full text-left px-4 py-2.5 text-sm transition-colors hover:bg-white/5 ${
-                      danger
-                        ? "text-[#c84b2f] border-t border-white/10 mt-1 pt-3"
-                        : "text-white/70 hover:text-white"
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
+                {accountLinks.map(({ label, href, danger }) =>
+                  href ? (
+                    <Link
+                      key={label}
+                      href={href}
+                      onClick={() => setAccountOpen(false)}
+                      className="flex items-center gap-2 w-full text-left px-4 py-2.5 text-sm text-white/70 hover:text-white transition-colors hover:bg-white/5"
+                    >
+                      {label === "Benachrichtigungen" && chatUnread > 0 && (
+                        <span className="ml-auto px-1.5 py-0.5 rounded-full text-[10px] font-bold text-white"
+                          style={{ backgroundColor: "var(--c-accent)" }}>
+                          {chatUnread}
+                        </span>
+                      )}
+                      {label}
+                    </Link>
+                  ) : (
+                    <button
+                      key={label}
+                      onClick={() => setAccountOpen(false)}
+                      className={`w-full text-left px-4 py-2.5 text-sm transition-colors hover:bg-white/5 ${
+                        danger ? "text-[#c84b2f] border-t border-white/10 mt-1 pt-3" : "text-white/70 hover:text-white"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  )
+                )}
               </div>
             )}
           </div>

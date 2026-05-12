@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { sendMahnung } from "@/app/actions/mahnungen";
 import SepaMandatForm from "./SepaMandatForm";
+import { triggerZeitersparnisToast } from "@/lib/zeitersparnis";
 
 const serif = { fontFamily: "var(--font-dm-serif)" } as const;
 
@@ -224,6 +225,7 @@ function EskalationsTimeline({
       const result = await sendMahnung(rechnung.id, kanal, sepaEnabled);
       if (result.success) {
         setFeedback({ ok: true, msg: `Stufe ${result.stufe} erfolgreich gesendet.` });
+        triggerZeitersparnisToast("Mahnung versendet", 20);
         router.refresh();
       } else {
         setFeedback({ ok: false, msg: result.error });

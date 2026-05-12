@@ -12,7 +12,9 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.95.2",
     "@prisma/client": "5.22.0",
+    "@supabase/supabase-js": "^2.105.4",
     "dotenv": "^17.4.2",
     "next": "16.2.6",
     "react": "19.2.4",

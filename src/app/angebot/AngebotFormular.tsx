@@ -1,6 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { triggerZeitersparnisToast } from "@/lib/zeitersparnis";
+import { FIRMENDATEN_LS_KEY, type Firmendaten } from "@/components/settings/FirmendatenForm";
+
+const LOGO_LS_KEY = "claaro-logo-url";
+
+const EMPTY_FIRMA: Firmendaten = {
+  firmenname: "", strasse: "", plz: "", ort: "",
+  telefon: "", email: "", website: "", ust_id_nr: "",
+};
 
 type Kundendaten = {
   firma: string;
@@ -65,6 +74,16 @@ export default function AngebotFormular() {
   const [angebotsdatum] = useState(
     () => new Date().toLocaleDateString("de-DE")
   );
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [firma, setFirma] = useState<Firmendaten>(EMPTY_FIRMA);
+
+  useEffect(() => {
+    setLogoUrl(localStorage.getItem(LOGO_LS_KEY));
+    try {
+      const raw = localStorage.getItem(FIRMENDATEN_LS_KEY);
+      if (raw) setFirma({ ...EMPTY_FIRMA, ...JSON.parse(raw) });
+    } catch {/* ignore */}
+  }, []);
 
   const netto = leistungen.reduce((sum, l) => {
     return sum + parseDecimal(l.menge) * parseDecimal(l.einzelpreis);
@@ -340,7 +359,7 @@ export default function AngebotFormular() {
               ← Zurück
             </button>
             <button
-              onClick={() => setSchritt(2)}
+              onClick={() => { setSchritt(2); triggerZeitersparnisToast("Angebot erstellt", 45); }}
               disabled={!leistungenValid}
               className="bg-[#c84b2f] text-white px-6 py-2.5 rounded-lg font-medium text-sm hover:bg-[#b03f25] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
@@ -373,24 +392,41 @@ export default function AngebotFormular() {
           <div className="bg-white rounded-xl border border-white/10 p-12 print:border-0 print:rounded-none print:shadow-none print:p-0">
             {/* Kopfzeile */}
             <div className="flex justify-between items-start mb-12">
-              <div>
-                <h1 className="text-2xl font-bold text-[#c84b2f] tracking-tight">
-                  Claaro
-                </h1>
-                <p className="text-sm text-gray-400 mt-0.5">
-                  Professionelle Angebote
-                </p>
+              {/* Absender links */}
+              <div className="space-y-2">
+                {logoUrl ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img src={logoUrl} alt="Firmen-Logo" className="max-w-[200px] max-h-[80px] object-contain mb-2" />
+                ) : null}
+                {firma.firmenname ? (
+                  <p className="font-bold text-gray-900 text-base">{firma.firmenname}</p>
+                ) : (
+                  !logoUrl && <h1 className="text-2xl font-bold text-[#c84b2f] tracking-tight">Claaro</h1>
+                )}
+                {(firma.strasse || firma.plz || firma.ort) && (
+                  <div className="text-sm text-gray-500 leading-relaxed">
+                    {firma.strasse && <p>{firma.strasse}</p>}
+                    {(firma.plz || firma.ort) && <p>{[firma.plz, firma.ort].filter(Boolean).join(" ")}</p>}
+                  </div>
+                )}
+                {(firma.telefon || firma.email) && (
+                  <div className="text-sm text-gray-500 leading-relaxed">
+                    {firma.telefon && <p>Tel: {firma.telefon}</p>}
+                    {firma.email && <p>{firma.email}</p>}
+                  </div>
+                )}
+                {firma.website && <p className="text-sm text-gray-500">{firma.website}</p>}
               </div>
-              <div className="text-right text-sm text-gray-600">
+
+              {/* Angebotsdaten rechts */}
+              <div className="text-right text-sm text-gray-600 shrink-0 ml-8">
                 <p className="font-semibold text-gray-900 text-base">
                   Angebot {angebotsnummer}
                 </p>
                 <p className="mt-1">Datum: {angebotsdatum}</p>
                 <p>
                   Gültig bis:{" "}
-                  {new Date(
-                    Date.now() + 30 * 24 * 60 * 60 * 1000
-                  ).toLocaleDateString("de-DE")}
+                  {new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString("de-DE")}
                 </p>
               </div>
             </div>
@@ -488,15 +524,23 @@ export default function AngebotFormular() {
             </div>
 
             {/* Fußtext */}
-            <div className="mt-12 pt-8 border-t border-gray-100 text-xs text-gray-400 space-y-1">
-              <p>
-                Dieses Angebot ist 30 Tage gültig. Bitte nehmen Sie das Angebot
-                schriftlich an.
-              </p>
-              <p>
-                Erstellt mit Claaro – Professionelle Angebote für kleine
-                Unternehmen.
-              </p>
+            <div className="mt-12 pt-8 border-t border-gray-100 text-xs text-gray-400">
+              <div className="flex justify-between gap-8">
+                <div className="space-y-0.5">
+                  <p>Dieses Angebot ist 30 Tage gültig. Bitte nehmen Sie das Angebot schriftlich an.</p>
+                  {firma.ust_id_nr && <p>USt-IdNr.: {firma.ust_id_nr}</p>}
+                </div>
+                {firma.firmenname && (
+                  <div className="text-right shrink-0 space-y-0.5">
+                    <p className="font-medium text-gray-500">{firma.firmenname}</p>
+                    {(firma.strasse || firma.plz || firma.ort) && (
+                      <p>{[firma.strasse, [firma.plz, firma.ort].filter(Boolean).join(" ")].filter(Boolean).join(", ")}</p>
+                    )}
+                    {firma.telefon && <p>Tel: {firma.telefon}</p>}
+                    {firma.email && <p>{firma.email}</p>}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </>

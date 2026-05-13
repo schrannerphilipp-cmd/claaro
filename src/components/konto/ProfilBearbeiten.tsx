@@ -5,7 +5,7 @@ import { getBrowserClient, supabaseConfigured } from "@/lib/supabase";
 
 const sans = { fontFamily: "var(--font-dm-sans)" } as const;
 
-const BUCKET = "avatars";
+const BUCKET = "claaro logos";
 const MAX_SIZE = 3 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
 const PROFILE_LS_KEY = "claaro-profil";
@@ -134,10 +134,13 @@ export default function ProfilBearbeiten() {
   }
 
   async function handleRemoveAvatar() {
-    if (!userId || !origAvatarPath || !supabaseConfigured) return;
-    const supabase = getBrowserClient()!;
-    await supabase.storage.from(BUCKET).remove([origAvatarPath]);
-    await supabase.from("profiles").update({ avatar_url: null, avatar_path: null }).eq("id", userId);
+    if (!origAvatarPath || !supabaseConfigured) return;
+    try {
+      const supabase = getBrowserClient()!;
+      await supabase.storage.from(BUCKET).remove([origAvatarPath]);
+    } catch (err) {
+      console.error("[ProfilBearbeiten] Avatar löschen Fehler:", err);
+    }
     setOrigAvatarUrl(null);
     setOrigAvatarPath(null);
     setAvatarPreview(null);
@@ -156,28 +159,41 @@ export default function ProfilBearbeiten() {
     let newAvatarUrl = origAvatarUrl;
     let newAvatarPath = origAvatarPath;
 
-    if (avatarFile && userId && supabaseConfigured) {
+    if (avatarFile && supabaseConfigured) {
       setUploading(true);
-      const supabase = getBrowserClient()!;
-      const ext = avatarFile.name.split(".").pop() ?? "jpg";
-      const path = `${userId}/avatar.${ext}`;
-      const { error: upErr } = await supabase.storage
-        .from(BUCKET)
-        .upload(path, avatarFile, { upsert: true, contentType: avatarFile.type });
+      try {
+        const supabase = getBrowserClient()!;
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setError("Nicht eingeloggt – bitte zuerst anmelden.");
+          setSaving(false);
+          setUploading(false);
+          return;
+        }
+        const ext = avatarFile.name.split(".").pop() ?? "jpg";
+        const path = `${user.id}/avatar.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from(BUCKET)
+          .upload(path, avatarFile, { upsert: true, contentType: avatarFile.type });
+        if (upErr) {
+          console.error("[ProfilBearbeiten] Avatar-Upload Fehler:", upErr);
+          setError(upErr.message);
+          setSaving(false);
+          setUploading(false);
+          return;
+        }
+        const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
+        newAvatarUrl = data.publicUrl + `?t=${Date.now()}`;
+        newAvatarPath = path;
+        console.log("[ProfilBearbeiten] Avatar hochgeladen:", newAvatarUrl);
+      } catch (err) {
+        console.error("[ProfilBearbeiten] Unbekannter Fehler:", err);
+        setError(err instanceof Error ? err.message : "Upload fehlgeschlagen.");
+        setSaving(false);
+        setUploading(false);
+        return;
+      }
       setUploading(false);
-      if (upErr) { setError(upErr.message); setSaving(false); return; }
-      const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
-      newAvatarUrl = data.publicUrl + `?t=${Date.now()}`;
-      newAvatarPath = path;
-    }
-
-    if (userId && supabaseConfigured) {
-      const supabase = getBrowserClient()!;
-      const { error: dbErr } = await supabase.from("profiles").upsert(
-        { id: userId, username: trimmed, avatar_url: newAvatarUrl, avatar_path: newAvatarPath },
-        { onConflict: "id" }
-      );
-      if (dbErr) { setError(dbErr.message); setSaving(false); return; }
     }
 
     setOrigUsername(trimmed);
@@ -342,7 +358,7 @@ export default function ProfilBearbeiten() {
         {saving ? "Wird gespeichert…" : saved ? "Gespeichert ✓" : "Änderungen speichern"}
       </button>
 
-      {!userId && (
+      {!supabaseConfigured && (
         <p className="text-xs text-white/25 text-center">
           Für Avatar-Upload Supabase konfigurieren.
         </p>

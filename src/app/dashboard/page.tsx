@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { getBrowserClient } from "@/lib/supabase";
 
 const serif = { fontFamily: "var(--font-dm-serif)" } as const;
 const sans = { fontFamily: "var(--font-dm-sans)" } as const;
@@ -92,8 +94,10 @@ function useOutsideClick(
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [accountOpen, setAccountOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [featuresOpen, setFeaturesOpen] = useState(false);
   const [greeting, setGreeting] = useState("Hallo");
   const [displayName, setDisplayName] = useState("Philipp");
   const [displayAvatar, setDisplayAvatar] = useState<string | null>(null);
@@ -228,8 +232,23 @@ export default function DashboardPage() {
     document.getElementById("features")?.scrollIntoView({ behavior: "smooth" });
   }
 
+  async function handleLogout() {
+    const supabase = getBrowserClient();
+    if (supabase) await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  }
+
+  function openFeatures() {
+    setFeaturesOpen(true);
+  }
+
+  function closeFeatures() {
+    setFeaturesOpen(false);
+  }
+
   return (
-    <div ref={pageRef} className="min-h-screen bg-[#1a1814]" style={sans}>
+    <div ref={pageRef} className="min-h-screen bg-[#1a1814] flex flex-col" style={sans}>
       <style>{`
         @media (prefers-reduced-motion: no-preference) {
           .claaro-tile {
@@ -254,8 +273,11 @@ export default function DashboardPage() {
           }
         }
       `}</style>
+      {/* ── First viewport (exactly 100vh) ────────────────────────────────── */}
+      <div className="h-screen flex flex-col overflow-hidden">
+
       {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <header className="border-b border-white/10 sticky top-0 z-30 bg-[#1a1814]">
+      <header className="border-b border-white/10 z-30 bg-[#1a1814]">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center gap-4">
           <span
             className="text-xl font-bold text-[#c84b2f] tracking-tight flex-none"
@@ -333,7 +355,7 @@ export default function DashboardPage() {
                   ) : (
                     <button
                       key={label}
-                      onClick={() => setAccountOpen(false)}
+                      onClick={() => { setAccountOpen(false); if (danger) handleLogout(); }}
                       className={`w-full text-left px-4 py-2.5 text-sm transition-colors hover:bg-white/5 ${
                         danger ? "text-[#c84b2f] border-t border-white/10 mt-1 pt-3" : "text-white/70 hover:text-white"
                       }`}
@@ -348,10 +370,13 @@ export default function DashboardPage() {
         </div>
       </header>
 
+      {/* ── Above-fold wrapper (fills viewport below header) ──────────────── */}
+      <div className="flex-1 flex flex-col">
+
       {/* ── Hero ───────────────────────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-6 py-24 text-center">
+      <section className="max-w-6xl mx-auto px-6 py-10 text-center">
         <h1
-          className="text-5xl lg:text-6xl text-white leading-tight mb-6"
+          className="text-6xl lg:text-7xl text-white leading-tight mb-12"
           style={serif}
         >
           <span ref={heroLine1Ref} className="block">Weniger Bürokratie.</span>
@@ -359,117 +384,31 @@ export default function DashboardPage() {
         </h1>
         <p
           ref={heroSubRef}
-          className="text-white/60 text-lg max-w-xl mx-auto mb-10 leading-relaxed"
+          className="text-white/60 text-lg max-w-xl mx-auto mb-12 leading-relaxed"
         >
-          claaro vereinfacht den Alltag von Handwerksbetrieben und
-          Unternehmen.
+          Angebote in 60 Sekunden erstellen, mit automatischem Mahnwesen.
         </p>
         <button
           ref={heroBtnRef}
-          onClick={scrollToFeatures}
+          onClick={openFeatures}
           className="bg-[#c84b2f] text-white px-7 py-3.5 rounded-lg font-semibold text-base hover:bg-[#b03f25] transition-colors"
         >
           Jetzt starten
         </button>
       </section>
 
-      {/* ── Stats bar ──────────────────────────────────────────────────────── */}
-      <div className="bg-white/5 border-y border-white/10">
-        <div className="max-w-6xl mx-auto px-6">
-          {/* Desktop */}
-          <div className="hidden lg:flex items-stretch">
-            {stats.map(({ value, label }, i) => (
-              <div
-                key={value}
-                ref={(el) => { statsDesktopRefs.current[i] = el; }}
-                className={`flex-1 flex flex-col items-center px-8 py-8 ${
-                  i < stats.length - 1 ? "border-r border-white/10" : ""
-                }`}
-              >
-                <span className="text-white font-bold text-xl mb-1">
-                  {value}
-                </span>
-                <span className="text-white/40 text-sm">{label}</span>
-              </div>
-            ))}
-          </div>
-          {/* Mobile */}
-          <div className="grid grid-cols-2 lg:hidden">
-            {stats.map(({ value, label }, i) => (
-              <div
-                key={value}
-                className={`flex flex-col items-center px-4 py-6 ${
-                  i % 2 !== 0 ? "border-l border-white/10" : ""
-                } ${i >= 2 ? "border-t border-white/10" : ""}`}
-              >
-                <span className="text-white font-bold text-base mb-0.5">
-                  {value}
-                </span>
-                <span className="text-white/40 text-xs text-center">
-                  {label}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* ── Feature tiles ──────────────────────────────────────────────────── */}
-      <section id="features" className="max-w-6xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {tiles.map(({ id, icon, name, description, available }, i) => (
-            <Link
-              key={id}
-              href={`/dashboard/${id}`}
-              ref={(el) => { tileRefs.current[i] = el; }}
-              className={`claaro-tile relative text-left rounded-xl border p-6 transition-all ${
-                available
-                  ? "bg-white/5 border-white/10 hover:bg-white/[0.08] hover:border-white/20"
-                  : "bg-white/[0.02] border-white/[0.06] hover:bg-white/5 hover:border-white/10"
-              }`}
-            >
-              {!available && (
-                <span className="absolute top-3 right-3 text-[10px] font-medium bg-white/10 text-white/40 px-2 py-0.5 rounded-full border border-white/10">
-                  Bald verfügbar
-                </span>
-              )}
-              <span
-                className={`claaro-tile-icon inline-block text-2xl mb-3 ${
-                  !available ? "opacity-40" : ""
-                }`}
-              >
-                {icon}
-              </span>
-              <h3
-                className={`font-semibold text-sm mb-1.5 ${
-                  available ? "text-white" : "text-white/30"
-                }`}
-              >
-                {name}
-              </h3>
-              <p
-                className={`text-xs leading-relaxed ${
-                  available ? "text-white/50" : "text-white/20"
-                }`}
-              >
-                {description}
-              </p>
-            </Link>
-          ))}
-        </div>
-      </section>
-
       {/* ── Was ist claaro? ────────────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-6 pb-20">
+      <div className="flex-1 flex items-center">
+      <section className="w-full max-w-6xl mx-auto px-6 py-6 -translate-y-8">
         <div
           ref={aboutRef}
-          className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start"
+          className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center"
         >
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-4 -translate-y-16">
             <div className="hidden md:block">
               <svg
-                width="180"
-                height="180"
+                width="130"
+                height="130"
                 viewBox="0 0 180 180"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
@@ -550,12 +489,102 @@ export default function DashboardPage() {
             </h2>
           </div>
           <p className="text-white/60 text-base leading-relaxed">
-            claaro ist eine Softwarelösung für Unternehmen und
-            Handwerksbetriebe. Sie bündelt die wichtigsten Alltagsaufgaben —
-            von Angeboten über Mahnungen bis zum Dienstplan — in einer
-            übersichtlichen Oberfläche. Weniger Aufwand, mehr Zeit fürs
-            Wesentliche.
+            Claaro vereinfacht den Alltag von Handwerksbetrieben und
+            Unternehmen. Die Software-Lösung bündelt die wichtigsten
+            Alltagsaufgaben – von Angeboten über Mahnungen bis zum Dienstplan —
+            in einer übersichtlichen Oberfläche. Weniger Aufwand, mehr Zeit
+            fürs Wesentliche.
           </p>
+        </div>
+      </section>
+      </div>{/* end centering wrapper */}
+
+      {/* ── Stats bar ──────────────────────────────────────────────────────── */}
+      <div className="bg-white/5 border-y border-white/10 -translate-y-10">
+        <div className="max-w-6xl mx-auto px-6">
+          {/* Desktop */}
+          <div className="hidden lg:flex items-stretch">
+            {stats.map(({ value, label }, i) => (
+              <div
+                key={value}
+                ref={(el) => { statsDesktopRefs.current[i] = el; }}
+                className={`flex-1 flex flex-col items-center px-8 py-5 ${
+                  i < stats.length - 1 ? "border-r border-white/10" : ""
+                }`}
+              >
+                <span className="text-white font-bold text-xl mb-1">
+                  {value}
+                </span>
+                <span className="text-white/40 text-sm">{label}</span>
+              </div>
+            ))}
+          </div>
+          {/* Mobile */}
+          <div className="grid grid-cols-2 lg:hidden">
+            {stats.map(({ value, label }, i) => (
+              <div
+                key={value}
+                className={`flex flex-col items-center px-4 py-6 ${
+                  i % 2 !== 0 ? "border-l border-white/10" : ""
+                } ${i >= 2 ? "border-t border-white/10" : ""}`}
+              >
+                <span className="text-white font-bold text-base mb-0.5">
+                  {value}
+                </span>
+                <span className="text-white/40 text-xs text-center">
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      </div>{/* end above-fold wrapper */}
+      </div>{/* end first viewport */}
+
+      {/* ── Feature tiles ──────────────────────────────────────────────────── */}
+      <section id="features" className="max-w-6xl mx-auto px-6 py-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {tiles.map(({ id, icon, name, description, available }, i) => (
+            <Link
+              key={id}
+              href={`/dashboard/${id}`}
+              ref={(el) => { tileRefs.current[i] = el; }}
+              className={`claaro-tile relative text-left rounded-xl border p-6 transition-all ${
+                available
+                  ? "bg-white/5 border-white/10 hover:bg-white/[0.08] hover:border-white/20"
+                  : "bg-white/[0.02] border-white/[0.06] hover:bg-white/5 hover:border-white/10"
+              }`}
+            >
+              {!available && (
+                <span className="absolute top-3 right-3 text-[10px] font-medium bg-white/10 text-white/40 px-2 py-0.5 rounded-full border border-white/10">
+                  Bald verfügbar
+                </span>
+              )}
+              <span
+                className={`claaro-tile-icon inline-block text-2xl mb-3 ${
+                  !available ? "opacity-40" : ""
+                }`}
+              >
+                {icon}
+              </span>
+              <h3
+                className={`font-semibold text-sm mb-1.5 ${
+                  available ? "text-white" : "text-white/30"
+                }`}
+              >
+                {name}
+              </h3>
+              <p
+                className={`text-xs leading-relaxed ${
+                  available ? "text-white/50" : "text-white/20"
+                }`}
+              >
+                {description}
+              </p>
+            </Link>
+          ))}
         </div>
       </section>
 
@@ -662,6 +691,51 @@ export default function DashboardPage() {
           ?
         </button>
       </div>
+
+      {/* ── Features Modal ─────────────────────────────────────────────────── */}
+      {featuresOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-6"
+          style={{ backgroundColor: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)" }}
+          onClick={closeFeatures}
+        >
+          <div
+            className="relative w-full max-w-3xl bg-[#1a1814] border border-white/10 rounded-2xl p-8 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl text-white" style={serif}>
+                Was kann claaro?
+              </h2>
+              <button
+                onClick={closeFeatures}
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors"
+                aria-label="Schließen"
+              >
+                <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4">
+                  <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              </button>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {tiles.map(({ id, icon, name, description }) => (
+                <Link
+                  key={id}
+                  href={`/dashboard/${id}`}
+                  onClick={closeFeatures}
+                  className="claaro-tile flex flex-col gap-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/[0.08] hover:border-white/20 p-5 transition-all text-left"
+                >
+                  <span className="claaro-tile-icon text-2xl">{icon}</span>
+                  <div>
+                    <p className="text-white text-sm font-semibold mb-1">{name}</p>
+                    <p className="text-white/50 text-xs leading-relaxed">{description}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

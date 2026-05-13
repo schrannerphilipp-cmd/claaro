@@ -13,20 +13,21 @@ export default function ClientProviders({ children }: { children: React.ReactNod
     <>
       {children}
 
-      {/* Feedback-Button — dezent, global auf allen Seiten */}
+      {/* Feedback-Button — global auf allen Seiten */}
       <button
         onClick={() => setFeedbackOpen(true)}
-        className="fixed bottom-6 left-6 z-40 flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition-all hover:scale-105"
+        className="fixed bottom-6 left-6 z-40 flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-full border transition-all hover:scale-105 hover:brightness-110"
         style={{
           ...sans,
-          backgroundColor: "rgba(26,24,20,0.85)",
-          borderColor: "rgba(255,255,255,0.12)",
-          color: "rgba(255,255,255,0.4)",
+          backgroundColor: "rgba(200,75,47,0.15)",
+          borderColor: "rgba(200,75,47,0.5)",
+          color: "#e8705a",
           backdropFilter: "blur(8px)",
+          boxShadow: "0 0 16px rgba(200,75,47,0.2)",
         }}
         aria-label="Feedback senden"
       >
-        <svg className="w-3 h-3" fill="none" viewBox="0 0 16 16">
+        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 16 16">
           <path d="M2 3h12a1 1 0 011 1v7a1 1 0 01-1 1H5l-3 2V4a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
         </svg>
         Feedback

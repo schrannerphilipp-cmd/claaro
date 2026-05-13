@@ -1,12 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import emailjs from "@emailjs/browser";
+
+const EMAILJS_SERVICE_ID  = "service_8b5ibjd";
+const EMAILJS_TEMPLATE_ID = "template_emiu248";
+const EMAILJS_PUBLIC_KEY  = "EfcnQ7wc4gnfWtpt5";
 
 const sans = { fontFamily: "var(--font-dm-sans)" } as const;
 const serif = { fontFamily: "var(--font-dm-serif)" } as const;
 
 const inputClass =
-  "w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-white/30 transition-colors";
+  "w-full bg-[#2a2620] border border-white/15 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-white/30 transition-colors";
 const labelClass = "block text-xs text-white/40 mb-1";
 
 const KATEGORIEN = ["Fehler melden", "Funktion vorschlagen", "Lob", "Sonstiges"];
@@ -21,6 +26,8 @@ export default function FeedbackModal({ open, onClose }: Props) {
   const [email, setEmail] = useState("");
   const [kategorie, setKategorie] = useState(KATEGORIEN[0]);
   const [nachricht, setNachricht] = useState("");
+  const [sterne, setSterne] = useState(0);
+  const [sterneHover, setSterneHover] = useState(0);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,19 +51,21 @@ export default function FeedbackModal({ open, onClose }: Props) {
     setError(null);
     setLoading(true);
     try {
-      const res = await fetch("/api/feedback", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, kategorie, nachricht }),
-      });
-      if (!res.ok) {
-        const d = await res.json().catch(() => ({}));
-        throw new Error((d as { error?: string }).error ?? "Fehler beim Senden.");
-      }
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          email,
+          kategorie,
+          nachricht,
+          sterne: sterne ? `${"★".repeat(sterne)}${"☆".repeat(5 - sterne)} (${sterne}/5)` : "Keine Bewertung",
+        },
+        EMAILJS_PUBLIC_KEY,
+      );
       setSuccess(true);
-      setTimeout(() => { onClose(); setSuccess(false); setNachricht(""); }, 2500);
+      setTimeout(() => { onClose(); setSuccess(false); setNachricht(""); setSterne(0); }, 2500);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unbekannter Fehler.");
+      setError(err instanceof Error ? err.message : "E-Mail konnte nicht gesendet werden.");
     } finally {
       setLoading(false);
     }
@@ -140,6 +149,36 @@ export default function FeedbackModal({ open, onClose }: Props) {
                     <option key={k} value={k}>{k}</option>
                   ))}
                 </select>
+              </div>
+
+              <div>
+                <label className={labelClass}>Bewertung</label>
+                <div className="flex gap-1.5 mt-1">
+                  {[1, 2, 3, 4, 5].map((n) => {
+                    const filled = n <= (sterneHover || sterne);
+                    return (
+                      <button
+                        key={n}
+                        type="button"
+                        onClick={() => setSterne(n)}
+                        onMouseEnter={() => setSterneHover(n)}
+                        onMouseLeave={() => setSterneHover(0)}
+                        aria-label={`${n} Stern${n > 1 ? "e" : ""}`}
+                        className="transition-transform hover:scale-110"
+                      >
+                        <svg
+                          className="w-7 h-7 transition-colors duration-100"
+                          viewBox="0 0 24 24"
+                          fill={filled ? "#c84b2f" : "none"}
+                          stroke={filled ? "#c84b2f" : "rgba(255,255,255,0.2)"}
+                          strokeWidth="1.5"
+                        >
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                        </svg>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               <div>

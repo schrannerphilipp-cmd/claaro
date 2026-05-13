@@ -19,9 +19,9 @@ alter table company_settings enable row level security;
 create policy "own_company_settings" on company_settings
   for all using (hauptaccount_id = auth.uid());
 
--- Supabase Storage Bucket: company-logos
+-- Supabase Storage Bucket: claaro logos
 -- Manuell im Supabase Dashboard anlegen:
---   Storage → New bucket → Name: "company-logos" → Public: true
+--   Storage → New bucket → Name: "claaro logos" → Public: true
 --   Allowed MIME types: image/png, image/jpeg, image/svg+xml
 --   Max file size: 5242880 (5 MB)
 

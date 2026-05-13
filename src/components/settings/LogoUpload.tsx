@@ -5,8 +5,7 @@ import { getBrowserClient, supabaseConfigured } from "@/lib/supabase";
 
 const sans = { fontFamily: "var(--font-dm-sans)" } as const;
 
-const HAUPTACCOUNT_ID = process.env.NEXT_PUBLIC_SUPABASE_HAUPTACCOUNT_ID ?? "";
-const BUCKET = "company-logos";
+const BUCKET = "claaro logos";
 const MAX_SIZE = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/svg+xml"];
 const LOGO_LS_KEY = "claaro-logo-url";
@@ -38,14 +37,23 @@ export default function LogoUpload({ onLogoChange }: Props) {
     }
 
     if (!supabaseConfigured) {
-      setError("Supabase nicht konfiguriert. Bitte Credentials in .env.local eintragen.");
+      setError("Supabase nicht konfiguriert – NEXT_PUBLIC_SUPABASE_URL und NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local prüfen.");
       return;
     }
     setUploading(true);
     try {
       const supabase = getBrowserClient()!;
+
+      // User-ID ermitteln
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setError("Nicht eingeloggt – bitte zuerst anmelden.");
+        setUploading(false);
+        return;
+      }
+
       const ext = file.name.split(".").pop() ?? "png";
-      const path = `${HAUPTACCOUNT_ID}/logo.${ext}`;
+      const path = `${user.id}/logo.${ext}`;
 
       const { error: uploadError } = await supabase.storage
         .from(BUCKET)
@@ -56,17 +64,11 @@ export default function LogoUpload({ onLogoChange }: Props) {
       const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
       const url = data.publicUrl + `?t=${Date.now()}`;
 
-      // In company_settings speichern
-      await supabase.from("company_settings").upsert(
-        { hauptaccount_id: HAUPTACCOUNT_ID, logo_url: url, logo_path: path },
-        { onConflict: "hauptaccount_id" }
-      );
-
-      // Lokal cachen
       localStorage.setItem(LOGO_LS_KEY, url);
       setLogoUrl(url);
       onLogoChange?.(url);
     } catch (err) {
+      console.error("[LogoUpload] Fehler:", err);
       setError(err instanceof Error ? err.message : "Upload fehlgeschlagen.");
     } finally {
       setUploading(false);
@@ -78,15 +80,16 @@ export default function LogoUpload({ onLogoChange }: Props) {
     setUploading(true);
     try {
       const supabase = getBrowserClient()!;
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
       const ext = logoUrl.includes(".svg") ? "svg" : logoUrl.includes(".jpg") || logoUrl.includes(".jpeg") ? "jpg" : "png";
-      await supabase.storage.from(BUCKET).remove([`${HAUPTACCOUNT_ID}/logo.${ext}`]);
-      await supabase.from("company_settings")
-        .update({ logo_url: null, logo_path: null })
-        .eq("hauptaccount_id", HAUPTACCOUNT_ID);
+      await supabase.storage.from(BUCKET).remove([`${user.id}/logo.${ext}`]);
       localStorage.removeItem(LOGO_LS_KEY);
       setLogoUrl(null);
       onLogoChange?.(null);
-    } catch {/* ignore */} finally {
+    } catch (err) {
+      console.error("[LogoUpload] Löschen Fehler:", err);
+    } finally {
       setUploading(false);
     }
   }

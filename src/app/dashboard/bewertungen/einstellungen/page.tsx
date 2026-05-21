@@ -144,7 +144,6 @@ export default function EinstellungenPage() {
                   }
                   className={`${inputClass} appearance-none`}
                 >
-                  <option value="whatsapp">WhatsApp</option>
                   <option value="sms">SMS</option>
                 </select>
               </div>
@@ -206,13 +205,13 @@ export default function EinstellungenPage() {
                   ? {
                       borderColor: "var(--c-teal)",
                       color: "var(--c-teal)",
-                      backgroundColor: "rgba(30,122,107,0.1)",
+                      backgroundColor: "rgba(var(--c-teal-rgb),0.1)",
                     }
                   : testStatus === "error"
                   ? {
                       borderColor: "var(--c-accent)",
                       color: "var(--c-accent)",
-                      backgroundColor: "rgba(200,75,47,0.1)",
+                      backgroundColor: "rgba(var(--c-accent-rgb),0.1)",
                     }
                   : settings.testPhone.trim() && testStatus !== "sending"
                   ? {

@@ -132,7 +132,7 @@ export default function StepBuilder({ template, onUpdate }: StepBuilderProps) {
           <button
             onClick={() => { setAddingStep(true); setSelectedId(null); }}
             className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-medium transition-colors"
-            style={{ backgroundColor: "rgba(30,122,107,0.2)", color: "var(--c-teal)" }}
+            style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.2)", color: "var(--c-teal)" }}
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 14 14">
               <path d="M7 2v10M2 7h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
@@ -281,7 +281,7 @@ function StepEditorPanel({ step, onUpdate }: StepEditorPanelProps) {
                 className="w-4 h-4 rounded border flex items-center justify-center transition-colors"
                 style={{
                   borderColor: step.isRequired ? "var(--c-accent)" : "rgba(255,255,255,0.2)",
-                  backgroundColor: step.isRequired ? "rgba(200,75,47,0.2)" : "transparent",
+                  backgroundColor: step.isRequired ? "rgba(var(--c-accent-rgb),0.2)" : "transparent",
                 }}
               >
                 {step.isRequired && (

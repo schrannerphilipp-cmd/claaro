@@ -148,7 +148,7 @@ export default function ReviewCard({
                   className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
                   style={
                     !submitting && responseText.trim()
-                      ? { backgroundColor: "rgba(30,122,107,0.25)", color: "var(--c-teal)" }
+                      ? { backgroundColor: "rgba(var(--c-teal-rgb),0.25)", color: "var(--c-teal)" }
                       : { backgroundColor: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.25)", cursor: "not-allowed" }
                   }
                 >

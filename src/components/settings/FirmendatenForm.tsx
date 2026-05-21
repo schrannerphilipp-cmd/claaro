@@ -212,8 +212,8 @@ export default function FirmendatenForm() {
           disabled={saving}
           className="w-full text-sm py-2.5 rounded-lg border transition-all disabled:opacity-40"
           style={{
-            backgroundColor: saved ? "rgba(30,122,107,0.2)" : "rgba(200,75,47,0.15)",
-            borderColor:     saved ? "rgba(30,122,107,0.4)" : "rgba(200,75,47,0.35)",
+            backgroundColor: saved ? "rgba(var(--c-teal-rgb),0.2)" : "rgba(var(--c-accent-rgb),0.15)",
+            borderColor:     saved ? "rgba(var(--c-teal-rgb),0.4)" : "rgba(var(--c-accent-rgb),0.35)",
             color:           saved ? "var(--c-teal)"        : "var(--c-accent)",
           }}
         >

@@ -103,7 +103,7 @@ export default function FeedbackModal({ open, onClose }: Props) {
             <div className="py-8 text-center">
               <div
                 className="w-12 h-12 rounded-full mx-auto flex items-center justify-center mb-4"
-                style={{ backgroundColor: "rgba(30,122,107,0.2)" }}
+                style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.2)" }}
               >
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" style={{ color: "var(--c-teal)" }}>
                   <path d="M5 12l4 4L19 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -169,8 +169,8 @@ export default function FeedbackModal({ open, onClose }: Props) {
                         <svg
                           className="w-7 h-7 transition-colors duration-100"
                           viewBox="0 0 24 24"
-                          fill={filled ? "#c84b2f" : "none"}
-                          stroke={filled ? "#c84b2f" : "rgba(255,255,255,0.2)"}
+                          fill={filled ? "var(--c-accent)" : "none"}
+                          stroke={filled ? "var(--c-accent)" : "rgba(255,255,255,0.2)"}
                           strokeWidth="1.5"
                         >
                           <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
@@ -207,8 +207,8 @@ export default function FeedbackModal({ open, onClose }: Props) {
                 disabled={loading || nachricht.trim().length < 20}
                 className="w-full flex items-center justify-center gap-2 text-sm py-2.5 rounded-lg border transition-colors disabled:opacity-40"
                 style={{
-                  backgroundColor: "rgba(200,75,47,0.2)",
-                  borderColor: "rgba(200,75,47,0.4)",
+                  backgroundColor: "rgba(var(--c-accent-rgb),0.2)",
+                  borderColor: "rgba(var(--c-accent-rgb),0.4)",
                   color: "var(--c-accent)",
                 }}
               >

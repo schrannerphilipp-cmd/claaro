@@ -67,7 +67,7 @@ export default function OnboardingOverviewPage() {
             <Link
               href="/dashboard/onboarding/templates/new"
               className="flex items-center gap-2 text-sm px-4 py-2.5 rounded-lg font-medium transition-colors"
-              style={{ backgroundColor: "rgba(30,122,107,0.25)", color: "var(--c-teal)" }}
+              style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.25)", color: "var(--c-teal)" }}
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16">
                 <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>

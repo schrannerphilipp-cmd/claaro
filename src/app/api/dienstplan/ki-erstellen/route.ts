@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (!process.env.ANTHROPIC_API_KEY) {
-    return NextResponse.json({ error: "ANTHROPIC_API_KEY nicht konfiguriert." }, { status: 503 });
+    return NextResponse.json({ error: "⚡ KI-Schichtplan ist in Vorbereitung — steht in Kürze bereit." }, { status: 503 });
   }
 
   const supabase = createServerClient();

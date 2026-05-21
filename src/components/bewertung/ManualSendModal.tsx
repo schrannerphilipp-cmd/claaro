@@ -60,6 +60,7 @@ export default function ManualSendModal({
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [dsgvoChecked, setDsgvoChecked] = useState(false);
 
   const selectedTemplate = requestTemplates.find((t) => t.id === templateId);
   const selectedPlatform = activePlatforms.find((p) => p.id === platformId);
@@ -148,25 +149,14 @@ export default function ManualSendModal({
               </div>
             </div>
 
-            {/* Channel selector */}
+            {/* Channel */}
             <div>
               <label className={labelClass}>Kanal</label>
               <div className="flex gap-2">
-                {(["whatsapp", "sms"] as Channel[]).map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    onClick={() => setChannel(c)}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-colors ${
-                      channel === c
-                        ? "border-white/20 bg-white/10 text-white"
-                        : "border-white/10 bg-white/5 text-white/40 hover:text-white/70"
-                    }`}
-                  >
-                    <ChannelBadge channel={c} />
-                    {c === "whatsapp" ? "WhatsApp" : "SMS"}
-                  </button>
-                ))}
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-white/20 bg-white/10 text-white text-sm">
+                  <ChannelBadge channel={channel} />
+                  SMS
+                </div>
               </div>
             </div>
 
@@ -200,16 +190,19 @@ export default function ManualSendModal({
             </div>
 
             {/* Live preview */}
-            {preview && (
-              <div className="bg-white/5 border border-white/10 rounded-xl p-3">
-                <p className="text-[10px] text-white/30 mb-1.5 uppercase tracking-wider">Vorschau</p>
-                <p className="text-xs text-white/70 leading-relaxed whitespace-pre-wrap">{preview}</p>
-              </div>
-            )}
+            <div className="bg-white/5 border border-white/10 rounded-xl p-3">
+              <p className="text-[10px] text-white/30 mb-1.5 uppercase tracking-wider">Vorschau</p>
+              <p className="text-xs text-white/70 leading-relaxed whitespace-pre-wrap">
+                {preview || `Hallo ${name || "Kunde"}, vielen Dank für Ihren Besuch! Wir würden uns sehr über Ihre Bewertung freuen.`}
+              </p>
+            </div>
 
             {activePlatforms.length === 0 && (
-              <p className="text-xs text-[var(--c-accent)] bg-[var(--c-accent)]/10 px-3 py-2 rounded-lg">
-                Keine aktiven Plattformen konfiguriert. Bitte zuerst eine Plattform mit URL einrichten.
+              <p className="text-xs text-[#c84b2f]">
+                Keine Plattform konfiguriert.{" "}
+                <a href="/dashboard/bewertungen/einstellungen" className="underline hover:opacity-80">
+                  Jetzt einrichten →
+                </a>
               </p>
             )}
 
@@ -218,6 +211,11 @@ export default function ManualSendModal({
                 {error}
               </p>
             )}
+
+            <label className="flex items-start gap-2 text-xs text-white/60 cursor-pointer mt-3">
+              <input type="checkbox" className="mt-0.5 accent-[#c84b2f]" checked={dsgvoChecked} onChange={e => setDsgvoChecked(e.target.checked)} />
+              <span>Der Kunde hat der Kontaktaufnahme ausdrücklich zugestimmt (DSGVO / UWG).</span>
+            </label>
 
             <div className="flex items-center gap-3 pt-1">
               <button
@@ -229,15 +227,22 @@ export default function ManualSendModal({
               </button>
               <button
                 type="submit"
-                disabled={sending || activePlatforms.length === 0}
+                disabled={sending || activePlatforms.length === 0 || !dsgvoChecked}
                 className="flex-1 py-2 rounded-lg text-sm font-medium transition-colors"
                 style={
-                  !sending && activePlatforms.length > 0
-                    ? { backgroundColor: "rgba(30,122,107,0.3)", color: "var(--c-teal)" }
+                  !sending && activePlatforms.length > 0 && dsgvoChecked
+                    ? { backgroundColor: "rgba(var(--c-teal-rgb),0.3)", color: "var(--c-teal)" }
                     : { backgroundColor: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.25)", cursor: "not-allowed" }
                 }
               >
-                {sending ? "Wird gesendet…" : "Anfrage senden"}
+                {sending ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 16 16">
+                    <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="2" strokeDasharray="20" strokeDashoffset="10" strokeLinecap="round"/>
+                  </svg>
+                  Wird gesendet…
+                </span>
+              ) : "Anfrage senden"}
               </button>
             </div>
           </form>

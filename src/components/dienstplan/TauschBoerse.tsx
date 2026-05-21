@@ -179,7 +179,7 @@ export default function TauschBoerse({ employeeId, hauptaccountId, isAdmin, mySh
                         onClick={() => gegenangebot(swap.id)}
                         disabled={!selectedCounterShift}
                         className="text-xs px-3 py-1.5 rounded-lg border disabled:opacity-40"
-                        style={{ backgroundColor: "rgba(30,122,107,0.2)", borderColor: "rgba(30,122,107,0.4)", color: "var(--c-teal)" }}
+                        style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.2)", borderColor: "rgba(var(--c-teal-rgb),0.4)", color: "var(--c-teal)" }}
                       >
                         Gegenangebot machen
                       </button>
@@ -239,14 +239,14 @@ export default function TauschBoerse({ employeeId, hauptaccountId, isAdmin, mySh
                         <button
                           onClick={() => adminEntscheiden(swap.id, "genehmigen")}
                           className="text-xs px-3 py-1.5 rounded-lg border"
-                          style={{ backgroundColor: "rgba(30,122,107,0.2)", borderColor: "rgba(30,122,107,0.4)", color: "var(--c-teal)" }}
+                          style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.2)", borderColor: "rgba(var(--c-teal-rgb),0.4)", color: "var(--c-teal)" }}
                         >
                           Genehmigen
                         </button>
                         <button
                           onClick={() => adminEntscheiden(swap.id, "ablehnen")}
                           className="text-xs px-3 py-1.5 rounded-lg border"
-                          style={{ backgroundColor: "rgba(200,75,47,0.1)", borderColor: "rgba(200,75,47,0.3)", color: "var(--c-accent)" }}
+                          style={{ backgroundColor: "rgba(var(--c-accent-rgb),0.1)", borderColor: "rgba(var(--c-accent-rgb),0.3)", color: "var(--c-accent)" }}
                         >
                           Ablehnen
                         </button>

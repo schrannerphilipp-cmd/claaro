@@ -17,6 +17,8 @@ export default function TemplateBuilderPage() {
   const [local, setLocal] = useState<OnboardTemplate | null>(null);
   const [savedLabel, setSavedLabel] = useState<"idle" | "saving" | "saved">("idle");
   const autoRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const didAutoFocus = useRef(false);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -40,6 +42,15 @@ export default function TemplateBuilderPage() {
     autoRef.current = setInterval(save, 30_000);
     return () => { if (autoRef.current) clearInterval(autoRef.current); };
   }, [save]);
+
+  useEffect(() => {
+    if (!local || didAutoFocus.current) return;
+    didAutoFocus.current = true;
+    if (local.title === "Neues Template" || local.title === "") {
+      nameInputRef.current?.focus();
+      nameInputRef.current?.select();
+    }
+  }, [local]);
 
   function handleUpdate(patch: Partial<OnboardTemplate>) {
     setLocal((prev) => (prev ? { ...prev, ...patch } : prev));
@@ -80,10 +91,11 @@ export default function TemplateBuilderPage() {
 
           {/* Inline title */}
           <input
+            ref={nameInputRef}
             value={local.title}
             onChange={(e) => handleUpdate({ title: e.target.value })}
             className="flex-1 bg-transparent text-sm font-medium text-white placeholder-white/30 focus:outline-none min-w-0"
-            placeholder="Template-Titel…"
+            placeholder="z.B. Neue Mitarbeiter Einarbeitung"
           />
 
           {/* Role */}
@@ -115,7 +127,7 @@ export default function TemplateBuilderPage() {
           <button
             onClick={save}
             className="shrink-0 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
-            style={{ backgroundColor: "rgba(30,122,107,0.25)", color: "var(--c-teal)" }}
+            style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.25)", color: "var(--c-teal)" }}
           >
             {savedLabel === "saving" ? "Speichert…" : savedLabel === "saved" ? "Gespeichert ✓" : "Speichern"}
           </button>

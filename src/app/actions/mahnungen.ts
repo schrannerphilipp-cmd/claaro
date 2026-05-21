@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { sendDunningEmail } from "@/lib/email";
-import { sendWhatsAppMessage } from "@/lib/whatsapp";
 
 const STUFE_MIN_DAYS: Record<1 | 2 | 3, number> = { 1: 1, 2: 7, 3: 14 };
 
@@ -19,7 +18,7 @@ type MandatResult =
 
 export async function sendMahnung(
   rechnungId: string,
-  kanal: "email" | "whatsapp",
+  kanal: "email",
   sepaEnabled: boolean
 ): Promise<SendResult> {
   try {
@@ -84,16 +83,72 @@ export async function sendMahnung(
       sepaEnabled,
     };
 
-    if (kanal === "email") {
-      await sendDunningEmail({ to: rechnung.kunde.email, ...params });
-    } else {
-      await sendWhatsAppMessage({ to: rechnung.kunde.phone, ...params });
-    }
+    await sendDunningEmail({ to: rechnung.kunde.email, ...params });
 
     revalidatePath("/dashboard/mahnungen");
     return { success: true, stufe: nextStufe };
   } catch (err) {
     console.error("[sendMahnung]", err);
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Ein unbekannter Fehler ist aufgetreten.",
+    };
+  }
+}
+
+// ── Create Rechnung ──────────────────────────────────────────────────────────
+
+type CreateRechnungResult =
+  | { success: true; rechnungsnummer: string }
+  | { success: false; error: string };
+
+export async function createRechnung(data: {
+  kundenname: string;
+  kundenemail: string;
+  betrag: number;
+  faelligkeitsdatum: string;
+  rechnungsnummer: string;
+  beschreibung: string;
+  mwstSatz: number;
+}): Promise<CreateRechnungResult> {
+  try {
+    if (!data.kundenname.trim()) return { success: false, error: "Kundenname ist erforderlich." };
+    if (!data.kundenemail.trim() || !data.kundenemail.includes("@"))
+      return { success: false, error: "Bitte eine gültige E-Mail-Adresse eingeben." };
+    if (!data.betrag || data.betrag <= 0) return { success: false, error: "Betrag muss größer als 0 sein." };
+    if (!data.faelligkeitsdatum) return { success: false, error: "Fälligkeitsdatum ist erforderlich." };
+    if (!data.rechnungsnummer.trim()) return { success: false, error: "Rechnungsnummer ist erforderlich." };
+    if (!data.beschreibung.trim()) return { success: false, error: "Leistungsbeschreibung ist erforderlich." };
+
+    const dateParts = data.faelligkeitsdatum.split("-").map(Number);
+    const faellig = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+    if (isNaN(faellig.getTime())) return { success: false, error: "Ungültiges Fälligkeitsdatum." };
+
+    const kunde = await db.kunde.create({
+      data: {
+        name: data.kundenname.trim(),
+        email: data.kundenemail.trim().toLowerCase(),
+        phone: "",
+        address: "",
+      },
+    });
+
+    await db.rechnung.create({
+      data: {
+        kundeId: kunde.id,
+        betrag: data.betrag,
+        faelligkeitsdatum: faellig,
+        rechnungsnummer: data.rechnungsnummer.trim(),
+        beschreibung: data.beschreibung.trim(),
+        mwstSatz: data.mwstSatz,
+        status: "offen",
+      },
+    });
+
+    revalidatePath("/dashboard/mahnungen");
+    return { success: true, rechnungsnummer: data.rechnungsnummer.trim() };
+  } catch (err) {
+    console.error("[createRechnung]", err);
     return {
       success: false,
       error: err instanceof Error ? err.message : "Ein unbekannter Fehler ist aufgetreten.",

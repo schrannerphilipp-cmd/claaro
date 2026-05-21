@@ -171,7 +171,7 @@ export default function PlatformConfigurator({
               onClick={handleAdd}
               disabled={!newName.trim() || !newUrl.trim()}
               className="flex-1 py-2 text-sm rounded-lg transition-colors"
-              style={{ backgroundColor: "rgba(30,122,107,0.25)", color: "var(--c-teal)" }}
+              style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.25)", color: "var(--c-teal)" }}
             >
               Hinzufügen
             </button>

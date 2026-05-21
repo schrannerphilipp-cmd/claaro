@@ -19,11 +19,11 @@ export default function ClientProviders({ children }: { children: React.ReactNod
         className="fixed bottom-6 left-6 z-40 flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-full border transition-all hover:scale-105 hover:brightness-110"
         style={{
           ...sans,
-          backgroundColor: "rgba(200,75,47,0.15)",
-          borderColor: "rgba(200,75,47,0.5)",
+          backgroundColor: "rgba(var(--c-accent-rgb),0.15)",
+          borderColor: "rgba(var(--c-accent-rgb),0.5)",
           color: "#e8705a",
           backdropFilter: "blur(8px)",
-          boxShadow: "0 0 16px rgba(200,75,47,0.2)",
+          boxShadow: "0 0 16px rgba(var(--c-accent-rgb),0.2)",
         }}
         aria-label="Feedback senden"
       >

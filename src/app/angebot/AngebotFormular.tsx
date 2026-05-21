@@ -44,13 +44,16 @@ function parseDecimal(v: string) {
 function neueLeistung(): Leistung {
   return { id: crypto.randomUUID(), beschreibung: "", menge: "1", einheit: "Stück", einzelpreis: "", mwst: 19 };
 }
+function toTitleCase(str: string): string {
+  return str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+}
 
 const SCHRITTE = ["Kundendaten", "Leistungen", "Vorschau"];
 
 const inputClass =
-  "w-full border border-[#1a1814]/20 rounded-lg px-3.5 py-2.5 text-sm text-[#1a1814] placeholder:text-[#1a1814]/30 bg-white focus:outline-none focus:ring-2 focus:ring-[#c84b2f] focus:border-transparent";
+  "w-full border border-[#1a1814]/20 rounded-lg px-3.5 py-2.5 text-sm text-[#1a1814] placeholder:text-[#1a1814]/30 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--c-accent)] focus:border-transparent";
 const selectClass =
-  "w-full border border-[#1a1814]/20 rounded-lg px-3 py-2.5 text-sm text-[#1a1814] bg-white focus:outline-none focus:ring-2 focus:ring-[#c84b2f] focus:border-transparent";
+  "w-full border border-[#1a1814]/20 rounded-lg px-3 py-2.5 text-sm text-[#1a1814] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--c-accent)] focus:border-transparent";
 
 interface Props {
   onSaved?: () => void;
@@ -323,12 +326,12 @@ export default function AngebotFormular({ onSaved }: Props) {
       <div className="flex items-center gap-2 mb-8 print:hidden">
         {SCHRITTE.map((name, i) => (
           <div key={name} className="flex items-center gap-2">
-            <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold transition-colors ${i <= schritt ? "bg-[#c84b2f] text-white" : "bg-white/20 text-white/40"}`}>
+            <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold transition-colors ${i <= schritt ? "bg-[var(--c-accent)] text-white" : "bg-white/20 text-white/40"}`}>
               {i < schritt ? "✓" : i + 1}
             </div>
             <span className={`text-sm font-medium ${i === schritt ? "text-white" : "text-white/40"}`}>{name}</span>
             {i < SCHRITTE.length - 1 && (
-              <div className={`h-px w-8 ${i < schritt ? "bg-[#c84b2f]" : "bg-white/20"}`} />
+              <div className={`h-px w-8 ${i < schritt ? "bg-[var(--c-accent)]" : "bg-white/20"}`} />
             )}
           </div>
         ))}
@@ -352,7 +355,7 @@ export default function AngebotFormular({ onSaved }: Props) {
                 onChange={e => { setSuche(e.target.value); setDropdownOffen(true); }}
                 onFocus={() => setDropdownOffen(true)}
                 placeholder="Bestehenden Kunden suchen…"
-                className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-[#1a1814]/15 bg-white text-sm text-[#1a1814] placeholder:text-[#1a1814]/30 focus:outline-none focus:ring-2 focus:ring-[#c84b2f] focus:border-transparent"
+                className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-[#1a1814]/15 bg-white text-sm text-[#1a1814] placeholder:text-[#1a1814]/30 focus:outline-none focus:ring-2 focus:ring-[var(--c-accent)] focus:border-transparent"
               />
             </div>
             {dropdownOffen && kunden.filter(k =>
@@ -378,7 +381,7 @@ export default function AngebotFormular({ onSaved }: Props) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-[#1a1814] mb-1.5">Firma / Kundenname <span className="text-[#c84b2f]">*</span></label>
+              <label className="block text-sm font-medium text-[#1a1814] mb-1.5">Firma / Kundenname <span className="text-[var(--c-accent)]">*</span></label>
               <input type="text" value={kunde.firma} onChange={e => setKunde({ ...kunde, firma: e.target.value })} placeholder="Mustermann GmbH" className={inputClass} />
             </div>
             <div>
@@ -390,21 +393,21 @@ export default function AngebotFormular({ onSaved }: Props) {
               <input type="email" value={kunde.email} onChange={e => setKunde({ ...kunde, email: e.target.value })} placeholder="max@beispiel.de" className={inputClass} />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-[#1a1814] mb-1.5">Straße und Hausnummer <span className="text-[#c84b2f]">*</span></label>
+              <label className="block text-sm font-medium text-[#1a1814] mb-1.5">Straße und Hausnummer <span className="text-[var(--c-accent)]">*</span></label>
               <input type="text" value={kunde.strasse} onChange={e => setKunde({ ...kunde, strasse: e.target.value })} placeholder="Musterstraße 1" className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#1a1814] mb-1.5">PLZ <span className="text-[#c84b2f]">*</span></label>
+              <label className="block text-sm font-medium text-[#1a1814] mb-1.5">PLZ <span className="text-[var(--c-accent)]">*</span></label>
               <input type="text" value={kunde.plz} onChange={e => setKunde({ ...kunde, plz: e.target.value })} placeholder="12345" maxLength={5} className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#1a1814] mb-1.5">Ort <span className="text-[#c84b2f]">*</span></label>
+              <label className="block text-sm font-medium text-[#1a1814] mb-1.5">Ort <span className="text-[var(--c-accent)]">*</span></label>
               <input type="text" value={kunde.ort} onChange={e => setKunde({ ...kunde, ort: e.target.value })} placeholder="Musterstadt" className={inputClass} />
             </div>
           </div>
           <div className="flex justify-end mt-8">
             <button onClick={kundeWeiterUndSpeichern} disabled={!kundeValid}
-              className="bg-[#c84b2f] text-white px-6 py-2.5 rounded-lg font-medium text-sm hover:bg-[#b03f25] transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+              className="bg-[var(--c-accent)] text-white px-6 py-2.5 rounded-lg font-medium text-sm hover:bg-[#b03f25] transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
               Weiter: Leistungen →
             </button>
           </div>
@@ -464,12 +467,12 @@ export default function AngebotFormular({ onSaved }: Props) {
                 <div className="col-span-2 md:col-span-1 flex items-center justify-end gap-1 pt-1">
                   <button onClick={() => vorlageSpeichern(l)} disabled={!l.beschreibung.trim()}
                     title="Als Vorlage speichern"
-                    className="text-[#1a1814]/25 hover:text-[#c84b2f] transition-colors disabled:opacity-0 text-base leading-none px-0.5">
+                    className="text-[#1a1814]/25 hover:text-[var(--c-accent)] transition-colors disabled:opacity-0 text-base leading-none px-0.5">
                     ★
                   </button>
                   <button onClick={() => leistungEntfernen(l.id)} disabled={leistungen.length === 1}
                     title="Position entfernen"
-                    className="text-[#1a1814]/30 hover:text-[#c84b2f] transition-colors disabled:opacity-20 disabled:cursor-not-allowed text-lg leading-none px-0.5">
+                    className="text-[#1a1814]/30 hover:text-[var(--c-accent)] transition-colors disabled:opacity-20 disabled:cursor-not-allowed text-lg leading-none px-0.5">
                     ×
                   </button>
                 </div>
@@ -480,7 +483,7 @@ export default function AngebotFormular({ onSaved }: Props) {
           {/* Aktionsleiste */}
           <div className="mt-4 flex items-center gap-5">
             <button onClick={leistungHinzufuegen}
-              className="text-sm text-[#c84b2f] hover:text-[#b03f25] font-medium transition-colors">
+              className="text-sm text-[var(--c-accent)] hover:text-[#b03f25] font-medium transition-colors">
               + Position hinzufügen
             </button>
 
@@ -488,7 +491,7 @@ export default function AngebotFormular({ onSaved }: Props) {
             <div ref={vorlagenRef} className="relative">
               <button onClick={() => setVorlagenOffen(!vorlagenOffen)}
                 className="text-sm text-[#1a1814]/50 hover:text-[#1a1814] font-medium transition-colors flex items-center gap-1.5">
-                <span className="text-[#c84b2f]">★</span> Aus Vorlage
+                <span className="text-[var(--c-accent)]">★</span> Aus Vorlage
               </button>
 
               {vorlagenOffen && (
@@ -512,7 +515,7 @@ export default function AngebotFormular({ onSaved }: Props) {
                             </p>
                           </div>
                           <button onClick={() => vorlageHinzufuegen(v)}
-                            className="shrink-0 text-xs bg-[#c84b2f] text-white px-2.5 py-1 rounded-md hover:bg-[#b03f25] transition-colors font-medium">
+                            className="shrink-0 text-xs bg-[var(--c-accent)] text-white px-2.5 py-1 rounded-md hover:bg-[#b03f25] transition-colors font-medium">
                             Übernehmen
                           </button>
                           <button onClick={() => vorlageLoeschen(v.id)} title="Vorlage löschen"
@@ -540,7 +543,7 @@ export default function AngebotFormular({ onSaved }: Props) {
                     value={rabatt === 0 ? "" : rabatt}
                     onChange={e => setRabatt(Math.min(100, Math.max(0, parseFloat(e.target.value) || 0)))}
                     placeholder="0"
-                    className="w-full border border-[#1a1814]/20 rounded-lg px-3 py-2 text-sm text-[#1a1814] bg-white text-right pr-7 focus:outline-none focus:ring-2 focus:ring-[#c84b2f] focus:border-transparent"
+                    className="w-full border border-[#1a1814]/20 rounded-lg px-3 py-2 text-sm text-[#1a1814] bg-white text-right pr-7 focus:outline-none focus:ring-2 focus:ring-[var(--c-accent)] focus:border-transparent"
                   />
                   <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sm text-[#1a1814]/40 pointer-events-none">%</span>
                 </div>
@@ -555,7 +558,7 @@ export default function AngebotFormular({ onSaved }: Props) {
               </div>
               {rabatt > 0 && (
                 <>
-                  <div className="flex gap-8 text-[#c84b2f]">
+                  <div className="flex gap-8 text-[var(--c-accent)]">
                     <span>Rabatt ({rabatt} %)</span>
                     <span className="w-28 text-right">− {formatEuro(rabattBetrag)} €</span>
                   </div>
@@ -585,7 +588,7 @@ export default function AngebotFormular({ onSaved }: Props) {
             </button>
             <button onClick={() => { setSchritt(2); triggerZeitersparnisToast("Angebot erstellt", 45); void angebotSpeichern(); }}
               disabled={!leistungenValid}
-              className="bg-[#c84b2f] text-white px-6 py-2.5 rounded-lg font-medium text-sm hover:bg-[#b03f25] transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+              className="bg-[var(--c-accent)] text-white px-6 py-2.5 rounded-lg font-medium text-sm hover:bg-[#b03f25] transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
               Weiter: Vorschau →
             </button>
           </div>
@@ -606,7 +609,7 @@ export default function AngebotFormular({ onSaved }: Props) {
                 ✉ Per E-Mail senden
               </button>
               <button onClick={() => window.print()}
-                className="bg-[#c84b2f] text-white px-6 py-2.5 rounded-lg font-medium text-sm hover:bg-[#b03f25] transition-colors flex items-center gap-2">
+                className="bg-[var(--c-accent)] text-white px-6 py-2.5 rounded-lg font-medium text-sm hover:bg-[#b03f25] transition-colors flex items-center gap-2">
                 🖨️ Als PDF / Drucken
               </button>
             </div>
@@ -621,14 +624,14 @@ export default function AngebotFormular({ onSaved }: Props) {
                   <img src={logoUrl} alt="Firmen-Logo" className="max-w-[200px] max-h-[80px] object-contain mb-2" />
                 ) : null}
                 {firma.firmenname ? (
-                  <p className="font-bold text-gray-900 text-base">{firma.firmenname}</p>
+                  <p className="font-bold text-gray-900 text-base">{toTitleCase(firma.firmenname)}</p>
                 ) : (
-                  !logoUrl && <h1 className="text-2xl font-bold text-[#c84b2f] tracking-tight">Claaro</h1>
+                  !logoUrl && <h1 className="text-2xl font-bold text-[var(--c-accent)] tracking-tight">Claaro</h1>
                 )}
                 {(firma.strasse || firma.plz || firma.ort) && (
                   <div className="text-sm text-gray-500 leading-relaxed">
-                    {firma.strasse && <p>{firma.strasse}</p>}
-                    {(firma.plz || firma.ort) && <p>{[firma.plz, firma.ort].filter(Boolean).join(" ")}</p>}
+                    {firma.strasse && <p>{toTitleCase(firma.strasse)}</p>}
+                    {(firma.plz || firma.ort) && <p>{[firma.plz, toTitleCase(firma.ort)].filter(Boolean).join(" ")}</p>}
                   </div>
                 )}
                 {(firma.telefon || firma.email) && (
@@ -703,7 +706,7 @@ export default function AngebotFormular({ onSaved }: Props) {
                 </div>
                 {rabatt > 0 && (
                   <>
-                    <div className="flex justify-between py-2 text-[#c84b2f]">
+                    <div className="flex justify-between py-2 text-[var(--c-accent)]">
                       <span>Rabatt ({rabatt} %)</span>
                       <span>− {formatEuro(rabattBetrag)} €</span>
                     </div>
@@ -735,9 +738,9 @@ export default function AngebotFormular({ onSaved }: Props) {
                 </div>
                 {firma.firmenname && (
                   <div className="text-right shrink-0 space-y-0.5">
-                    <p className="font-medium text-gray-500">{firma.firmenname}</p>
+                    <p className="font-medium text-gray-500">{toTitleCase(firma.firmenname)}</p>
                     {(firma.strasse || firma.plz || firma.ort) && (
-                      <p>{[firma.strasse, [firma.plz, firma.ort].filter(Boolean).join(" ")].filter(Boolean).join(", ")}</p>
+                      <p>{[toTitleCase(firma.strasse), [firma.plz, toTitleCase(firma.ort)].filter(Boolean).join(" ")].filter(Boolean).join(", ")}</p>
                     )}
                     {firma.telefon && <p>Tel: {firma.telefon}</p>}
                     {firma.email && <p>{firma.email}</p>}
@@ -783,7 +786,7 @@ export default function AngebotFormular({ onSaved }: Props) {
                 <textarea value={emailNachricht} onChange={e => setEmailNachricht(e.target.value)}
                   rows={3}
                   placeholder="Vielen Dank für Ihre Anfrage. Anbei finden Sie unser Angebot…"
-                  className="w-full border border-[#1a1814]/20 rounded-lg px-3.5 py-2.5 text-sm text-[#1a1814] placeholder:text-[#1a1814]/30 bg-white focus:outline-none focus:ring-2 focus:ring-[#c84b2f] focus:border-transparent resize-none" />
+                  className="w-full border border-[#1a1814]/20 rounded-lg px-3.5 py-2.5 text-sm text-[#1a1814] placeholder:text-[#1a1814]/30 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--c-accent)] focus:border-transparent resize-none" />
               </div>
               <p className="text-xs text-[#1a1814]/35 leading-relaxed">
                 Das vollständige Angebot wird als Text im E-Mail-Inhalt mitgesendet. Für eine PDF-Version nutze „Als PDF / Drucken".
@@ -804,7 +807,7 @@ export default function AngebotFormular({ onSaved }: Props) {
               </button>
               <button onClick={angebotSenden}
                 disabled={!emailAn.trim() || emailSending || emailGesendet}
-                className="flex-1 py-2.5 rounded-lg text-sm font-semibold bg-[#c84b2f] text-white hover:bg-[#b03f25] transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                className="flex-1 py-2.5 rounded-lg text-sm font-semibold bg-[var(--c-accent)] text-white hover:bg-[#b03f25] transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
                 {emailSending ? "Wird gesendet…" : emailGesendet ? "✓ Gesendet" : "E-Mail senden"}
               </button>
             </div>

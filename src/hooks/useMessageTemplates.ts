@@ -24,7 +24,7 @@ const STARTER_TEMPLATES: MessageTemplate[] = [
   {
     id: "tpl-wa-default",
     name: "WhatsApp-Anfrage (Standard)",
-    channel: "whatsapp",
+    channel: "sms",
     type: "request",
     body: "Hallo {kunde} 👋 Danke für Ihr Vertrauen in {betrieb}! Falls Sie einen Moment Zeit haben — wir freuen uns über Ihr Feedback: {link}",
     variables: ["{kunde}", "{betrieb}", "{link}"],

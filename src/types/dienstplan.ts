@@ -6,7 +6,6 @@ export type PlanStatus = "entwurf" | "veroeffentlicht";
 export type VacationStatus = "beantragt" | "genehmigt" | "abgelehnt";
 export type SwapStatus = "offen" | "angenommen" | "abgelehnt";
 export type NotifTyp = "schicht" | "urlaub" | "tausch" | "erinnerung";
-export type WhatsappStatus = "gesendet" | "fehler";
 
 export interface Employee {
   id: string;
@@ -87,7 +86,6 @@ export interface NotificationLog {
   id: string;
   employee_id: string;
   typ: NotifTyp;
-  whatsapp_status: WhatsappStatus;
   nachricht: string;
   fehler_detail: string | null;
   sent_at: string;

@@ -144,7 +144,7 @@ export default function RunPage() {
           <button
             onClick={() => router.push("/dashboard/onboarding")}
             className="w-full py-2.5 rounded-xl text-sm font-medium transition-colors"
-            style={{ backgroundColor: "rgba(30,122,107,0.3)", color: "var(--c-teal)" }}
+            style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.3)", color: "var(--c-teal)" }}
           >
             Zur Übersicht
           </button>
@@ -250,7 +250,7 @@ export default function RunPage() {
                   className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all"
                   style={
                     isStepUnlockable()
-                      ? { backgroundColor: "rgba(30,122,107,0.3)", color: "var(--c-teal)" }
+                      ? { backgroundColor: "rgba(var(--c-teal-rgb),0.3)", color: "var(--c-teal)" }
                       : { backgroundColor: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.2)", cursor: "not-allowed" }
                   }
                 >
@@ -307,7 +307,7 @@ function ChecklistStep({
             className="w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 mt-0.5 transition-colors"
             style={{
               borderColor: done.has(item.id) ? "var(--c-teal)" : "rgba(255,255,255,0.2)",
-              backgroundColor: done.has(item.id) ? "rgba(30,122,107,0.2)" : "transparent",
+              backgroundColor: done.has(item.id) ? "rgba(var(--c-teal-rgb),0.2)" : "transparent",
             }}
           >
             {done.has(item.id) && (

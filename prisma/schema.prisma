@@ -50,6 +50,8 @@ model Rechnung {
   betrag            Float
   faelligkeitsdatum DateTime
   rechnungsnummer   String    @unique
+  beschreibung      String?
+  mwstSatz          Int       @default(19)
   zahlungsToken     String    @unique @default(cuid())
   status            String    @default("offen")
   mahnungen         Mahnung[]

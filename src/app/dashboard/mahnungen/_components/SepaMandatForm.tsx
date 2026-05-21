@@ -121,7 +121,7 @@ export default function SepaMandatForm({
                 ? "var(--c-teal)"
                 : "rgba(255,255,255,0.2)",
               backgroundColor: unterschrift
-                ? "rgba(30,122,107,0.3)"
+                ? "rgba(var(--c-teal-rgb),0.3)"
                 : "transparent",
             }}
           >
@@ -148,7 +148,7 @@ export default function SepaMandatForm({
       {error && (
         <p
           className="text-xs px-3 py-2 rounded-lg"
-          style={{ backgroundColor: "rgba(200,75,47,0.15)", color: "var(--c-accent)" }}
+          style={{ backgroundColor: "rgba(var(--c-accent-rgb),0.15)", color: "var(--c-accent)" }}
         >
           {error}
         </p>
@@ -160,7 +160,7 @@ export default function SepaMandatForm({
         className="w-full text-sm font-medium py-2 px-4 rounded-lg transition-all"
         style={
           !isPending && unterschrift
-            ? { backgroundColor: "rgba(30,122,107,0.25)", color: "var(--c-teal)" }
+            ? { backgroundColor: "rgba(var(--c-teal-rgb),0.25)", color: "var(--c-teal)" }
             : { backgroundColor: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.25)", cursor: "not-allowed" }
         }
       >

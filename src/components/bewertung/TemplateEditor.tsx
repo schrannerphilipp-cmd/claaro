@@ -66,9 +66,7 @@ export default function TemplateEditor({
             onChange={(e) => onChange({ channel: e.target.value as Channel | "both" })}
             className={`${inputClass} appearance-none`}
           >
-            <option value="whatsapp">WhatsApp</option>
             <option value="sms">SMS</option>
-            <option value="both">Beide</option>
           </select>
         </div>
         <div>

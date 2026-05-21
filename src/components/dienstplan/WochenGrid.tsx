@@ -43,7 +43,7 @@ function shiftDuration(von: string, bis: string, pauseMin: number): string {
 
 function statusStyle(status: Shift["status"]) {
   if (status === "bestaetigt")
-    return { bg: "rgba(30,122,107,0.2)", border: "rgba(30,122,107,0.4)", color: "var(--c-teal)" };
+    return { bg: "rgba(var(--c-teal-rgb),0.2)", border: "rgba(var(--c-teal-rgb),0.4)", color: "var(--c-teal)" };
   if (status === "getauscht")
     return { bg: "rgba(245,158,11,0.15)", border: "rgba(245,158,11,0.35)", color: "var(--c-amber)" };
   return { bg: "rgba(255,255,255,0.07)", border: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.6)" };
@@ -94,7 +94,7 @@ export default function WochenGrid({
               className="text-xs px-2.5 py-1 rounded-full border"
               style={
                 plan.status === "veroeffentlicht"
-                  ? { backgroundColor: "rgba(30,122,107,0.2)", borderColor: "rgba(30,122,107,0.4)", color: "var(--c-teal)" }
+                  ? { backgroundColor: "rgba(var(--c-teal-rgb),0.2)", borderColor: "rgba(var(--c-teal-rgb),0.4)", color: "var(--c-teal)" }
                   : { backgroundColor: "rgba(255,255,255,0.06)", borderColor: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.4)" }
               }
             >
@@ -119,8 +119,8 @@ export default function WochenGrid({
               disabled={isPublishing}
               className="flex items-center gap-2 text-sm px-4 py-2 rounded-lg border transition-colors disabled:opacity-40"
               style={{
-                backgroundColor: "rgba(30,122,107,0.2)",
-                borderColor: "rgba(30,122,107,0.4)",
+                backgroundColor: "rgba(var(--c-teal-rgb),0.2)",
+                borderColor: "rgba(var(--c-teal-rgb),0.4)",
                 color: "var(--c-teal)",
               }}
             >
@@ -238,7 +238,7 @@ export default function WochenGrid({
           Entwurf
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: "rgba(30,122,107,0.3)" }} />
+          <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.3)" }} />
           Bestätigt
         </span>
         <span className="flex items-center gap-1.5">

@@ -170,8 +170,8 @@ export default function VerfuegbarkeitsForm({ employeeId }: Props) {
                 key={i}
                 className="rounded-xl border p-4 transition-colors"
                 style={{
-                  borderColor: d.verfuegbar ? "rgba(30,122,107,0.3)" : "rgba(255,255,255,0.08)",
-                  backgroundColor: d.verfuegbar ? "rgba(30,122,107,0.05)" : "rgba(255,255,255,0.03)",
+                  borderColor: d.verfuegbar ? "rgba(var(--c-teal-rgb),0.3)" : "rgba(255,255,255,0.08)",
+                  backgroundColor: d.verfuegbar ? "rgba(var(--c-teal-rgb),0.05)" : "rgba(255,255,255,0.03)",
                 }}
               >
                 <div className="flex flex-wrap items-center gap-3">
@@ -255,8 +255,8 @@ export default function VerfuegbarkeitsForm({ employeeId }: Props) {
         onClick={saveAll}
         className="w-full flex items-center justify-center gap-2 text-sm py-2.5 rounded-lg border transition-colors"
         style={{
-          backgroundColor: "rgba(30,122,107,0.2)",
-          borderColor: "rgba(30,122,107,0.4)",
+          backgroundColor: "rgba(var(--c-teal-rgb),0.2)",
+          borderColor: "rgba(var(--c-teal-rgb),0.4)",
           color: "var(--c-teal)",
         }}
       >

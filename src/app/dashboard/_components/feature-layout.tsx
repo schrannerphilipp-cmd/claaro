@@ -59,7 +59,7 @@ export default function FeatureLayout({
     <div ref={wrapperRef} className="min-h-screen bg-[#1a1814]" style={sans}>
       {/* Top bar */}
       <header className="border-b border-white/10 sticky top-0 z-30 bg-[#1a1814]">
-        <div className="max-w-5xl mx-auto px-6 py-4 grid grid-cols-3 items-center">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 grid grid-cols-3 items-center">
           <button
             onClick={handleBack}
             className="flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors"
@@ -83,7 +83,7 @@ export default function FeatureLayout({
       </header>
 
       {/* Description + content */}
-      <main className="max-w-5xl mx-auto px-6 py-10">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="mb-10">
           <h1 className="text-3xl lg:text-4xl text-white mb-4" style={serif}>
             {name}

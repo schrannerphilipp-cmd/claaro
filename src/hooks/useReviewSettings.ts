@@ -35,7 +35,7 @@ const DEFAULT_SETTINGS: ReviewSettings = {
   autoSendEnabled: false,
   autoSendDelayMinutes: 60,
   autoSendTrigger: "transaction",
-  defaultChannel: "whatsapp",
+  defaultChannel: "sms",
   defaultRequestTemplateId: "",
   businessName: "Mein Betrieb",
   testPhone: "",

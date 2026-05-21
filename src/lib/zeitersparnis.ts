@@ -4,13 +4,14 @@
 export interface ZeitersparnisEvent {
   aktion: string;
   minuten: number;
+  message?: string;
 }
 
-export function triggerZeitersparnisToast(aktion: string, minuten: number): void {
+export function triggerZeitersparnisToast(aktion: string, minuten: number, message?: string): void {
   if (typeof window === "undefined") return;
   window.dispatchEvent(
     new CustomEvent<ZeitersparnisEvent>("claaro:zeitersparnis", {
-      detail: { aktion, minuten },
+      detail: { aktion, minuten, message },
     })
   );
 }

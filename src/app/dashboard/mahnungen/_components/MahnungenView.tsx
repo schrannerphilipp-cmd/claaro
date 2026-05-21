@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import React, { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { sendMahnung } from "@/app/actions/mahnungen";
+import { sendMahnung, createRechnung } from "@/app/actions/mahnungen";
 import SepaMandatForm from "./SepaMandatForm";
 import { triggerZeitersparnisToast } from "@/lib/zeitersparnis";
 
@@ -43,7 +43,7 @@ type RechnungData = {
 };
 
 type DisplayStatus = "offen" | "überfällig" | "bezahlt" | "gemahnt";
-type Kanal = "email" | "whatsapp";
+type Kanal = "email";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -94,8 +94,8 @@ function maskIban(iban: string) {
 
 const BADGE_STYLES: Record<DisplayStatus, { bg: string; color: string; label: string }> = {
   offen:      { bg: "rgba(245,158,11,0.12)",  color: "var(--c-amber)",  label: "Offen"      },
-  überfällig: { bg: "rgba(200,75,47,0.18)",   color: "var(--c-accent)", label: "Überfällig" },
-  bezahlt:    { bg: "rgba(30,122,107,0.18)",  color: "var(--c-teal)",   label: "Bezahlt"    },
+  überfällig: { bg: "rgba(var(--c-accent-rgb),0.18)",   color: "var(--c-accent)", label: "Überfällig" },
+  bezahlt:    { bg: "rgba(var(--c-teal-rgb),0.18)",  color: "var(--c-teal)",   label: "Bezahlt"    },
   gemahnt:    { bg: "rgba(245,158,11,0.12)",  color: "var(--c-amber)",  label: "Gemahnt"    },
 };
 
@@ -113,8 +113,8 @@ function StatusBadge({ status }: { status: DisplayStatus }) {
 
 const MAHNUNG_STATUS: Record<string, { bg: string; color: string; label: string }> = {
   ausstehend: { bg: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.4)", label: "Ausstehend" },
-  gesendet:   { bg: "rgba(30,122,107,0.18)",  color: "var(--c-teal)",         label: "Gesendet"   },
-  bezahlt:    { bg: "rgba(30,122,107,0.28)",  color: "var(--c-teal)",         label: "Bezahlt"    },
+  gesendet:   { bg: "rgba(var(--c-teal-rgb),0.18)",  color: "var(--c-teal)",         label: "Gesendet"   },
+  bezahlt:    { bg: "rgba(var(--c-teal-rgb),0.28)",  color: "var(--c-teal)",         label: "Bezahlt"    },
 };
 
 function MahnungPill({ status }: { status: string }) {
@@ -129,37 +129,6 @@ function MahnungPill({ status }: { status: string }) {
   );
 }
 
-function KanalToggle({ value, onChange }: { value: Kanal; onChange: (k: Kanal) => void }) {
-  return (
-    <div className="flex rounded-lg overflow-hidden border border-white/10 text-xs font-medium">
-      {(["email", "whatsapp"] as Kanal[]).map((k) => (
-        <button
-          key={k}
-          type="button"
-          onClick={() => onChange(k)}
-          className="flex items-center gap-1.5 px-3 py-1.5 transition-colors"
-          style={
-            value === k
-              ? { backgroundColor: "rgba(200,75,47,0.18)", color: "var(--c-accent)" }
-              : { color: "rgba(255,255,255,0.4)" }
-          }
-        >
-          {k === "email" ? (
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 16 16">
-              <rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.3" />
-              <path d="M1 5l7 5 7-5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-            </svg>
-          ) : (
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 16 16">
-              <path d="M2 13l1-3A6 6 0 1 1 5 12l-3 1z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
-            </svg>
-          )}
-          {k === "email" ? "E-Mail" : "WhatsApp"}
-        </button>
-      ))}
-    </div>
-  );
-}
 
 // ── Toggle switch ─────────────────────────────────────────────────────────────
 
@@ -201,7 +170,6 @@ function EskalationsTimeline({
   onClose: () => void;
 }) {
   const router = useRouter();
-  const [kanal, setKanal] = useState<Kanal>("email");
   const [sepaEnabled, setSepaEnabled] = useState(false);
   const [showMandatForm, setShowMandatForm] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -222,10 +190,10 @@ function EskalationsTimeline({
   function handleSend() {
     setFeedback(null);
     startTransition(async () => {
-      const result = await sendMahnung(rechnung.id, kanal, sepaEnabled);
+      const result = await sendMahnung(rechnung.id, "email", sepaEnabled);
       if (result.success) {
         setFeedback({ ok: true, msg: `Stufe ${result.stufe} erfolgreich gesendet.` });
-        triggerZeitersparnisToast("Mahnung versendet", 20);
+        triggerZeitersparnisToast("Mahnung versendet", 20, `Mahnung versendet 📨 — ${rechnung.kunde.name} wird benachrichtigt.`);
         router.refresh();
       } else {
         setFeedback({ ok: false, msg: result.error });
@@ -338,14 +306,14 @@ function EskalationsTimeline({
           {sepaEnabled && (
             <div
               className="rounded-lg p-3 space-y-2"
-              style={{ backgroundColor: "rgba(30,122,107,0.08)", border: "1px solid rgba(30,122,107,0.2)" }}
+              style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.08)", border: "1px solid rgba(var(--c-teal-rgb),0.2)" }}
             >
               {hasMandat ? (
                 <>
                   <div className="flex items-center gap-2">
                     <span
                       className="text-xs px-2 py-0.5 rounded-full font-medium"
-                      style={{ backgroundColor: "rgba(30,122,107,0.2)", color: "var(--c-teal)" }}
+                      style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.2)", color: "var(--c-teal)" }}
                     >
                       SEPA Mandat vorhanden
                     </span>
@@ -380,12 +348,6 @@ function EskalationsTimeline({
             </div>
           )}
 
-          {/* Kanal + send */}
-          <div className="flex items-center justify-between pt-1">
-            <span className="text-xs text-white/40">Kanal</span>
-            <KanalToggle value={kanal} onChange={setKanal} />
-          </div>
-
           <button
             onClick={handleSend}
             disabled={!canSend}
@@ -412,8 +374,8 @@ function EskalationsTimeline({
               className="text-xs text-center py-1.5 rounded-lg px-3"
               style={
                 feedback.ok
-                  ? { backgroundColor: "rgba(30,122,107,0.15)", color: "var(--c-teal)" }
-                  : { backgroundColor: "rgba(200,75,47,0.15)", color: "var(--c-accent)" }
+                  ? { backgroundColor: "rgba(var(--c-teal-rgb),0.15)", color: "var(--c-teal)" }
+                  : { backgroundColor: "rgba(var(--c-accent-rgb),0.15)", color: "var(--c-accent)" }
               }
             >
               {feedback.msg}
@@ -426,7 +388,7 @@ function EskalationsTimeline({
         <div className="border-t border-white/10 pt-4">
           <p
             className="text-xs text-center py-2 rounded-lg"
-            style={{ backgroundColor: "rgba(30,122,107,0.15)", color: "var(--c-teal)" }}
+            style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.15)", color: "var(--c-teal)" }}
           >
             Diese Rechnung wurde bezahlt.
           </p>
@@ -440,6 +402,8 @@ function EskalationsTimeline({
 
 export default function MahnungenView({ rechnungen }: { rechnungen: RechnungData[] }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [showNeuModal, setShowNeuModal] = useState(false);
+  const router = useRouter();
   const selected = rechnungen.find((r) => r.id === selectedId) ?? null;
 
   function toggleSelect(id: string) {
@@ -448,12 +412,22 @@ export default function MahnungenView({ rechnungen }: { rechnungen: RechnungData
 
   return (
     <>
+      {showNeuModal && (
+        <NeueRechnungModal
+          onClose={() => setShowNeuModal(false)}
+          onCreated={() => { setShowNeuModal(false); router.refresh(); }}
+        />
+      )}
+
       {/* Action row */}
       <div className="flex items-center justify-between mb-6">
         <p className="text-sm text-white/40">
           {rechnungen.length} {rechnungen.length === 1 ? "Rechnung" : "Rechnungen"}
         </p>
-        <button className="text-sm font-medium px-4 py-2 rounded-lg border border-white/15 text-white/70 hover:text-white hover:bg-white/5 transition-colors">
+        <button
+          onClick={() => setShowNeuModal(true)}
+          className="text-sm font-medium px-4 py-2 rounded-lg border border-white/15 text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+        >
           + Neue Rechnung
         </button>
       </div>
@@ -507,7 +481,7 @@ export default function MahnungenView({ rechnungen }: { rechnungen: RechnungData
                             {r.kunde.sepaMandat && (
                               <span
                                 className="text-xs px-1.5 py-px rounded font-medium"
-                                style={{ backgroundColor: "rgba(30,122,107,0.2)", color: "var(--c-teal)" }}
+                                style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.2)", color: "var(--c-teal)" }}
                               >
                                 SEPA
                               </span>
@@ -551,7 +525,7 @@ export default function MahnungenView({ rechnungen }: { rechnungen: RechnungData
                             className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
                             style={
                               canSendNext
-                                ? { backgroundColor: "rgba(200,75,47,0.12)", color: "var(--c-accent)" }
+                                ? { backgroundColor: "rgba(var(--c-accent-rgb),0.12)", color: "var(--c-accent)" }
                                 : { backgroundColor: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.25)" }
                             }
                           >
@@ -577,5 +551,179 @@ export default function MahnungenView({ rechnungen }: { rechnungen: RechnungData
         </div>
       )}
     </>
+  );
+}
+
+// ── Neue Rechnung Modal ───────────────────────────────────────────────────────
+
+function NeueRechnungModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [betrag, setBetrag] = useState("");
+  const [rechnungsnummer, setRechnungsnummer] = useState("");
+  const [beschreibung, setBeschreibung] = useState("");
+  const [mwst, setMwst] = useState("19");
+  const [faellig, setFaellig] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setSaving(true);
+    const result = await createRechnung({
+      kundenname: name,
+      kundenemail: email,
+      betrag: parseFloat(betrag.replace(",", ".")),
+      faelligkeitsdatum: faellig,
+      rechnungsnummer,
+      beschreibung,
+      mwstSatz: parseInt(mwst, 10),
+    });
+    setSaving(false);
+    if (result.success) {
+      onCreated();
+    } else {
+      setError(result.error);
+    }
+  }
+
+  const inputClass = "w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-white/30 transition-colors";
+  const labelClass = "block text-xs text-white/40 mb-1";
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div className="w-full max-w-md bg-[#1a1814] border border-white/15 rounded-2xl overflow-hidden shadow-2xl">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+          <p className="text-sm font-semibold text-white">Neue Rechnung erstellen</p>
+          <button onClick={onClose} className="text-white/30 hover:text-white transition-colors">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16">
+              <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <p className="text-xs text-white/40 -mt-1">Pflichtangaben für eine gültige Rechnung nach § 14 UStG.</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className={labelClass}>Kundenname</label>
+              <input
+                autoFocus
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Max Mustermann"
+                required
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className={labelClass}>E-Mail</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="max@beispiel.de"
+                required
+                className={inputClass}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className={labelClass}>Betrag (€)</label>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={betrag}
+                onChange={(e) => setBetrag(e.target.value)}
+                placeholder="0,00"
+                required
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className={labelClass}>Rechnungsnummer</label>
+              <input
+                type="text"
+                value={rechnungsnummer}
+                onChange={(e) => setRechnungsnummer(e.target.value)}
+                placeholder="RE-2026-004"
+                required
+                className={inputClass}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className={labelClass}>Leistungsbeschreibung</label>
+            <textarea
+              rows={3}
+              value={beschreibung}
+              onChange={(e) => setBeschreibung(e.target.value)}
+              placeholder="Beschreibung der erbrachten Leistung"
+              required
+              className={`${inputClass} resize-none`}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className={labelClass}>MwSt-Satz</label>
+              <select
+                value={mwst}
+                onChange={(e) => setMwst(e.target.value)}
+                required
+                className={inputClass}
+              >
+                <option value="19">19 % (Standard)</option>
+                <option value="7">7 % (ermäßigt)</option>
+                <option value="0">0 % (steuerfrei)</option>
+              </select>
+            </div>
+            <div>
+              <label className={labelClass}>Fällig am</label>
+              <input
+                type="date"
+                value={faellig}
+                onChange={(e) => setFaellig(e.target.value)}
+                required
+                className={inputClass}
+                style={{ colorScheme: "dark" }}
+              />
+            </div>
+          </div>
+
+          {error && (
+            <p className="text-xs px-3 py-2 rounded-lg" style={{ backgroundColor: "rgba(var(--c-accent-rgb),0.12)", color: "var(--c-accent)" }}>
+              {error}
+            </p>
+          )}
+
+          <div className="flex items-center gap-3 pt-1">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 py-2 rounded-lg text-sm text-white/50 border border-white/10 hover:bg-white/5 transition-colors"
+            >
+              Abbrechen
+            </button>
+            <button
+              type="submit"
+              disabled={saving}
+              className="flex-1 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-40"
+              style={{ backgroundColor: "rgba(var(--c-accent-rgb),0.2)", color: "var(--c-accent)", border: "1px solid rgba(var(--c-accent-rgb),0.3)" }}
+            >
+              {saving ? "Wird erstellt …" : "Rechnung erstellen"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 }

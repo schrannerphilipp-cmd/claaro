@@ -34,11 +34,11 @@ export function useOnboardTemplates() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(templates));
   }, [templates, isLoaded]);
 
-  const createTemplate = useCallback((): OnboardTemplate => {
+  const createTemplate = useCallback((title?: string): OnboardTemplate => {
     const now = new Date().toISOString();
     const t: OnboardTemplate = {
       id: genId(),
-      title: "Neues Template",
+      title: title ?? "Neues Template",
       role: "",
       description: "",
       estimatedMinutes: 0,

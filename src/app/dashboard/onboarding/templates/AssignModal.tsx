@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useOnboardAssignments } from "@/hooks/useOnboardAssignments";
 import { OnboardTemplate } from "@/types/onboard";
+import { triggerZeitersparnisToast } from "@/lib/zeitersparnis";
 
 const sans = { fontFamily: "var(--font-dm-sans)" } as const;
 const inputClass =
@@ -34,6 +35,7 @@ export default function AssignModal({ template, onClose }: AssignModalProps) {
       employeeName: name.trim(),
       dueDate: dueDate || undefined,
     });
+    triggerZeitersparnisToast("Vorlage zugewiesen", 10, "Einarbeitung gestartet 🚀 — Vorlage wurde zugewiesen.");
     router.push(`/dashboard/onboarding/run/${a.id}`);
     onClose();
   }
@@ -89,7 +91,7 @@ export default function AssignModal({ template, onClose }: AssignModalProps) {
             <button
               type="submit"
               className="flex-1 py-2 rounded-lg text-sm font-medium transition-colors"
-              style={{ backgroundColor: "rgba(30,122,107,0.3)", color: "var(--c-teal)" }}
+              style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.3)", color: "var(--c-teal)" }}
             >
               Einarbeitung starten
             </button>

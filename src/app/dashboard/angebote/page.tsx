@@ -9,18 +9,26 @@ const serif = { fontFamily: "var(--font-dm-serif)" } as const;
 
 export default function AngebotePage() {
   const [refreshKey, setRefreshKey] = useState(0);
+  const [showForm, setShowForm] = useState(false);
+
+  function handleShowForm() {
+    setShowForm(true);
+    setTimeout(() => document.getElementById("angebot-formular")?.scrollIntoView({ behavior: "smooth" }), 50);
+  }
 
   return (
     <FeatureLayout
       name="Angebote"
       description="Erstellen Sie in wenigen Minuten professionelle Angebote mit automatischer Berechnung, Mehrwertsteuerausweis und direktem PDF-Export."
     >
-      <AngeboteListe key={refreshKey} />
+      <AngeboteListe key={refreshKey} onShowForm={handleShowForm} />
 
-      <div className="border-t border-white/8 pt-10">
-        <h2 className="text-2xl text-white mb-8" style={serif}>Neues Angebot</h2>
-        <AngebotFormular onSaved={() => setRefreshKey(k => k + 1)} />
-      </div>
+      {showForm && (
+        <div id="angebot-formular" className="border-t border-white/8 pt-10">
+          <h2 className="text-2xl text-white mb-8" style={serif}>Neues Angebot</h2>
+          <AngebotFormular onSaved={() => setRefreshKey(k => k + 1)} />
+        </div>
+      )}
     </FeatureLayout>
   );
 }

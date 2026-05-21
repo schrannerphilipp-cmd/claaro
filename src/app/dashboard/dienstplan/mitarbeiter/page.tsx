@@ -126,7 +126,7 @@ export default function MitarbeiterPage() {
                 <div className="flex items-center gap-3">
                   <div
                     className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
-                    style={{ backgroundColor: "rgba(200,75,47,0.2)", color: "var(--c-accent)" }}
+                    style={{ backgroundColor: "rgba(var(--c-accent-rgb),0.2)", color: "var(--c-accent)" }}
                   >
                     {emp.name.charAt(0).toUpperCase()}
                   </div>
@@ -150,8 +150,8 @@ export default function MitarbeiterPage() {
                     className="text-xs px-3 py-1.5 rounded-lg border transition-colors disabled:opacity-40"
                     style={
                       emp.aktiv
-                        ? { backgroundColor: "rgba(200,75,47,0.1)", borderColor: "rgba(200,75,47,0.25)", color: "var(--c-accent)" }
-                        : { backgroundColor: "rgba(30,122,107,0.15)", borderColor: "rgba(30,122,107,0.3)", color: "var(--c-teal)" }
+                        ? { backgroundColor: "rgba(var(--c-accent-rgb),0.1)", borderColor: "rgba(var(--c-accent-rgb),0.25)", color: "var(--c-accent)" }
+                        : { backgroundColor: "rgba(var(--c-teal-rgb),0.15)", borderColor: "rgba(var(--c-teal-rgb),0.3)", color: "var(--c-teal)" }
                     }
                   >
                     {toggling === emp.id ? "…" : emp.aktiv ? "Deaktivieren" : "Reaktivieren"}

@@ -11,9 +11,9 @@ const labelClass = "block text-xs text-white/40 mb-1";
 
 function statusStyle(status: Vacation["status"]) {
   if (status === "genehmigt")
-    return { color: "var(--c-teal)", bg: "rgba(30,122,107,0.15)", border: "rgba(30,122,107,0.3)" };
+    return { color: "var(--c-teal)", bg: "rgba(var(--c-teal-rgb),0.15)", border: "rgba(var(--c-teal-rgb),0.3)" };
   if (status === "abgelehnt")
-    return { color: "var(--c-accent)", bg: "rgba(200,75,47,0.15)", border: "rgba(200,75,47,0.3)" };
+    return { color: "var(--c-accent)", bg: "rgba(var(--c-accent-rgb),0.15)", border: "rgba(var(--c-accent-rgb),0.3)" };
   return { color: "var(--c-amber)", bg: "rgba(245,158,11,0.12)", border: "rgba(245,158,11,0.25)" };
 }
 
@@ -154,7 +154,7 @@ export default function UrlaubsAntrag({ employeeId, urlaubTageJahr = 25, isAdmin
               type="submit"
               disabled={submitting}
               className="w-full text-sm py-2 rounded-lg border transition-colors disabled:opacity-40"
-              style={{ backgroundColor: "rgba(30,122,107,0.2)", borderColor: "rgba(30,122,107,0.4)", color: "var(--c-teal)" }}
+              style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.2)", borderColor: "rgba(var(--c-teal-rgb),0.4)", color: "var(--c-teal)" }}
             >
               {submitting ? "Wird gesendet…" : "Antrag einreichen"}
             </button>
@@ -222,14 +222,14 @@ export default function UrlaubsAntrag({ employeeId, urlaubTageJahr = 25, isAdmin
                       <button
                         onClick={() => handleEntscheiden(v.id, "genehmigt")}
                         className="text-xs px-3 py-1 rounded-lg border"
-                        style={{ backgroundColor: "rgba(30,122,107,0.2)", borderColor: "rgba(30,122,107,0.4)", color: "var(--c-teal)" }}
+                        style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.2)", borderColor: "rgba(var(--c-teal-rgb),0.4)", color: "var(--c-teal)" }}
                       >
                         Genehmigen
                       </button>
                       <button
                         onClick={() => handleEntscheiden(v.id, "abgelehnt")}
                         className="text-xs px-3 py-1 rounded-lg border"
-                        style={{ backgroundColor: "rgba(200,75,47,0.15)", borderColor: "rgba(200,75,47,0.35)", color: "var(--c-accent)" }}
+                        style={{ backgroundColor: "rgba(var(--c-accent-rgb),0.15)", borderColor: "rgba(var(--c-accent-rgb),0.35)", color: "var(--c-accent)" }}
                       >
                         Ablehnen
                       </button>

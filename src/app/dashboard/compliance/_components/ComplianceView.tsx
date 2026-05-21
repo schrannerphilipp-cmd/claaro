@@ -131,9 +131,9 @@ function TaskCard({
         borderColor,
         borderLeftWidth: 3,
         backgroundColor: isErledigt
-          ? "rgba(30,122,107,0.06)"
+          ? "rgba(var(--c-teal-rgb),0.06)"
           : isUeberfaellig
-          ? "rgba(200,75,47,0.07)"
+          ? "rgba(var(--c-accent-rgb),0.07)"
           : "rgba(255,255,255,0.04)",
       }}
     >
@@ -279,8 +279,8 @@ function TaskCard({
                 onClick={() => onMarkErledigt(task.id)}
                 className="flex items-center gap-2 text-sm px-4 py-2 rounded-lg border transition-colors"
                 style={{
-                  backgroundColor: "rgba(30,122,107,0.18)",
-                  borderColor: "rgba(30,122,107,0.35)",
+                  backgroundColor: "rgba(var(--c-teal-rgb),0.18)",
+                  borderColor: "rgba(var(--c-teal-rgb),0.35)",
                   color: "var(--c-teal)",
                 }}
               >
@@ -356,7 +356,7 @@ export default function ComplianceView() {
 
   function markErledigt(id: string) {
     _markErledigt(id);
-    triggerZeitersparnisToast("Aufgabe abgehakt", 15);
+    triggerZeitersparnisToast("Aufgabe abgehakt", 15, "Aufgabe erledigt ✅ — du bleibst compliant!");
   }
 
   const [activeBranche, setActiveBranche] = useState<Branche | "alle">("alle");
@@ -439,8 +439,8 @@ export default function ComplianceView() {
               style={
                 active
                   ? {
-                      backgroundColor: "rgba(30,122,107,0.2)",
-                      borderColor: "rgba(30,122,107,0.4)",
+                      backgroundColor: "rgba(var(--c-teal-rgb),0.2)",
+                      borderColor: "rgba(var(--c-teal-rgb),0.4)",
                       color: "var(--c-teal)",
                     }
                   : {

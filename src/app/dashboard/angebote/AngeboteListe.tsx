@@ -29,7 +29,7 @@ function formatDatum(iso: string) {
   return new Date(iso).toLocaleDateString("de-DE");
 }
 
-export default function AngeboteListe() {
+export default function AngeboteListe({ onShowForm }: { onShowForm?: () => void }) {
   const [angebote, setAngebote] = useState<Angebot[]>([]);
   const [laden, setLaden]       = useState(true);
   const [openId, setOpenId]     = useState<string | null>(null);
@@ -79,13 +79,46 @@ export default function AngeboteListe() {
     );
   }
 
-  if (angebote.length === 0) return null;
+  if (angebote.length === 0) {
+    return (
+      <div className="mb-10 flex flex-col items-center justify-center py-16 text-center">
+        <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
+          style={{ backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <span className="text-3xl">📄</span>
+        </div>
+        <p className="text-base font-medium text-white mb-2">Noch keine Angebote erstellt</p>
+        <p className="text-sm text-white/35 mb-6 max-w-xs">Erstelle dein erstes Angebot und sende es direkt an deine Kunden.</p>
+        <button
+          onClick={onShowForm}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all"
+          style={{ backgroundColor: "rgba(var(--c-accent-rgb),0.15)", color: "var(--c-accent)", border: "1px solid rgba(var(--c-accent-rgb),0.25)" }}
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16">
+            <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+          Erstes Angebot erstellen
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div ref={listRef} className="mb-10">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-white">Meine Angebote</h2>
-        <span className="text-xs text-white/30">{angebote.length} Angebot{angebote.length !== 1 ? "e" : ""}</span>
+        <div className="flex items-center gap-4">
+          <span className="text-xs text-white/30">{angebote.length} Angebot{angebote.length !== 1 ? "e" : ""}</span>
+          <button
+            onClick={onShowForm}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+            style={{ backgroundColor: "rgba(var(--c-accent-rgb),0.15)", color: "var(--c-accent)", border: "1px solid rgba(var(--c-accent-rgb),0.25)" }}
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 16 16">
+              <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+            Neues Angebot
+          </button>
+        </div>
       </div>
 
       <div className="bg-white/5 rounded-xl border border-white/10 overflow-visible">

@@ -125,7 +125,7 @@ export default function LogoUpload({ onLogoChange }: Props) {
               onClick={handleDelete}
               disabled={uploading}
               className="text-xs px-3 py-1.5 rounded-lg border transition-colors disabled:opacity-40"
-              style={{ backgroundColor: "rgba(200,75,47,0.12)", borderColor: "rgba(200,75,47,0.3)", color: "var(--c-accent)" }}
+              style={{ backgroundColor: "rgba(var(--c-accent-rgb),0.12)", borderColor: "rgba(var(--c-accent-rgb),0.3)", color: "var(--c-accent)" }}
             >
               {uploading ? "Wird gelöscht…" : "Logo entfernen"}
             </button>
@@ -145,8 +145,8 @@ export default function LogoUpload({ onLogoChange }: Props) {
           onClick={() => inputRef.current?.click()}
           className="cursor-pointer rounded-xl border-2 border-dashed transition-colors p-10 text-center"
           style={{
-            borderColor: dragging ? "rgba(30,122,107,0.6)" : "rgba(255,255,255,0.12)",
-            backgroundColor: dragging ? "rgba(30,122,107,0.06)" : "transparent",
+            borderColor: dragging ? "rgba(var(--c-teal-rgb),0.6)" : "rgba(255,255,255,0.12)",
+            backgroundColor: dragging ? "rgba(var(--c-teal-rgb),0.06)" : "transparent",
           }}
         >
           {uploading ? (

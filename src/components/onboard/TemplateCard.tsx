@@ -134,7 +134,7 @@ export default function TemplateCard({
         <button
           onClick={onAssign}
           className="flex-1 text-xs py-1.5 rounded-lg border transition-colors"
-          style={{ backgroundColor: "rgba(30,122,107,0.15)", borderColor: "rgba(30,122,107,0.3)", color: "var(--c-teal)" }}
+          style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.15)", borderColor: "rgba(var(--c-teal-rgb),0.3)", color: "var(--c-teal)" }}
         >
           Zuweisen
         </button>

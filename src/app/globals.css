@@ -5,11 +5,13 @@
   --foreground: #171717;
 
   /* claaro brand tokens */
-  --c-dark:   #3d2b1f;
-  --c-accent: #c84b2f;
-  --c-teal:   #1e7a6b;
-  --c-warm:   #f2ede4;
-  --c-amber:  #f59e0b;
+  --c-dark:       #3d2b1f;
+  --c-accent:     #c84b2f;
+  --c-accent-rgb: 200, 75, 47;
+  --c-teal:       #1e7a6b;
+  --c-teal-rgb:   30, 122, 107;
+  --c-warm:       #f2ede4;
+  --c-amber:      #f59e0b;
 }
 
 @theme inline {

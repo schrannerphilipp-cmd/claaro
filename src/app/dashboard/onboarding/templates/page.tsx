@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import FeatureLayout from "../../_components/feature-layout";
@@ -14,10 +14,34 @@ const sans = { fontFamily: "var(--font-dm-sans)" } as const;
 
 export default function TemplatesPage() {
   const router = useRouter();
-  const { templates, isLoaded, deleteTemplate } = useOnboardTemplates();
+  const { templates, isLoaded, createTemplate, deleteTemplate } = useOnboardTemplates();
   const { assignments } = useOnboardAssignments();
   const [assignTarget, setAssignTarget] = useState<OnboardTemplate | null>(null);
   const [search, setSearch] = useState("");
+  const [showVorlagen, setShowVorlagen] = useState(false);
+  const vorlagenRef = useRef<HTMLDivElement>(null);
+
+  const VORLAGEN = [
+    "Neue Mitarbeiter — Erste Woche",
+    "Neuer Kunde — Auftragsaufnahme",
+    "Jahresabschluss Betrieb",
+  ];
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (vorlagenRef.current && !vorlagenRef.current.contains(e.target as Node)) {
+        setShowVorlagen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  function handleCreateFromVorlage(title: string) {
+    setShowVorlagen(false);
+    const t = createTemplate(title);
+    router.push(`/dashboard/onboarding/templates/${t.id}`);
+  }
 
   const filtered = templates.filter(
     (t) =>
@@ -47,13 +71,40 @@ export default function TemplatesPage() {
           <Link
             href="/dashboard/onboarding/templates/new"
             className="flex items-center gap-1.5 text-sm px-4 py-2 rounded-lg font-medium shrink-0 transition-colors"
-            style={{ backgroundColor: "rgba(30,122,107,0.25)", color: "var(--c-teal)" }}
+            style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.25)", color: "var(--c-teal)" }}
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 14 14">
               <path d="M7 2v10M2 7h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
             </svg>
             Neues Template
           </Link>
+
+          <div className="relative shrink-0" ref={vorlagenRef}>
+            <button
+              onClick={() => setShowVorlagen((v) => !v)}
+              className="flex items-center gap-1.5 text-sm px-4 py-2 rounded-lg font-medium transition-colors"
+              style={{ backgroundColor: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.12)" }}
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 14 14">
+                <path d="M2 4h10M2 7h7M2 10h5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+              Aus Vorlage
+            </button>
+
+            {showVorlagen && (
+              <div className="absolute right-0 top-10 z-40 w-64 bg-[#23211c] border border-white/10 rounded-xl shadow-2xl overflow-hidden">
+                {VORLAGEN.map((name) => (
+                  <button
+                    key={name}
+                    onClick={() => handleCreateFromVorlage(name)}
+                    className="w-full text-left px-4 py-2.5 text-sm text-white/70 hover:bg-white/5 hover:text-white transition-colors"
+                  >
+                    {name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {!isLoaded ? (
@@ -70,7 +121,7 @@ export default function TemplatesPage() {
                 <Link
                   href="/dashboard/onboarding/templates/new"
                   className="inline-flex items-center gap-1.5 text-sm px-4 py-2 rounded-lg font-medium transition-colors"
-                  style={{ backgroundColor: "rgba(30,122,107,0.25)", color: "var(--c-teal)" }}
+                  style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.25)", color: "var(--c-teal)" }}
                 >
                   Ersten Schritt hinzufügen
                 </Link>

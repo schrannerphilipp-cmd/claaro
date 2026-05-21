@@ -52,7 +52,7 @@ function LoginForm() {
     <div className="min-h-screen bg-[#1a1814] flex items-center justify-center px-4" style={sans}>
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <span className="text-2xl font-bold text-[#c84b2f] tracking-tight" style={sans}>
+          <span className="text-2xl font-bold text-[var(--c-accent)] tracking-tight" style={sans}>
             Claaro
           </span>
           <h1 className="text-3xl text-white mt-3" style={serif}>
@@ -105,7 +105,7 @@ function LoginForm() {
             type="submit"
             disabled={loading}
             className="w-full py-2.5 rounded-lg text-sm font-semibold text-white transition-colors disabled:opacity-50"
-            style={{ backgroundColor: "#c84b2f" }}
+            style={{ backgroundColor: "var(--c-accent)" }}
           >
             {loading ? "Bitte warten…" : mode === "login" ? "Einloggen" : "Registrieren"}
           </button>
@@ -115,7 +115,7 @@ function LoginForm() {
           {mode === "login" ? "Noch kein Konto?" : "Bereits registriert?"}{" "}
           <button
             onClick={() => { setMode(mode === "login" ? "register" : "login"); setError(null); setInfo(null); }}
-            className="text-[#c84b2f] hover:text-[#e05a38] transition-colors font-medium"
+            className="text-[var(--c-accent)] hover:text-[#e05a38] transition-colors font-medium"
           >
             {mode === "login" ? "Registrieren" : "Einloggen"}
           </button>

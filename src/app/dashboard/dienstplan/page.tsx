@@ -112,7 +112,7 @@ export default function DienstplanPage() {
   return (
     <FeatureLayout
       name="Dienstplan"
-      description="KI-gestützter Schichtplan mit automatischer Gesetzeskonformität für Deutschland, Österreich und die Schweiz."
+      description="KI-gestützter Schichtplan — orientiert an den Arbeitszeitgesetzen für Deutschland, Österreich und die Schweiz. Keine Rechtsberatung."
     >
       <div className="space-y-8" style={sans}>
         {/* Setup-Hinweis */}
@@ -176,8 +176,8 @@ export default function DienstplanPage() {
               disabled={generatingKi || needsSetup}
               className="flex items-center gap-2 text-sm px-4 py-2 rounded-lg border transition-colors disabled:opacity-40"
               style={{
-                backgroundColor: "rgba(200,75,47,0.15)",
-                borderColor: "rgba(200,75,47,0.35)",
+                backgroundColor: "rgba(var(--c-accent-rgb),0.15)",
+                borderColor: "rgba(var(--c-accent-rgb),0.35)",
                 color: "var(--c-accent)",
               }}
             >

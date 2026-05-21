@@ -123,7 +123,7 @@ export default function QuizRunner({ content, onComplete }: QuizRunnerProps) {
         <button
           onClick={handleNext}
           className="w-full py-2.5 rounded-xl text-sm font-medium transition-colors"
-          style={{ backgroundColor: "rgba(30,122,107,0.25)", color: "var(--c-teal)" }}
+          style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.25)", color: "var(--c-teal)" }}
         >
           {isLastQuestion ? "Auswertung anzeigen" : "Nächste Frage →"}
         </button>

@@ -196,6 +196,23 @@ export default function ProfilBearbeiten() {
       setUploading(false);
     }
 
+    // Persist to Supabase profiles table
+    if (supabaseConfigured && userId) {
+      const supabase = getBrowserClient()!;
+      const { error: dbErr } = await supabase.from("profiles").upsert({
+        id: userId,
+        username: trimmed,
+        avatar_url: newAvatarUrl,
+        avatar_path: newAvatarPath,
+      });
+      if (dbErr) {
+        console.error("[ProfilBearbeiten] Profil speichern Fehler:", dbErr);
+        setError(dbErr.message);
+        setSaving(false);
+        return;
+      }
+    }
+
     setOrigUsername(trimmed);
     setOrigAvatarUrl(newAvatarUrl);
     setOrigAvatarPath(newAvatarPath);
@@ -241,7 +258,7 @@ export default function ProfilBearbeiten() {
             className="cursor-pointer w-20 h-20 rounded-full overflow-hidden flex items-center justify-center relative"
             style={{
               border: dragging ? "2px solid var(--c-teal)" : "2px solid rgba(255,255,255,0.15)",
-              backgroundColor: displayAvatar ? "transparent" : "rgba(200,75,47,0.2)",
+              backgroundColor: displayAvatar ? "transparent" : "rgba(var(--c-accent-rgb),0.2)",
             }}
           >
             {uploading ? (
@@ -350,8 +367,8 @@ export default function ProfilBearbeiten() {
         disabled={!canSave}
         className="w-full text-sm py-2.5 rounded-lg border transition-all disabled:opacity-40"
         style={{
-          backgroundColor: saved ? "rgba(30,122,107,0.2)" : "rgba(200,75,47,0.15)",
-          borderColor: saved ? "rgba(30,122,107,0.4)" : "rgba(200,75,47,0.35)",
+          backgroundColor: saved ? "rgba(var(--c-teal-rgb),0.2)" : "rgba(var(--c-accent-rgb),0.15)",
+          borderColor: saved ? "rgba(var(--c-teal-rgb),0.4)" : "rgba(var(--c-accent-rgb),0.35)",
           color: saved ? "var(--c-teal)" : "var(--c-accent)",
         }}
       >

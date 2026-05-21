@@ -18,6 +18,7 @@ interface Toast {
   id: number;
   aktion: string;
   minuten: number;
+  message?: string;
 }
 
 export default function ZeitersparnisToast() {
@@ -27,9 +28,9 @@ export default function ZeitersparnisToast() {
 
   useEffect(() => {
     function handler(e: Event) {
-      const { aktion, minuten } = (e as CustomEvent<ZeitersparnisEvent>).detail;
+      const { aktion, minuten, message } = (e as CustomEvent<ZeitersparnisEvent>).detail;
       const id = ++idRef.current;
-      setToasts((prev) => [...prev, { id, aktion, minuten }]);
+      setToasts((prev) => [...prev, { id, aktion, minuten, message }]);
       setSessionMinuten((prev) => prev + minuten);
       setTimeout(() => {
         setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -55,7 +56,7 @@ export default function ZeitersparnisToast() {
         key={latest.id}
         className="pointer-events-auto max-w-xs w-full rounded-2xl border px-5 py-4 shadow-2xl"
         style={{
-          backgroundColor: "rgba(30,122,107,0.95)",
+          backgroundColor: "rgba(var(--c-teal-rgb),0.95)",
           borderColor: "rgba(255,255,255,0.15)",
           animation: "claaro-zeitersparnis-in 0.4s cubic-bezier(0.22,1,0.36,1) both",
         }}
@@ -83,12 +84,18 @@ export default function ZeitersparnisToast() {
           </div>
 
           <div className="flex-1 min-w-0">
-            <p className="text-white font-semibold text-sm leading-snug">
-              Du hast gerade{" "}
-              <span className="text-white">{formatZeit(latest.minuten)}</span>{" "}
-              gespart!
-            </p>
-            <p className="text-white/65 text-xs mt-0.5">{latest.aktion}</p>
+            {latest.message ? (
+              <p className="text-white font-semibold text-sm leading-snug">{latest.message}</p>
+            ) : (
+              <>
+                <p className="text-white font-semibold text-sm leading-snug">
+                  Du hast gerade{" "}
+                  <span className="text-white">{formatZeit(latest.minuten)}</span>{" "}
+                  gespart!
+                </p>
+                <p className="text-white/65 text-xs mt-0.5">{latest.aktion}</p>
+              </>
+            )}
 
             {sessionMinuten > latest.minuten && (
               <p className="text-white/50 text-xs mt-2 pt-2 border-t border-white/15">

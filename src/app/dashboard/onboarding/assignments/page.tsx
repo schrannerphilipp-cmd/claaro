@@ -75,7 +75,7 @@ export default function AssignmentsPage() {
           <button
             onClick={() => setShowForm((v) => !v)}
             className="flex items-center gap-1.5 text-sm px-4 py-2 rounded-lg font-medium transition-colors"
-            style={{ backgroundColor: "rgba(30,122,107,0.25)", color: "var(--c-teal)" }}
+            style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.25)", color: "var(--c-teal)" }}
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 14 14">
               <path d="M7 2v10M2 7h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
@@ -152,7 +152,7 @@ export default function AssignmentsPage() {
               <button
                 type="submit"
                 className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                style={{ backgroundColor: "rgba(30,122,107,0.3)", color: "var(--c-teal)" }}
+                style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.3)", color: "var(--c-teal)" }}
               >
                 Einarbeitung starten
               </button>

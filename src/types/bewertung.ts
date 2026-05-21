@@ -1,5 +1,5 @@
 export type PlatformType = "google" | "yelp" | "trustpilot" | "custom";
-export type Channel = "whatsapp" | "sms";
+export type Channel = "sms";
 export type TriggerType = "appointment" | "transaction" | "manual";
 export type RequestStatus = "pending" | "sent" | "delivered" | "clicked" | "failed";
 export type EntryStatus = "new" | "read" | "responded";

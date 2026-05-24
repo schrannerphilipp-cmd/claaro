@@ -11,6 +11,11 @@ export const supabaseConfigured =
   anonKey.length > 0 &&
   !anonKey.startsWith("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.placeholder");
 
+// Service-Role-Key muss ein JWT sein (eyJ…), nicht das neue sb_secret_-Format.
+// Den echten JWT-Key im Supabase-Dashboard unter Settings → API → service_role kopieren.
+export const serviceRoleConfigured =
+  serviceKey.startsWith("eyJ") && serviceKey.length > 100;
+
 // Browser-Client mit Cookie-Persistenz (für Auth in Next.js)
 let browserInstance: SupabaseClient | null = null;
 export function getBrowserClient(): SupabaseClient | null {

@@ -46,6 +46,7 @@ export default function DienstplanPage() {
   const [publishing, setPublishing] = useState(false);
   const [warnungen, setWarnungen] = useState<string[]>([]);
   const [kiError, setKiError] = useState<string | null>(null);
+  const [kiNotConfigured, setKiNotConfigured] = useState<string | null>(null);
 
   const loadEmployees = useCallback(async () => {
     if (HAUPTACCOUNT_ID === "demo") return;
@@ -68,6 +69,7 @@ export default function DienstplanPage() {
   async function generiereKiPlan() {
     setGeneratingKi(true);
     setKiError(null);
+    setKiNotConfigured(null);
     setWarnungen([]);
     try {
       const res = await fetch("/api/dienstplan/ki-erstellen", {
@@ -76,6 +78,10 @@ export default function DienstplanPage() {
         body: JSON.stringify({ woche, hauptaccount_id: HAUPTACCOUNT_ID }),
       });
       const data = await res.json();
+      if (res.status === 503 || data.type === "not_configured") {
+        setKiNotConfigured(data.error ?? "KI nicht konfiguriert.");
+        return;
+      }
       if (!res.ok) throw new Error(data.error ?? "KI-Fehler.");
       setPlan(data.plan);
       setShifts(data.schichten ?? []);
@@ -199,6 +205,19 @@ export default function DienstplanPage() {
               )}
             </button>
           </div>
+
+          {kiNotConfigured && (
+            <div className="mb-4 flex items-start gap-2 bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3 text-sm" style={{ color: "var(--c-amber)" }}>
+              <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 16 16">
+                <path d="M8 2l6 12H2L8 2z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+                <path d="M8 6v4M8 11.5v.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+              </svg>
+              <div>
+                <p className="font-medium mb-0.5">KI nicht konfiguriert</p>
+                <p className="opacity-80">{kiNotConfigured}</p>
+              </div>
+            </div>
+          )}
 
           {kiError && (
             <div className="mb-4 flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 text-sm text-red-400">

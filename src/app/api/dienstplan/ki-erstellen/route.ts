@@ -26,7 +26,18 @@ export async function POST(req: NextRequest) {
   }
 
   if (!process.env.ANTHROPIC_API_KEY) {
-    return NextResponse.json({ error: "⚡ KI-Schichtplan ist in Vorbereitung — steht in Kürze bereit." }, { status: 503 });
+    return NextResponse.json(
+      { error: "ANTHROPIC_API_KEY fehlt. Trage den Key in .env.local ein.", type: "not_configured" },
+      { status: 503 }
+    );
+  }
+
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+  if (!serviceKey.startsWith("eyJ")) {
+    return NextResponse.json(
+      { error: "SUPABASE_SERVICE_ROLE_KEY ist kein gültiger JWT. Bitte den echten Service-Role-Key (eyJ…) aus dem Supabase-Dashboard eintragen.", type: "not_configured" },
+      { status: 503 }
+    );
   }
 
   const supabase = createServerClient();

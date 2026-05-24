@@ -71,6 +71,11 @@ export default function ProfilBearbeiten() {
         .maybeSingle()
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .then((res: any) => {
+          if (res.error) {
+            // profiles-Tabelle fehlt noch — kein harter Fehler beim Laden
+            console.warn("[ProfilBearbeiten] profiles-Tabelle nicht gefunden:", res.error.message);
+            return;
+          }
           const p = res.data;
           if (!p) return;
           const u = (p.username as string) ?? "";
@@ -207,7 +212,18 @@ export default function ProfilBearbeiten() {
       });
       if (dbErr) {
         console.error("[ProfilBearbeiten] Profil speichern Fehler:", dbErr);
-        setError(dbErr.message);
+        // Fehlermeldung: profiles-Tabelle fehlt noch
+        if (
+          dbErr.message.includes("profiles") &&
+          (dbErr.message.includes("schema cache") || dbErr.message.includes("does not exist"))
+        ) {
+          setError(
+            "Die profiles-Tabelle fehlt in Supabase. Bitte führe die Migration 004_profil_abo_chat.sql " +
+            "im Supabase Dashboard → SQL Editor aus."
+          );
+        } else {
+          setError(dbErr.message);
+        }
         setSaving(false);
         return;
       }

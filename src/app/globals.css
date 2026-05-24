@@ -67,6 +67,135 @@ body {
   .page-enter-back { animation: claaro-page-fade 200ms ease-out both; }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   CLAARO ANIMATION SYSTEM — Apple/Amazon quality
+   All transforms use GPU-composited properties: transform + opacity only.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Cards / Tiles ────────────────────────────────────────────────────── */
+.c-card {
+  transition: transform 200ms ease-out, box-shadow 200ms ease-out;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .c-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.07);
+  }
+  .c-card:active {
+    transform: scale(0.995);
+  }
+}
+
+/* ── 2. Buttons ──────────────────────────────────────────────────────────── */
+.c-btn {
+  transition: transform 150ms ease-out, opacity 150ms ease-out,
+              background-color 150ms ease-out, border-color 150ms ease-out,
+              box-shadow 150ms ease-out;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .c-btn:active:not(:disabled) {
+    transform: scale(0.97);
+    opacity: 0.9;
+  }
+  .c-btn:hover:not(:disabled) {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  }
+}
+
+/* ── 3. Shake (form error) ───────────────────────────────────────────────── */
+@keyframes c-shake {
+  0%,  100% { transform: translateX(0); }
+  15%        { transform: translateX(-8px); }
+  30%        { transform: translateX(7px); }
+  45%        { transform: translateX(-5px); }
+  60%        { transform: translateX(4px); }
+  75%        { transform: translateX(-2px); }
+  90%        { transform: translateX(1px); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .c-shake {
+    animation: c-shake 420ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  }
+}
+
+/* ── 4. Success pop (form success) ──────────────────────────────────────── */
+@keyframes c-success-pop {
+  0%   { transform: scale(0.88); opacity: 0; }
+  65%  { transform: scale(1.04); }
+  100% { transform: scale(1);    opacity: 1; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .c-success-pop {
+    animation: c-success-pop 320ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .c-success-pop { animation: claaro-page-fade 200ms ease-out both; }
+}
+
+/* ── 5. Skeleton loader ──────────────────────────────────────────────────── */
+@keyframes c-skeleton-wave {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+.c-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.06) 25%,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(255, 255, 255, 0.06) 75%
+  );
+  background-size: 200% 100%;
+  border-radius: 8px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .c-skeleton {
+    animation: c-skeleton-wave 1.8s ease-in-out infinite;
+  }
+}
+
+/* ── 6. FadeIn utility (JS-independent fallback) ─────────────────────────── */
+@keyframes c-fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .c-fade-up {
+    animation: c-fade-up 400ms cubic-bezier(0.25, 0.1, 0.25, 1) both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .c-fade-up { animation: claaro-page-fade 200ms ease-out both; }
+}
+
+/* ── 7. Input focus glow ──────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  input, textarea, select {
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+  }
+  input:focus, textarea:focus, select:focus {
+    box-shadow: 0 0 0 3px rgba(200, 75, 47, 0.15);
+  }
+}
+
+/* ── 8. Link / icon buttons ──────────────────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  .c-icon-btn {
+    transition: transform 150ms ease-out, opacity 150ms ease-out;
+  }
+  .c-icon-btn:hover  { transform: scale(1.1); }
+  .c-icon-btn:active { transform: scale(0.93); }
+}
+
+/* ── 9. Tab indicator ────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  .c-tab {
+    transition: color 150ms ease, border-color 150ms ease, background-color 150ms ease;
+  }
+}
+
 @media print {
   .print\:hidden {
     display: none !important;

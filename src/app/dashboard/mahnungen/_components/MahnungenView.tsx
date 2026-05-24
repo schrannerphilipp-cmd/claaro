@@ -351,7 +351,7 @@ function EskalationsTimeline({
           <button
             onClick={handleSend}
             disabled={!canSend}
-            className="w-full text-sm font-medium py-2.5 px-4 rounded-lg transition-all"
+            className="c-btn w-full text-sm font-medium py-2.5 px-4 rounded-lg transition-all"
             style={
               canSend
                 ? { backgroundColor: "var(--c-accent)", color: "#fff" }
@@ -426,7 +426,7 @@ export default function MahnungenView({ rechnungen }: { rechnungen: RechnungData
         </p>
         <button
           onClick={() => setShowNeuModal(true)}
-          className="text-sm font-medium px-4 py-2 rounded-lg border border-white/15 text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+          className="c-btn text-sm font-medium px-4 py-2 rounded-lg border border-white/15 text-white/70 hover:text-white hover:bg-white/5 transition-colors"
         >
           + Neue Rechnung
         </button>
@@ -441,7 +441,7 @@ export default function MahnungenView({ rechnungen }: { rechnungen: RechnungData
       ) : (
         <div className={`grid grid-cols-1 gap-6 items-start ${selected ? "lg:grid-cols-[1fr_340px]" : ""}`}>
           {/* Rechnungs-Übersicht */}
-          <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+          <div className="c-card bg-white/5 border border-white/10 rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[640px]">
                 <thead>

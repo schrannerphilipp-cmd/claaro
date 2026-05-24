@@ -569,7 +569,7 @@ export default function DashboardPage() {
                   key={id}
                   href={`/dashboard/${id}`}
                   ref={(el) => { tileRefs.current[i] = el; }}
-                  className="claaro-tile relative text-left rounded-xl border p-6 transition-all bg-white/5 border-white/10 hover:bg-white/[0.08] hover:border-white/20"
+                  className="claaro-tile c-card relative text-left rounded-xl border p-6 transition-all bg-white/5 border-white/10 hover:bg-white/[0.08] hover:border-white/20"
                 >
                   <span className="claaro-tile-icon inline-block text-2xl mb-3">{icon}</span>
                   <h3 className="font-semibold text-sm mb-1.5 text-white">{name}</h3>

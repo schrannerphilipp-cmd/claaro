@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getBrowserClient, supabaseConfigured } from "@/lib/supabase";
 
 const sans = { fontFamily: "var(--font-dm-sans)" } as const;
@@ -10,9 +10,9 @@ const MAX_SIZE = 3 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
 const PROFILE_LS_KEY = "claaro-profil";
 
-export function dispatchProfilUpdated(username: string, avatarUrl: string | null) {
-  localStorage.setItem(PROFILE_LS_KEY, JSON.stringify({ username, avatarUrl }));
-  window.dispatchEvent(new CustomEvent("claaro:profil-updated", { detail: { username, avatarUrl } }));
+export function dispatchProfilUpdated(name: string, avatarUrl: string | null) {
+  localStorage.setItem(PROFILE_LS_KEY, JSON.stringify({ username: name, avatarUrl }));
+  window.dispatchEvent(new CustomEvent("claaro:profil-updated", { detail: { username: name, avatarUrl } }));
 }
 
 export function loadProfilFromStorage(): { username: string; avatarUrl: string | null } {
@@ -28,13 +28,14 @@ const inputClass =
 
 export default function ProfilBearbeiten() {
   const [userId, setUserId] = useState<string | null>(null);
-  const [origUsername, setOrigUsername] = useState("");
+
+  const [name, setName] = useState("");
+  const [origName, setOrigName] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [origCompanyName, setOrigCompanyName] = useState("");
+
   const [origAvatarUrl, setOrigAvatarUrl] = useState<string | null>(null);
   const [origAvatarPath, setOrigAvatarPath] = useState<string | null>(null);
-
-  const [username, setUsername] = useState("");
-  const [checking, setChecking] = useState(false);
-  const [available, setAvailable] = useState<boolean | null>(null);
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -46,14 +47,13 @@ export default function ProfilBearbeiten() {
   const [error, setError] = useState<string | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const checkTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Load profile on mount
   useEffect(() => {
     const stored = loadProfilFromStorage();
     if (stored.username) {
-      setUsername(stored.username);
-      setOrigUsername(stored.username);
+      setName(stored.username);
+      setOrigName(stored.username);
       setOrigAvatarUrl(stored.avatarUrl);
     }
 
@@ -66,60 +66,30 @@ export default function ProfilBearbeiten() {
 
       supabase
         .from("profiles")
-        .select("username, avatar_url, avatar_path")
+        .select("name, username, avatar_url, avatar_path, company_name")
         .eq("id", res.data.user.id)
         .maybeSingle()
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .then((res: any) => {
           if (res.error) {
-            // profiles-Tabelle fehlt noch — kein harter Fehler beim Laden
-            console.warn("[ProfilBearbeiten] profiles-Tabelle nicht gefunden:", res.error.message);
+            console.warn("[ProfilBearbeiten] profiles-Fehler:", res.error.message);
             return;
           }
           const p = res.data;
           if (!p) return;
-          const u = (p.username as string) ?? "";
+          // name hat Vorrang; fallback auf username (Legacy)
+          const n = (p.name as string) || (p.username as string) || "";
           const av = (p.avatar_url as string | null) ?? null;
-          setUsername(u);
-          setOrigUsername(u);
+          const cn = (p.company_name as string) || "";
+          setName(n);
+          setOrigName(n);
           setOrigAvatarUrl(av);
           setOrigAvatarPath((p.avatar_path as string | null) ?? null);
+          setCompanyName(cn);
+          setOrigCompanyName(cn);
         });
     });
   }, []);
-
-  const runCheck = useCallback(
-    (val: string, uid: string | null) => {
-      if (val === origUsername) { setAvailable(null); setChecking(false); return; }
-      if (!uid) { setChecking(false); return; }
-      setChecking(true);
-      if (!supabaseConfigured) { setChecking(false); return; }
-      const supabase = getBrowserClient()!;
-      supabase
-        .from("profiles")
-        .select("id")
-        .eq("username", val)
-        .neq("id", uid)
-        .maybeSingle()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .then(({ data }: { data: any }) => {
-          setAvailable(!data);
-          setChecking(false);
-        });
-    },
-    [origUsername]
-  );
-
-  function handleUsernameChange(val: string) {
-    if (!/^[a-zA-Z0-9_]*$/.test(val) && val !== "") return;
-    setUsername(val);
-    setAvailable(null);
-    setSaved(false);
-    if (checkTimer.current) clearTimeout(checkTimer.current);
-    if (val.length >= 3) {
-      checkTimer.current = setTimeout(() => runCheck(val, userId), 500);
-    }
-  }
 
   function handleFile(file: File) {
     setError(null);
@@ -150,14 +120,16 @@ export default function ProfilBearbeiten() {
     setOrigAvatarPath(null);
     setAvatarPreview(null);
     setAvatarFile(null);
-    dispatchProfilUpdated(origUsername, null);
+    dispatchProfilUpdated(origName, null);
   }
 
   async function handleSave() {
     setError(null);
-    const trimmed = username.trim();
-    if (trimmed.length < 3) { setError("Benutzername mind. 3 Zeichen."); return; }
-    if (trimmed.length > 30) { setError("Benutzername max. 30 Zeichen."); return; }
+    const trimmedName = name.trim();
+    const trimmedCompany = companyName.trim();
+
+    if (trimmedName.length < 2) { setError("Name mind. 2 Zeichen."); return; }
+    if (trimmedName.length > 50) { setError("Name max. 50 Zeichen."); return; }
 
     setSaving(true);
 
@@ -171,8 +143,7 @@ export default function ProfilBearbeiten() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
           setError("Nicht eingeloggt – bitte zuerst anmelden.");
-          setSaving(false);
-          setUploading(false);
+          setSaving(false); setUploading(false);
           return;
         }
         const ext = avatarFile.name.split(".").pop() ?? "jpg";
@@ -181,78 +152,60 @@ export default function ProfilBearbeiten() {
           .from(BUCKET)
           .upload(path, avatarFile, { upsert: true, contentType: avatarFile.type });
         if (upErr) {
-          console.error("[ProfilBearbeiten] Avatar-Upload Fehler:", upErr);
           setError(upErr.message);
-          setSaving(false);
-          setUploading(false);
+          setSaving(false); setUploading(false);
           return;
         }
         const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
         newAvatarUrl = data.publicUrl + `?t=${Date.now()}`;
         newAvatarPath = path;
-        console.log("[ProfilBearbeiten] Avatar hochgeladen:", newAvatarUrl);
       } catch (err) {
-        console.error("[ProfilBearbeiten] Unbekannter Fehler:", err);
         setError(err instanceof Error ? err.message : "Upload fehlgeschlagen.");
-        setSaving(false);
-        setUploading(false);
+        setSaving(false); setUploading(false);
         return;
       }
       setUploading(false);
     }
 
-    // Persist to Supabase profiles table
     if (supabaseConfigured && userId) {
       const supabase = getBrowserClient()!;
       const { error: dbErr } = await supabase.from("profiles").upsert({
         id: userId,
-        username: trimmed,
+        name: trimmedName,
+        username: trimmedName,        // Legacy-Feld beibehalten
+        company_name: trimmedCompany || null,
         avatar_url: newAvatarUrl,
         avatar_path: newAvatarPath,
+        updated_at: new Date().toISOString(),
       });
       if (dbErr) {
-        console.error("[ProfilBearbeiten] Profil speichern Fehler:", dbErr);
-        // Fehlermeldung: profiles-Tabelle fehlt noch
-        if (
-          dbErr.message.includes("profiles") &&
-          (dbErr.message.includes("schema cache") || dbErr.message.includes("does not exist"))
-        ) {
-          setError(
-            "Die profiles-Tabelle fehlt in Supabase. Bitte führe die Migration 004_profil_abo_chat.sql " +
-            "im Supabase Dashboard → SQL Editor aus."
-          );
-        } else {
-          setError(dbErr.message);
-        }
+        console.error("[ProfilBearbeiten] Speichern Fehler:", dbErr);
+        setError(dbErr.message);
         setSaving(false);
         return;
       }
     }
 
-    setOrigUsername(trimmed);
+    setOrigName(trimmedName);
+    setOrigCompanyName(trimmedCompany);
     setOrigAvatarUrl(newAvatarUrl);
     setOrigAvatarPath(newAvatarPath);
     setAvatarFile(null);
     setAvatarPreview(null);
-    setAvailable(null);
-    dispatchProfilUpdated(trimmed, newAvatarUrl);
+    dispatchProfilUpdated(trimmedName, newAvatarUrl);
     setSaved(true);
     setSaving(false);
     setTimeout(() => setSaved(false), 3000);
   }
 
   const displayAvatar = avatarPreview ?? origAvatarUrl;
-  const initials = (username || origUsername || "?").slice(0, 2).toUpperCase();
-  const usernameValid = /^[a-zA-Z0-9_]{3,30}$/.test(username);
-  const usernameChanged = username !== origUsername;
-  const avatarChanged = avatarFile !== null;
-  const hasChanges = usernameChanged || avatarChanged;
-  const canSave =
-    hasChanges &&
-    usernameValid &&
-    !checking &&
-    !saving &&
-    (usernameChanged ? available !== false : true);
+  const initials = (name || "?").slice(0, 2).toUpperCase();
+  const nameValid = name.trim().length >= 2 && name.trim().length <= 50;
+  const hasChanges =
+    name !== origName ||
+    companyName !== origCompanyName ||
+    avatarFile !== null;
+  const canSave = hasChanges && nameValid && !saving;
 
   return (
     <div className="space-y-6" style={sans}>
@@ -330,46 +283,29 @@ export default function ProfilBearbeiten() {
         </div>
       </div>
 
-      {/* Username */}
+      {/* Name */}
       <div>
-        <label className="block text-xs text-white/40 mb-1.5">Benutzername</label>
-        <div className="relative">
-          <input
-            className={`${inputClass} pr-8`}
-            value={username}
-            onChange={(e) => handleUsernameChange(e.target.value)}
-            maxLength={30}
-            placeholder="dein_name"
-          />
-          <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            {checking && (
-              <svg className="w-3.5 h-3.5 animate-spin text-white/40" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-              </svg>
-            )}
-            {!checking && available === true && (
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 16 16" style={{ color: "var(--c-teal)" }}>
-                <path d="M3 8l3.5 3.5L13 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            )}
-            {!checking && available === false && (
-              <svg className="w-3.5 h-3.5 text-red-400" fill="none" viewBox="0 0 16 16">
-                <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              </svg>
-            )}
-          </div>
-        </div>
-        <div className="flex justify-between mt-1">
-          <p className="text-xs text-white/25">
-            {available === false ? (
-              <span className="text-red-400">Dieser Name ist bereits vergeben.</span>
-            ) : (
-              "Buchstaben, Zahlen und _ · 3–30 Zeichen"
-            )}
-          </p>
-          <p className="text-xs text-white/20">{username.length}/30</p>
-        </div>
+        <label className="block text-xs text-white/40 mb-1.5">Name</label>
+        <input
+          className={inputClass}
+          value={name}
+          onChange={(e) => { setName(e.target.value); setSaved(false); }}
+          maxLength={50}
+          placeholder="Dein Name"
+        />
+        <p className="text-xs text-white/25 mt-1">2–50 Zeichen</p>
+      </div>
+
+      {/* Firmenname */}
+      <div>
+        <label className="block text-xs text-white/40 mb-1.5">Firmenname <span className="text-white/20">(optional)</span></label>
+        <input
+          className={inputClass}
+          value={companyName}
+          onChange={(e) => { setCompanyName(e.target.value); setSaved(false); }}
+          maxLength={100}
+          placeholder="Deine Firma GmbH"
+        />
       </div>
 
       {error && (

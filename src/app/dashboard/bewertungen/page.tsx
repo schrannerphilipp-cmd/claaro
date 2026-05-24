@@ -23,7 +23,7 @@ function genId(): string {
 
 function KpiTile({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+    <div className="c-card bg-white/5 border border-white/10 rounded-xl p-4">
       <p className="text-xs text-white/40 mb-2">{label}</p>
       <p className="text-2xl font-bold text-white">{value}</p>
       {sub && <p className="text-[10px] text-white/30 mt-1">{sub}</p>}
@@ -133,7 +133,7 @@ export default function BewertungenPage() {
           <Link
             key={href}
             href={href}
-            className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/50 hover:text-white/80 hover:bg-white/10 transition-colors"
+            className="c-btn flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/50 hover:text-white/80 hover:bg-white/10 transition-colors"
           >
             {label}
             {badge !== undefined && (
@@ -236,7 +236,7 @@ export default function BewertungenPage() {
       {/* FAB */}
       <button
         onClick={() => setShowSendModal(true)}
-        className="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-5 py-3 rounded-full text-sm font-semibold shadow-xl hover:opacity-90 transition-opacity"
+        className="c-btn fixed bottom-6 right-6 z-40 flex items-center gap-2 px-5 py-3 rounded-full text-sm font-semibold shadow-xl hover:opacity-90 transition-opacity"
         style={{ backgroundColor: "var(--c-teal)", color: "#fff" }}
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16">

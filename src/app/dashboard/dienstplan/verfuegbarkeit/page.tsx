@@ -15,7 +15,7 @@ export default function VerfuegbarkeitsPage() {
       backHref="/dashboard/dienstplan"
     >
       {isDemo ? (
-        <div className="bg-white/5 border border-white/10 rounded-xl py-14 px-8 text-center">
+        <div className="c-card bg-white/5 border border-white/10 rounded-xl py-14 px-8 text-center">
           <p className="text-3xl mb-4">🔑</p>
           <p className="text-sm text-white/50">
             Bitte{" "}

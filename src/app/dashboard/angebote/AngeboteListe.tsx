@@ -90,7 +90,7 @@ export default function AngeboteListe({ onShowForm }: { onShowForm?: () => void 
         <p className="text-sm text-white/35 mb-6 max-w-xs">Erstelle dein erstes Angebot und sende es direkt an deine Kunden.</p>
         <button
           onClick={onShowForm}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all"
+          className="c-btn inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all"
           style={{ backgroundColor: "rgba(var(--c-accent-rgb),0.15)", color: "var(--c-accent)", border: "1px solid rgba(var(--c-accent-rgb),0.25)" }}
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16">
@@ -110,7 +110,7 @@ export default function AngeboteListe({ onShowForm }: { onShowForm?: () => void 
           <span className="text-xs text-white/30">{angebote.length} Angebot{angebote.length !== 1 ? "e" : ""}</span>
           <button
             onClick={onShowForm}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+            className="c-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
             style={{ backgroundColor: "rgba(var(--c-accent-rgb),0.15)", color: "var(--c-accent)", border: "1px solid rgba(var(--c-accent-rgb),0.25)" }}
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 16 16">
@@ -121,7 +121,7 @@ export default function AngeboteListe({ onShowForm }: { onShowForm?: () => void 
         </div>
       </div>
 
-      <div className="bg-white/5 rounded-xl border border-white/10 overflow-visible">
+      <div className="c-card bg-white/5 rounded-xl border border-white/10 overflow-visible">
         {/* Tabellenkopf (Desktop) */}
         <div className="hidden md:grid grid-cols-12 gap-4 px-5 py-2.5 text-xs font-medium text-white/25 uppercase tracking-wide border-b border-white/5">
           <div className="col-span-2">Nummer</div>

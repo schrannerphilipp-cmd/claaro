@@ -83,7 +83,7 @@ function StatCard({
   accent?: string;
 }) {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-xl px-5 py-4 flex flex-col gap-1">
+    <div className="c-card bg-white/5 border border-white/10 rounded-xl px-5 py-4 flex flex-col gap-1">
       <span
         className="text-2xl font-semibold"
         style={{ color: accent ?? "white" }}
@@ -277,7 +277,7 @@ function TaskCard({
             {!isErledigt ? (
               <button
                 onClick={() => onMarkErledigt(task.id)}
-                className="flex items-center gap-2 text-sm px-4 py-2 rounded-lg border transition-colors"
+                className="c-btn flex items-center gap-2 text-sm px-4 py-2 rounded-lg border transition-colors"
                 style={{
                   backgroundColor: "rgba(var(--c-teal-rgb),0.18)",
                   borderColor: "rgba(var(--c-teal-rgb),0.35)",
@@ -298,7 +298,7 @@ function TaskCard({
             ) : (
               <button
                 onClick={() => onMarkOffen(task.id)}
-                className="flex items-center gap-2 text-sm px-4 py-2 rounded-lg border transition-colors"
+                className="c-btn flex items-center gap-2 text-sm px-4 py-2 rounded-lg border transition-colors"
                 style={{
                   backgroundColor: "rgba(255,255,255,0.05)",
                   borderColor: "rgba(255,255,255,0.12)",
@@ -336,7 +336,7 @@ function MetaItem({ label, value }: { label: string; value: string }) {
 
 function EmptyState({ filtered }: { filtered: boolean }) {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-xl py-14 px-8 text-center">
+    <div className="c-card bg-white/5 border border-white/10 rounded-xl py-14 px-8 text-center">
       <p className="text-3xl mb-4">{filtered ? "🔍" : "✅"}</p>
       <p className="text-white/60 text-sm">
         {filtered

@@ -122,7 +122,7 @@ export default function RunPage() {
           />
         ))}
 
-        <div className="relative z-10 max-w-md w-full text-center bg-white/5 border border-white/10 rounded-2xl p-10">
+        <div className="c-card relative z-10 max-w-md w-full text-center bg-white/5 border border-white/10 rounded-2xl p-10">
           <p className="text-5xl mb-5">🎉</p>
           <h1 className="text-3xl text-white mb-2" style={serif}>Geschafft!</h1>
           <p className="text-white/60 mb-1">{assignment.employeeName} hat die Einarbeitung</p>
@@ -143,7 +143,7 @@ export default function RunPage() {
 
           <button
             onClick={() => router.push("/dashboard/onboarding")}
-            className="w-full py-2.5 rounded-xl text-sm font-medium transition-colors"
+            className="c-btn w-full py-2.5 rounded-xl text-sm font-medium transition-colors"
             style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.3)", color: "var(--c-teal)" }}
           >
             Zur Übersicht
@@ -155,7 +155,7 @@ export default function RunPage() {
 
   // ── Run screen ──────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-[#1a1814] flex flex-col" style={sans}>
+    <div className="min-h-screen bg-[#1a1814] flex flex-col c-fade-up" style={sans}>
       <style>{`
         @keyframes claaro-page-fade { from { opacity: 0; } to { opacity: 1; } }
         .step-appear { animation: claaro-page-fade 300ms ease-out both; }
@@ -239,7 +239,7 @@ export default function RunPage() {
                 {stepIdx > 0 && (
                   <button
                     onClick={() => { setStepIdx((i) => i - 1); setChecklistDone(new Set()); setDocRead(false); setVideoWatched(false); setQuizScore(null); }}
-                    className="px-4 py-2.5 rounded-xl text-sm border border-white/10 bg-white/5 text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+                    className="c-btn px-4 py-2.5 rounded-xl text-sm border border-white/10 bg-white/5 text-white/60 hover:text-white hover:bg-white/10 transition-colors"
                   >
                     ← Zurück
                   </button>
@@ -247,7 +247,7 @@ export default function RunPage() {
                 <button
                   onClick={handleComplete}
                   disabled={!isStepUnlockable()}
-                  className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all"
+                  className="c-btn flex-1 py-2.5 rounded-xl text-sm font-medium transition-all"
                   style={
                     isStepUnlockable()
                       ? { backgroundColor: "rgba(var(--c-teal-rgb),0.3)", color: "var(--c-teal)" }

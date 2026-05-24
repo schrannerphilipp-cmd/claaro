@@ -48,7 +48,7 @@ export default function OnboardingOverviewPage() {
             ].map(({ label, value, sub, accent }) => (
               <div
                 key={label}
-                className="bg-white/5 border border-white/10 rounded-xl px-5 py-4"
+                className="c-card bg-white/5 border border-white/10 rounded-xl px-5 py-4"
               >
                 <p
                   className="text-2xl font-bold mb-0.5"

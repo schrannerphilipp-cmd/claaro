@@ -72,14 +72,14 @@ export default function TemplateBuilderPage() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-[#1a1814]" style={sans}>
+    <div className="h-screen flex flex-col bg-[#1a1814] c-fade-up" style={sans}>
       {/* ── Builder header ─────────────────────────────────────────────── */}
       <header className="border-b border-white/10 bg-[#1a1814] shrink-0 z-20">
         <div className="px-5 py-3 flex items-center gap-3">
           {/* Back */}
           <button
             onClick={handleBack}
-            className="flex items-center gap-1.5 text-sm text-white/50 hover:text-white transition-colors shrink-0"
+            className="c-btn flex items-center gap-1.5 text-sm text-white/50 hover:text-white transition-colors shrink-0"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16">
               <path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -114,7 +114,7 @@ export default function TemplateBuilderPage() {
           {/* Published toggle */}
           <button
             onClick={() => handleUpdate({ isPublished: !local.isPublished })}
-            className={`shrink-0 text-xs px-3 py-1.5 rounded-lg border transition-colors ${
+            className={`c-btn shrink-0 text-xs px-3 py-1.5 rounded-lg border transition-colors ${
               local.isPublished
                 ? "border-[var(--c-teal)]/40 text-[var(--c-teal)] bg-[var(--c-teal)]/10"
                 : "border-white/10 text-white/40 bg-white/5"
@@ -126,7 +126,7 @@ export default function TemplateBuilderPage() {
           {/* Save */}
           <button
             onClick={save}
-            className="shrink-0 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
+            className="c-btn shrink-0 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
             style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.25)", color: "var(--c-teal)" }}
           >
             {savedLabel === "saving" ? "Speichert…" : savedLabel === "saved" ? "Gespeichert ✓" : "Speichern"}

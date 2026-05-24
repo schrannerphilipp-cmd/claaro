@@ -11,7 +11,7 @@ const sans = { fontFamily: "var(--font-dm-sans)" } as const;
 const inputClass =
   "w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-white/30 transition-colors";
 const labelClass = "block text-xs text-white/40 mb-1";
-const cardClass = "bg-white/5 border border-white/10 rounded-xl p-5 space-y-4";
+const cardClass = "c-card bg-white/5 border border-white/10 rounded-xl p-5 space-y-4";
 
 export default function EinstellungenPage() {
   const {
@@ -102,7 +102,7 @@ export default function EinstellungenPage() {
             </div>
             <button
               onClick={() => updateSettings({ autoSendEnabled: !settings.autoSendEnabled })}
-              className={`relative w-11 h-6 rounded-full border transition-colors shrink-0 ${
+              className={`c-btn relative w-11 h-6 rounded-full border transition-colors shrink-0 ${
                 settings.autoSendEnabled
                   ? "border-[var(--c-teal)]/40 bg-[var(--c-teal)]/20"
                   : "border-white/10 bg-white/5"
@@ -199,7 +199,7 @@ export default function EinstellungenPage() {
             <button
               onClick={sendTestMessage}
               disabled={!settings.testPhone.trim() || testStatus === "sending"}
-              className="px-4 py-2 text-sm rounded-lg border transition-colors shrink-0 mb-px"
+              className="c-btn px-4 py-2 text-sm rounded-lg border transition-colors shrink-0 mb-px"
               style={
                 testStatus === "ok"
                   ? {

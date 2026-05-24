@@ -3,7 +3,7 @@ import AngebotFormular from "./AngebotFormular";
 
 export default function AngebotPage() {
   return (
-    <div className="min-h-screen bg-[#1a1814]">
+    <div className="min-h-screen bg-[#1a1814] c-fade-up">
       <header className="bg-[#1a1814] border-b border-white/10">
         <nav className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="text-xl font-bold text-[var(--c-accent)] tracking-tight">

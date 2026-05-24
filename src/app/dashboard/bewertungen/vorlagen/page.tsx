@@ -74,7 +74,7 @@ export default function VorlagenPage() {
         {/* Add template */}
         <button
           onClick={handleCreate}
-          className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white/70 transition-colors"
+          className="c-btn flex items-center gap-1.5 text-xs text-white/40 hover:text-white/70 transition-colors"
         >
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 14 14">
             <path

@@ -12,12 +12,12 @@ export default function EinstellungenPage() {
     >
       <div className="max-w-xl space-y-8" style={sans}>
         {/* Logo */}
-        <div className="bg-white/5 border border-white/10 rounded-xl p-6">
+        <div className="c-card bg-white/5 border border-white/10 rounded-xl p-6">
           <LogoUpload />
         </div>
 
         {/* Firmendaten */}
-        <div className="bg-white/5 border border-white/10 rounded-xl p-6">
+        <div className="c-card bg-white/5 border border-white/10 rounded-xl p-6">
           <FirmendatenForm />
         </div>
       </div>

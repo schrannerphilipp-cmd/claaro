@@ -4,10 +4,10 @@ const sans  = { fontFamily: "var(--font-dm-sans)"  } as const;
 export default function PaymentSuccessPage() {
   return (
     <div
-      className="min-h-screen bg-[#1a1814] flex items-center justify-center px-6"
+      className="min-h-screen bg-[#1a1814] flex items-center justify-center px-6 c-fade-up"
       style={sans}
     >
-      <div className="text-center max-w-md">
+      <div className="c-card text-center max-w-md">
         <div className="w-16 h-16 rounded-full bg-[#1e7a6b]/20 flex items-center justify-center mx-auto mb-6">
           <svg className="w-8 h-8 text-[#1e7a6b]" fill="none" viewBox="0 0 24 24">
             <path

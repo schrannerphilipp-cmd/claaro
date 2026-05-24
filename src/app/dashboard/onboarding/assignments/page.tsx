@@ -74,7 +74,7 @@ export default function AssignmentsPage() {
           </p>
           <button
             onClick={() => setShowForm((v) => !v)}
-            className="flex items-center gap-1.5 text-sm px-4 py-2 rounded-lg font-medium transition-colors"
+            className="c-btn flex items-center gap-1.5 text-sm px-4 py-2 rounded-lg font-medium transition-colors"
             style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.25)", color: "var(--c-teal)" }}
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 14 14">
@@ -88,7 +88,7 @@ export default function AssignmentsPage() {
         {showForm && (
           <form
             onSubmit={handleCreate}
-            className="bg-white/5 border border-white/10 rounded-xl p-5 space-y-4"
+            className="c-card bg-white/5 border border-white/10 rounded-xl p-5 space-y-4"
           >
             <p className="text-sm font-medium text-white">Mitarbeiter einarbeiten</p>
             <div className="grid grid-cols-2 gap-3">
@@ -129,7 +129,7 @@ export default function AssignmentsPage() {
               </div>
             </div>
             {formError && (
-              <p className="text-xs text-[var(--c-accent)] bg-[var(--c-accent)]/10 px-3 py-2 rounded-lg">
+              <p className="c-shake text-xs text-[var(--c-accent)] bg-[var(--c-accent)]/10 px-3 py-2 rounded-lg">
                 {formError}
               </p>
             )}
@@ -145,13 +145,13 @@ export default function AssignmentsPage() {
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="px-4 py-2 rounded-lg text-sm text-white/50 border border-white/10 hover:bg-white/5 transition-colors"
+                className="c-btn px-4 py-2 rounded-lg text-sm text-white/50 border border-white/10 hover:bg-white/5 transition-colors"
               >
                 Abbrechen
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                className="c-btn px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                 style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.3)", color: "var(--c-teal)" }}
               >
                 Einarbeitung starten

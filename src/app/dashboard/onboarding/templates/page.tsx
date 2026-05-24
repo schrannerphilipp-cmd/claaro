@@ -82,7 +82,7 @@ export default function TemplatesPage() {
           <div className="relative shrink-0" ref={vorlagenRef}>
             <button
               onClick={() => setShowVorlagen((v) => !v)}
-              className="flex items-center gap-1.5 text-sm px-4 py-2 rounded-lg font-medium transition-colors"
+              className="c-btn flex items-center gap-1.5 text-sm px-4 py-2 rounded-lg font-medium transition-colors"
               style={{ backgroundColor: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.12)" }}
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 14 14">

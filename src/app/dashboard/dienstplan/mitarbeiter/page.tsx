@@ -57,25 +57,25 @@ export default function MitarbeiterPage() {
       <div className="space-y-6" style={sans}>
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3">
+          <div className="c-card bg-white/5 border border-white/10 rounded-xl px-4 py-3">
             <p className="text-xl font-semibold text-white">{employees.length}</p>
             <p className="text-xs text-white/40 mt-0.5">Gesamt</p>
           </div>
-          <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3">
+          <div className="c-card bg-white/5 border border-white/10 rounded-xl px-4 py-3">
             <p className="text-xl font-semibold" style={{ color: "var(--c-teal)" }}>{aktive.length}</p>
             <p className="text-xs text-white/40 mt-0.5">Aktiv</p>
           </div>
-          <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3">
+          <div className="c-card bg-white/5 border border-white/10 rounded-xl px-4 py-3">
             <p className="text-xl font-semibold text-white/30">{inaktive.length}</p>
             <p className="text-xs text-white/40 mt-0.5">Deaktiviert</p>
           </div>
         </div>
 
         {/* Neu anlegen */}
-        <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+        <div className="c-card bg-white/5 border border-white/10 rounded-xl overflow-hidden">
           <button
             onClick={() => setShowForm((v) => !v)}
-            className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-white/[0.03] transition-colors"
+            className="c-btn w-full flex items-center justify-between px-5 py-4 text-left hover:bg-white/[0.03] transition-colors"
           >
             <span className="flex items-center gap-2 text-sm text-white/70">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16">
@@ -120,7 +120,7 @@ export default function MitarbeiterPage() {
             {[...aktive, ...inaktive].map((emp) => (
               <div
                 key={emp.id}
-                className="bg-white/5 border border-white/10 rounded-xl px-5 py-4 flex flex-wrap items-center justify-between gap-3"
+                className="c-card bg-white/5 border border-white/10 rounded-xl px-5 py-4 flex flex-wrap items-center justify-between gap-3"
                 style={{ opacity: emp.aktiv ? 1 : 0.5 }}
               >
                 <div className="flex items-center gap-3">
@@ -147,7 +147,7 @@ export default function MitarbeiterPage() {
                   <button
                     onClick={() => toggleAktiv(emp)}
                     disabled={toggling === emp.id}
-                    className="text-xs px-3 py-1.5 rounded-lg border transition-colors disabled:opacity-40"
+                    className="c-btn text-xs px-3 py-1.5 rounded-lg border transition-colors disabled:opacity-40"
                     style={
                       emp.aktiv
                         ? { backgroundColor: "rgba(var(--c-accent-rgb),0.1)", borderColor: "rgba(var(--c-accent-rgb),0.25)", color: "var(--c-accent)" }

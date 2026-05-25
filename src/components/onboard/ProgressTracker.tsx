@@ -55,7 +55,7 @@ export default function ProgressTracker({ steps, progress }: ProgressTrackerProp
           <p className="text-sm font-medium text-white">
             {done} von {total} Schritten
           </p>
-          <p className="text-xs text-white/40 mt-0.5">
+          <p className="text-xs text-white/55 mt-0.5">
             {pct === 100 ? "Abgeschlossen 🎉" : `Noch ${total - done} offen`}
           </p>
         </div>
@@ -87,10 +87,10 @@ export default function ProgressTracker({ steps, progress }: ProgressTrackerProp
                 )}
               </div>
               <div className="flex-1 pb-2">
-                <p className={`text-xs font-medium ${isDone ? "text-white/70" : "text-white/40"}`}>
+                <p className={`text-xs font-medium ${isDone ? "text-white/70" : "text-white/55"}`}>
                   {step.title || `Schritt ${step.order}`}
                 </p>
-                <p className="text-[10px] text-white/25 flex items-center gap-1">
+                <p className="text-[10px] text-white/45 flex items-center gap-1">
                   {TYPE_LABEL[step.type]}
                   {quizScore !== undefined && ` · ${quizScore}% Punkte`}
                 </p>

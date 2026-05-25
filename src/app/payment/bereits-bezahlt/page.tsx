@@ -4,12 +4,12 @@ const sans  = { fontFamily: "var(--font-dm-sans)"  } as const;
 export default function BereitsBezahltPage() {
   return (
     <div
-      className="min-h-screen bg-[#1a1814] flex items-center justify-center px-6 c-fade-up"
+      className="min-h-screen bg-[#241c14] flex items-center justify-center px-6 c-fade-up"
       style={sans}
     >
       <div className="c-card text-center max-w-md">
         <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-6">
-          <svg className="w-8 h-8 text-white/30" fill="none" viewBox="0 0 24 24">
+          <svg className="w-8 h-8 text-white/50" fill="none" viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
             <path
               d="M12 8v4M12 16h.01"

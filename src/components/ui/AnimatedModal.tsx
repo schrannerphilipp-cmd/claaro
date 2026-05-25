@@ -58,7 +58,7 @@ export default function AnimatedModal({
 
           {/* Panel */}
           <motion.div
-            className={`relative w-full ${maxWidth} bg-[#1a1814] border border-white/15 rounded-2xl shadow-2xl overflow-hidden`}
+            className={`relative w-full ${maxWidth} bg-[#241c14] border border-white/15 rounded-2xl shadow-2xl overflow-hidden`}
             variants={reduced ? {} : modalPanel}
             onClick={(e) => e.stopPropagation()}
           >

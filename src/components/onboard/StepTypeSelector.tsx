@@ -62,7 +62,7 @@ export default function StepTypeSelector({ onSelect, onCancel }: StepTypeSelecto
     <div style={sans}>
       <div className="mb-5">
         <p className="text-sm font-medium text-white mb-1">Schritt-Typ auswählen</p>
-        <p className="text-xs text-white/40">Was soll der Mitarbeiter in diesem Schritt tun?</p>
+        <p className="text-xs text-white/55">Was soll der Mitarbeiter in diesem Schritt tun?</p>
       </div>
       <div className="grid grid-cols-2 gap-3">
         {TYPES.map(({ type, label, desc, icon }) => (
@@ -75,13 +75,13 @@ export default function StepTypeSelector({ onSelect, onCancel }: StepTypeSelecto
               {icon}
             </div>
             <p className="text-sm font-medium text-white mb-0.5">{label}</p>
-            <p className="text-xs text-white/40">{desc}</p>
+            <p className="text-xs text-white/55">{desc}</p>
           </button>
         ))}
       </div>
       <button
         onClick={onCancel}
-        className="mt-4 text-sm text-white/40 hover:text-white/70 transition-colors"
+        className="mt-4 text-sm text-white/55 hover:text-white/70 transition-colors"
       >
         Abbrechen
       </button>

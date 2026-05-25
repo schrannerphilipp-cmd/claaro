@@ -4,7 +4,7 @@ const sans  = { fontFamily: "var(--font-dm-sans)"  } as const;
 export default function PaymentSuccessPage() {
   return (
     <div
-      className="min-h-screen bg-[#1a1814] flex items-center justify-center px-6 c-fade-up"
+      className="min-h-screen bg-[#241c14] flex items-center justify-center px-6 c-fade-up"
       style={sans}
     >
       <div className="c-card text-center max-w-md">

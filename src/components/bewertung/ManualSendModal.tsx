@@ -7,7 +7,7 @@ import ChannelBadge from "./ChannelBadge";
 const sans = { fontFamily: "var(--font-dm-sans)" } as const;
 const inputClass =
   "w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-white/30 transition-colors";
-const labelClass = "block text-xs text-white/40 mb-1";
+const labelClass = "block text-xs text-white/55 mb-1";
 
 interface ManualSendModalProps {
   platforms: ReviewPlatform[];
@@ -102,13 +102,13 @@ export default function ManualSendModal({
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
-        className="w-full max-w-lg bg-[#1a1814] border border-white/15 rounded-2xl overflow-hidden shadow-2xl"
+        className="w-full max-w-lg bg-[#241c14] border border-white/15 rounded-2xl overflow-hidden shadow-2xl"
         style={sans}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
           <p className="text-sm font-semibold text-white">Bewertungsanfrage senden</p>
-          <button onClick={onClose} className="text-white/30 hover:text-white transition-colors">
+          <button onClick={onClose} aria-label="Schließen" className="text-white/50 hover:text-white transition-colors p-1 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16">
               <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
             </svg>
@@ -119,7 +119,7 @@ export default function ManualSendModal({
           <div className="px-6 py-12 text-center">
             <p className="text-4xl mb-3">✅</p>
             <p className="text-sm font-medium text-white">Anfrage gesendet!</p>
-            <p className="text-xs text-white/40 mt-1">
+            <p className="text-xs text-white/55 mt-1">
               {name} wird benachrichtigt.
             </p>
           </div>
@@ -191,7 +191,7 @@ export default function ManualSendModal({
 
             {/* Live preview */}
             <div className="bg-white/5 border border-white/10 rounded-xl p-3">
-              <p className="text-[10px] text-white/30 mb-1.5 uppercase tracking-wider">Vorschau</p>
+              <p className="text-[10px] text-white/50 mb-1.5 uppercase tracking-wider">Vorschau</p>
               <p className="text-xs text-white/70 leading-relaxed whitespace-pre-wrap">
                 {preview || `Hallo ${name || "Kunde"}, vielen Dank für Ihren Besuch! Wir würden uns sehr über Ihre Bewertung freuen.`}
               </p>

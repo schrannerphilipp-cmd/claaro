@@ -65,16 +65,16 @@ export default function TemplateBuilderPage() {
 
   if (!isLoaded || !local) {
     return (
-      <div className="min-h-screen bg-[#1a1814] flex items-center justify-center" style={sans}>
-        <p className="text-sm text-white/30">Lädt…</p>
+      <div className="min-h-screen bg-[#241c14] flex items-center justify-center" style={sans}>
+        <p className="text-sm text-white/50">Lädt…</p>
       </div>
     );
   }
 
   return (
-    <div className="h-screen flex flex-col bg-[#1a1814] c-fade-up" style={sans}>
+    <div className="h-screen flex flex-col bg-[#241c14] c-fade-up" style={sans}>
       {/* ── Builder header ─────────────────────────────────────────────── */}
-      <header className="border-b border-white/10 bg-[#1a1814] shrink-0 z-20">
+      <header className="border-b border-white/10 bg-[#241c14] shrink-0 z-20">
         <div className="px-5 py-3 flex items-center gap-3">
           {/* Back */}
           <button
@@ -108,7 +108,7 @@ export default function TemplateBuilderPage() {
 
           {/* Duration */}
           {totalMin > 0 && (
-            <span className="text-xs text-white/30 shrink-0">ca. {totalMin} Min.</span>
+            <span className="text-xs text-white/50 shrink-0">ca. {totalMin} Min.</span>
           )}
 
           {/* Published toggle */}
@@ -117,7 +117,7 @@ export default function TemplateBuilderPage() {
             className={`c-btn shrink-0 text-xs px-3 py-1.5 rounded-lg border transition-colors ${
               local.isPublished
                 ? "border-[var(--c-teal)]/40 text-[var(--c-teal)] bg-[var(--c-teal)]/10"
-                : "border-white/10 text-white/40 bg-white/5"
+                : "border-white/10 text-white/55 bg-white/5"
             }`}
           >
             {local.isPublished ? "Veröffentlicht" : "Entwurf"}
@@ -138,7 +138,7 @@ export default function TemplateBuilderPage() {
           <input
             value={local.description}
             onChange={(e) => handleUpdate({ description: e.target.value })}
-            className="w-full bg-transparent text-xs text-white/40 placeholder-white/20 focus:outline-none"
+            className="w-full bg-transparent text-xs text-white/55 placeholder-white/20 focus:outline-none"
             placeholder="Kurze Beschreibung des Templates (optional)…"
           />
         </div>

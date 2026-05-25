@@ -192,6 +192,7 @@ function EskalationsTimeline({
     startTransition(async () => {
       const result = await sendMahnung(rechnung.id, "email", sepaEnabled);
       if (result.success) {
+        try { localStorage.setItem("claaro-setup-mahnung", "1"); } catch {/* ignore */}
         setFeedback({ ok: true, msg: `Stufe ${result.stufe} erfolgreich gesendet.` });
         triggerZeitersparnisToast("Mahnung versendet", 20, `Mahnung versendet 📨 — ${rechnung.kunde.name} wird benachrichtigt.`);
         router.refresh();
@@ -214,20 +215,20 @@ function EskalationsTimeline({
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
         <div>
-          <p className="text-xs text-white/35 uppercase tracking-wider mb-1">
+          <p className="text-xs text-white/55 uppercase tracking-wider mb-1">
             Eskalationsstufen
           </p>
           <p className="text-white font-medium text-sm" style={serif}>
             {rechnung.kunde.name}
           </p>
-          <p className="text-white/40 text-xs mt-0.5">
+          <p className="text-white/55 text-xs mt-0.5">
             {rechnung.rechnungsnummer} · {formatCurrency(rechnung.betrag)}
           </p>
         </div>
         <button
           onClick={onClose}
           aria-label="Schließen"
-          className="text-white/30 hover:text-white/70 transition-colors p-1 -mr-1"
+          className="text-white/50 hover:text-white/70 transition-colors p-1 -mr-1"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16">
             <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -272,19 +273,19 @@ function EskalationsTimeline({
                 <p className="text-sm font-medium text-white leading-snug">
                   Stufe {stufe} — {title}
                 </p>
-                <p className="text-xs text-white/40 mt-0.5 mb-2">{subtitle}</p>
+                <p className="text-xs text-white/55 mt-0.5 mb-2">{subtitle}</p>
                 {mahnungStatus ? (
                   <div className="flex items-center gap-2 flex-wrap">
                     <MahnungPill status={mahnungStatus} />
                     {mahnung?.kanal && mahnung.status !== "ausstehend" && (
-                      <span className="text-xs text-white/30 capitalize">{mahnung.kanal}</span>
+                      <span className="text-xs text-white/50 capitalize">{mahnung.kanal}</span>
                     )}
                     {mahnung?.versandtAm && (
-                      <span className="text-xs text-white/30">{formatDate(mahnung.versandtAm)}</span>
+                      <span className="text-xs text-white/50">{formatDate(mahnung.versandtAm)}</span>
                     )}
                   </div>
                 ) : (
-                  <p className="text-xs text-white/25">Noch nicht verfügbar</p>
+                  <p className="text-xs text-white/45">Noch nicht verfügbar</p>
                 )}
               </div>
             </div>
@@ -318,7 +319,7 @@ function EskalationsTimeline({
                       SEPA Mandat vorhanden
                     </span>
                   </div>
-                  <p className="text-xs text-white/40">
+                  <p className="text-xs text-white/55">
                     {rechnung.kunde.sepaMandat!.kontoinhaber} ·{" "}
                     {maskIban(rechnung.kunde.sepaMandat!.iban)}
                   </p>
@@ -421,7 +422,7 @@ export default function MahnungenView({ rechnungen }: { rechnungen: RechnungData
 
       {/* Action row */}
       <div className="flex items-center justify-between mb-6">
-        <p className="text-sm text-white/40">
+        <p className="text-sm text-white/55">
           {rechnungen.length} {rechnungen.length === 1 ? "Rechnung" : "Rechnungen"}
         </p>
         <button
@@ -436,20 +437,21 @@ export default function MahnungenView({ rechnungen }: { rechnungen: RechnungData
         <div className="bg-white/5 border border-white/10 rounded-xl py-20 px-8 text-center">
           <p className="text-2xl mb-4" aria-hidden="true">✅</p>
           <p className="text-white font-semibold mb-2">Keine offenen Rechnungen</p>
-          <p className="text-white/40 text-sm">Alle Rechnungen wurden beglichen.</p>
+          <p className="text-white/55 text-sm">Alle Rechnungen wurden beglichen.</p>
         </div>
       ) : (
         <div className={`grid grid-cols-1 gap-6 items-start ${selected ? "lg:grid-cols-[1fr_340px]" : ""}`}>
           {/* Rechnungs-Übersicht */}
           <div className="c-card bg-white/5 border border-white/10 rounded-xl overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[640px]">
+            <div className="relative">
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[640px]">
                 <thead>
                   <tr className="border-b border-white/10">
                     {["Kunde", "Rechnungsnr.", "Betrag", "Fällig am", "Status", ""].map((h, i) => (
                       <th
                         key={i}
-                        className={`px-5 py-3 text-xs font-medium uppercase tracking-wider text-white/30 ${
+                        className={`px-5 py-3 text-xs font-medium uppercase tracking-wider text-white/50 ${
                           i === 2 || i === 3 ? "text-right" : "text-left"
                         }`}
                       >
@@ -477,7 +479,7 @@ export default function MahnungenView({ rechnungen }: { rechnungen: RechnungData
                         <td className="px-5 py-4">
                           <p className="text-sm text-white font-medium">{r.kunde.name}</p>
                           <div className="flex items-center gap-2 mt-0.5">
-                            <p className="text-xs text-white/35">{r.kunde.email}</p>
+                            <p className="text-xs text-white/50">{r.kunde.email}</p>
                             {r.kunde.sepaMandat && (
                               <span
                                 className="text-xs px-1.5 py-px rounded font-medium"
@@ -522,7 +524,7 @@ export default function MahnungenView({ rechnungen }: { rechnungen: RechnungData
                         <td className="px-5 py-4">
                           <button
                             onClick={(e) => { e.stopPropagation(); setSelectedId(r.id); }}
-                            className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+                            className="text-xs font-medium px-3 py-2.5 rounded-lg transition-colors whitespace-nowrap min-h-[44px]"
                             style={
                               canSendNext
                                 ? { backgroundColor: "rgba(var(--c-accent-rgb),0.12)", color: "var(--c-accent)" }
@@ -537,7 +539,18 @@ export default function MahnungenView({ rechnungen }: { rechnungen: RechnungData
                   })}
                 </tbody>
               </table>
+              </div>
+              {/* Scroll-Shadow: zeigt auf Mobile dass Tabelle scrollbar ist */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute right-0 top-0 h-full w-10 md:hidden"
+                style={{ background: "linear-gradient(to right, transparent, rgba(36,28,20,0.85))" }}
+              />
             </div>
+            {/* Scrollhinweis nur auf kleinen Screens */}
+            <p className="text-xs text-white/45 text-center py-2 border-t border-white/5 md:hidden">
+              ← Tabelle scrollbar →
+            </p>
           </div>
 
           {/* Eskalationsstufen */}
@@ -589,17 +602,17 @@ function NeueRechnungModal({ onClose, onCreated }: { onClose: () => void; onCrea
   }
 
   const inputClass = "w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-white/30 transition-colors";
-  const labelClass = "block text-xs text-white/40 mb-1";
+  const labelClass = "block text-xs text-white/55 mb-1";
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="w-full max-w-md bg-[#1a1814] border border-white/15 rounded-2xl overflow-hidden shadow-2xl">
+      <div className="w-full max-w-md bg-[#241c14] border border-white/15 rounded-2xl overflow-hidden shadow-2xl">
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
           <p className="text-sm font-semibold text-white">Neue Rechnung erstellen</p>
-          <button onClick={onClose} className="text-white/30 hover:text-white transition-colors">
+          <button onClick={onClose} aria-label="Schließen" className="text-white/50 hover:text-white transition-colors p-1 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16">
               <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
             </svg>
@@ -607,7 +620,7 @@ function NeueRechnungModal({ onClose, onCreated }: { onClose: () => void; onCrea
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <p className="text-xs text-white/40 -mt-1">Pflichtangaben für eine gültige Rechnung nach § 14 UStG.</p>
+          <p className="text-xs text-white/55 -mt-1">Pflichtangaben für eine gültige Rechnung nach § 14 UStG.</p>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelClass}>Kundenname</label>

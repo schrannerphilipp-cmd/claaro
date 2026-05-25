@@ -10,7 +10,7 @@ import { OnboardAssignment } from "@/types/onboard";
 const sans = { fontFamily: "var(--font-dm-sans)" } as const;
 const inputClass =
   "w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-white/30 transition-colors";
-const labelClass = "block text-xs text-white/40 mb-1";
+const labelClass = "block text-xs text-white/55 mb-1";
 
 const STATUS_LABEL: Record<string, string> = {
   not_started: "Nicht gestartet",
@@ -18,7 +18,7 @@ const STATUS_LABEL: Record<string, string> = {
   completed: "Abgeschlossen",
 };
 const STATUS_COLOR: Record<string, string> = {
-  not_started: "text-white/30 bg-white/5 border-white/10",
+  not_started: "text-white/50 bg-white/5 border-white/10",
   in_progress: "text-[var(--c-amber)] bg-[var(--c-amber)]/10 border-[var(--c-amber)]/20",
   completed: "text-[var(--c-teal)] bg-[var(--c-teal)]/10 border-[var(--c-teal)]/20",
 };
@@ -65,11 +65,12 @@ export default function AssignmentsPage() {
     <FeatureLayout
       name="Zuweisungen"
       description="Einarbeitungs-Templates Mitarbeitern zuweisen und den Fortschritt verfolgen."
+      backHref="/dashboard/onboarding"
     >
       <div className="space-y-5" style={sans}>
         {/* Toolbar */}
         <div className="flex items-center justify-between">
-          <p className="text-sm text-white/40">
+          <p className="text-sm text-white/55">
             {assignments.length} Einarbeitung{assignments.length !== 1 ? "en" : ""}
           </p>
           <button
@@ -134,7 +135,7 @@ export default function AssignmentsPage() {
               </p>
             )}
             {tLoaded && templates.filter((t) => t.isPublished).length === 0 && (
-              <p className="text-xs text-white/30">
+              <p className="text-xs text-white/50">
                 Keine veröffentlichten Templates.{" "}
                 <Link href="/dashboard/onboarding/templates" className="underline">
                   Templates bearbeiten
@@ -162,16 +163,16 @@ export default function AssignmentsPage() {
 
         {/* Table */}
         {!aLoaded || !tLoaded ? (
-          <div className="py-16 text-center text-white/30 text-sm">Lädt…</div>
+          <div className="py-16 text-center text-white/50 text-sm">Lädt…</div>
         ) : sorted.length === 0 ? (
           <div className="py-16 bg-white/5 border border-white/10 rounded-xl text-center">
             <p className="text-4xl mb-4">🤝</p>
             <p className="text-sm font-medium text-white mb-1">Noch keine Einarbeitungen</p>
-            <p className="text-xs text-white/40">Weise ein Template einem Mitarbeiter zu.</p>
+            <p className="text-xs text-white/55">Weise ein Template einem Mitarbeiter zu.</p>
           </div>
         ) : (
           <div className="border border-white/10 rounded-xl overflow-hidden">
-            <div className="grid grid-cols-[1fr_1fr_100px_90px_80px] items-center px-5 py-2.5 border-b border-white/10 text-xs text-white/30">
+            <div className="grid grid-cols-[1fr_1fr_100px_90px_80px] items-center px-5 py-2.5 border-b border-white/10 text-xs text-white/50">
               <span>Mitarbeiter</span>
               <span>Template</span>
               <span>Fortschritt</span>
@@ -191,7 +192,7 @@ export default function AssignmentsPage() {
                   <div>
                     <p className="text-sm text-white">{a.employeeName}</p>
                     {a.dueDate && (
-                      <p className="text-[10px] text-white/30">
+                      <p className="text-[10px] text-white/50">
                         Fällig: {new Date(a.dueDate).toLocaleDateString("de-DE")}
                       </p>
                     )}
@@ -206,7 +207,7 @@ export default function AssignmentsPage() {
                         style={{ width: `${pct}%`, backgroundColor: "var(--c-teal)" }}
                       />
                     </div>
-                    <p className="text-[10px] text-white/30">{done}/{total} Schritte</p>
+                    <p className="text-[10px] text-white/50">{done}/{total} Schritte</p>
                   </div>
                   <span
                     className={`text-[10px] font-medium px-2 py-0.5 rounded-full border ${STATUS_COLOR[a.status]}`}
@@ -216,7 +217,7 @@ export default function AssignmentsPage() {
                   <div className="flex items-center gap-2 justify-end">
                     <Link
                       href={`/dashboard/onboarding/run/${a.id}`}
-                      className="text-xs text-white/40 hover:text-white border border-white/10 rounded-lg px-2 py-1 hover:bg-white/5 transition-colors"
+                      className="text-xs text-white/55 hover:text-white border border-white/10 rounded-lg px-2 py-1 hover:bg-white/5 transition-colors"
                     >
                       Öffnen
                     </Link>

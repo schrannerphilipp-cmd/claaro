@@ -124,7 +124,7 @@ export default function PlatformConfigurator({
               {!p.isDefault && (
                 <button
                   onClick={() => onSetDefault(p.id)}
-                  className="text-xs text-white/40 hover:text-white/70 transition-colors"
+                  className="text-xs text-white/55 hover:text-white/70 transition-colors"
                 >
                   Als Standard setzen
                 </button>
@@ -163,7 +163,7 @@ export default function PlatformConfigurator({
           <div className="flex gap-2">
             <button
               onClick={() => setShowAdd(false)}
-              className="flex-1 py-2 text-sm text-white/40 border border-white/10 rounded-lg hover:bg-white/5 transition-colors"
+              className="flex-1 py-2 text-sm text-white/55 border border-white/10 rounded-lg hover:bg-white/5 transition-colors"
             >
               Abbrechen
             </button>
@@ -180,7 +180,7 @@ export default function PlatformConfigurator({
       ) : (
         <button
           onClick={() => setShowAdd(true)}
-          className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white/70 transition-colors"
+          className="flex items-center gap-1.5 text-xs text-white/55 hover:text-white/70 transition-colors"
         >
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 14 14">
             <path d="M7 2v10M2 7h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>

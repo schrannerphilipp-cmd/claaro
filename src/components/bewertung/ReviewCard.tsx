@@ -10,7 +10,7 @@ const inputClass =
 
 const STATUS_STYLE: Record<string, string> = {
   new: "text-[var(--c-amber)] bg-[var(--c-amber)]/10 border-[var(--c-amber)]/20",
-  read: "text-white/40 bg-white/5 border-white/10",
+  read: "text-white/55 bg-white/5 border-white/10",
   responded: "text-[var(--c-teal)] bg-[var(--c-teal)]/10 border-[var(--c-teal)]/20",
 };
 const STATUS_LABEL: Record<string, string> = {
@@ -78,7 +78,7 @@ export default function ReviewCard({
           <StarRating rating={entry.rating} size="sm" />
           <p className="text-sm font-medium text-white truncate">{entry.customerName}</p>
           {platform && (
-            <span className="text-[10px] text-white/30 bg-white/5 border border-white/10 rounded-full px-2 py-0.5 shrink-0">
+            <span className="text-[10px] text-white/50 bg-white/5 border border-white/10 rounded-full px-2 py-0.5 shrink-0">
               {platform.name}
             </span>
           )}
@@ -86,11 +86,11 @@ export default function ReviewCard({
         <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full border shrink-0 ${STATUS_STYLE[entry.status]}`}>
           {STATUS_LABEL[entry.status]}
         </span>
-        <p className="text-xs text-white/30 shrink-0">
+        <p className="text-xs text-white/50 shrink-0">
           {new Date(entry.publishedAt).toLocaleDateString("de-DE")}
         </p>
         <svg
-          className={`w-4 h-4 text-white/30 shrink-0 transition-transform duration-150 ${expanded ? "rotate-180" : ""}`}
+          className={`w-4 h-4 text-white/50 shrink-0 transition-transform duration-150 ${expanded ? "rotate-180" : ""}`}
           fill="none" viewBox="0 0 16 16"
         >
           <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -114,7 +114,7 @@ export default function ReviewCard({
           ) : (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <p className="text-xs text-white/40">Antwort verfassen</p>
+                <p className="text-xs text-white/55">Antwort verfassen</p>
                 {responseTemplates.length > 0 && (
                   <select
                     value={selectedTplId}

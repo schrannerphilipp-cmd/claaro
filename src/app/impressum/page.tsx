@@ -5,11 +5,11 @@ const serif = { fontFamily: "var(--font-dm-serif)" } as const;
 
 export default function ImpressumPage() {
   return (
-    <div className="min-h-screen bg-[#1a1814] text-white c-fade-up" style={sans}>
+    <div className="min-h-screen bg-[#241c14] text-white c-fade-up" style={sans}>
       <div className="max-w-2xl mx-auto px-6 py-12">
         <button
           onClick={() => window.history.back()}
-          className="c-btn flex items-center gap-1.5 text-sm text-white/40 hover:text-white/70 transition-colors mb-10"
+          className="c-btn flex items-center gap-1.5 text-sm text-white/55 hover:text-white/70 transition-colors mb-10"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16">
             <path d="M10 4L6 8l4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -18,7 +18,7 @@ export default function ImpressumPage() {
         </button>
 
         <h1 className="text-4xl text-white mb-2" style={serif}>Impressum</h1>
-        <p className="text-white/40 text-sm mb-10">Angaben gemäß § 5 TMG</p>
+        <p className="text-white/55 text-sm mb-10">Angaben gemäß § 5 TMG</p>
 
         <div className="space-y-2 text-white/80 text-sm mb-10">
           <p>Philipp Schranner</p>

@@ -65,7 +65,7 @@ function WiederholungIcon({ w }: { w: ComplianceTask["wiederholung"] }) {
     einmalig: "◉",
   };
   return (
-    <span className="text-white/30 text-xs" title={w}>
+    <span className="text-white/50 text-xs" title={w}>
       {map[w]} {w}
     </span>
   );
@@ -90,7 +90,7 @@ function StatCard({
       >
         {value}
       </span>
-      <span className="text-xs text-white/40">{label}</span>
+      <span className="text-xs text-white/55">{label}</span>
     </div>
   );
 }
@@ -151,7 +151,7 @@ function TaskCard({
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap items-center gap-2 mb-1">
             <span
-              className={`text-sm font-medium ${isErledigt ? "text-white/40 line-through" : "text-white"}`}
+              className={`text-sm font-medium ${isErledigt ? "text-white/55 line-through" : "text-white"}`}
             >
               {task.titel}
             </span>
@@ -178,12 +178,12 @@ function TaskCard({
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 text-xs text-white/40">
+          <div className="flex flex-wrap items-center gap-3 text-xs text-white/55">
             <span className="bg-white/5 px-2 py-0.5 rounded-md text-white/50">
               {task.kategorie}
             </span>
             {showBranche && (
-              <span className="text-white/30">{brancheLabel}</span>
+              <span className="text-white/50">{brancheLabel}</span>
             )}
             <WiederholungIcon w={task.wiederholung} />
           </div>
@@ -197,7 +197,7 @@ function TaskCard({
           >
             {formatDate(task.frist)}
           </p>
-          <p className="text-[10px] text-white/30 mt-0.5">
+          <p className="text-[10px] text-white/50 mt-0.5">
             {isErledigt
               ? "erledigt"
               : days === 0
@@ -210,7 +210,7 @@ function TaskCard({
 
         {/* chevron */}
         <svg
-          className={`w-4 h-4 text-white/25 flex-shrink-0 mt-0.5 transition-transform duration-200 ${expanded ? "rotate-90" : ""}`}
+          className={`w-4 h-4 text-white/45 flex-shrink-0 mt-0.5 transition-transform duration-200 ${expanded ? "rotate-90" : ""}`}
           fill="none"
           viewBox="0 0 16 16"
         >
@@ -242,7 +242,7 @@ function TaskCard({
           {/* dokumente */}
           {task.dokumente.length > 0 && (
             <div>
-              <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2">
+              <p className="text-[10px] text-white/50 uppercase tracking-widest mb-2">
                 Vorlagen & Dokumente
               </p>
               <div className="flex flex-wrap gap-2">
@@ -325,9 +325,9 @@ function TaskCard({
 
 function MetaItem({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-white/4 rounded-lg px-3 py-2">
-      <p className="text-[10px] text-white/30 uppercase tracking-widest mb-0.5">{label}</p>
-      <p className="text-xs text-white/65">{value}</p>
+    <div className="bg-white/5 border border-white/10 rounded-lg px-3 py-2">
+      <p className="text-[10px] text-white/50 uppercase tracking-widest mb-0.5">{label}</p>
+      <p className="text-xs text-white/60">{value}</p>
     </div>
   );
 }
@@ -346,6 +346,29 @@ function EmptyState({ filtered }: { filtered: boolean }) {
     </div>
   );
 }
+
+// ─── compliance top-3 intro ───────────────────────────────────────────────────
+
+const TOP3 = [
+  {
+    icon: "📋",
+    text: "Arbeitszeitdokumentation",
+    hint: "Mindestlohngesetz",
+    beschreibung: "Alle Arbeitszeiten müssen lückenlos aufgezeichnet und mindestens 2 Jahre aufbewahrt werden.",
+  },
+  {
+    icon: "🛡️",
+    text: "DSGVO-konforme Datenschutzerklärung",
+    hint: "DSGVO Art. 13",
+    beschreibung: "Jede Webseite und App muss Nutzer transparent über die Verarbeitung ihrer Daten informieren.",
+  },
+  {
+    icon: "⚠️",
+    text: "Gefährdungsbeurteilung",
+    hint: "ArbSchG § 5",
+    beschreibung: "Alle Arbeitgeber müssen Gefährdungen am Arbeitsplatz beurteilen und dokumentieren.",
+  },
+];
 
 // ─── main component ───────────────────────────────────────────────────────────
 
@@ -418,7 +441,7 @@ export default function ComplianceView() {
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="h-16 bg-white/5 border border-white/10 rounded-xl animate-pulse"
+            className="c-skeleton h-16 rounded-xl"
           />
         ))}
       </div>
@@ -427,15 +450,80 @@ export default function ComplianceView() {
 
   return (
     <div className="space-y-6" style={sans}>
+
+      {/* ── Top-3 Einstieg ── */}
+      <div
+        className="rounded-xl border p-5"
+        style={{
+          backgroundColor: "rgba(255,255,255,0.04)",
+          borderColor: "rgba(255,255,255,0.10)",
+        }}
+      >
+        <div className="flex items-start gap-3 mb-4">
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+            style={{
+              backgroundColor: "rgba(var(--c-teal-rgb),0.15)",
+              border: "1px solid rgba(var(--c-teal-rgb),0.25)",
+            }}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16" style={{ color: "var(--c-teal)" }}>
+              <rect x="2" y="7" width="9" height="7" rx="1.3" stroke="currentColor" strokeWidth="1.3" />
+              <path d="M4 7V5a3 3 0 116 0v2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-sm font-semibold text-white" style={serif}>
+              Die 3 wichtigsten Compliance-Pflichten
+            </h2>
+            <p className="text-xs text-white/45 mt-0.5">
+              Gesetzliche Mindestanforderungen für jedes KMU in Deutschland
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {TOP3.map(({ icon, text, hint, beschreibung }) => (
+            <div
+              key={hint}
+              className="rounded-lg p-3.5 flex flex-col gap-2"
+              style={{
+                backgroundColor: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.08)",
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-base leading-none" aria-hidden="true">{icon}</span>
+                <div>
+                  <p className="text-xs font-semibold text-white/85 leading-snug">{text}</p>
+                  <p
+                    className="text-[10px] mt-0.5 font-medium"
+                    style={{ color: "var(--c-teal)" }}
+                  >
+                    {hint}
+                  </p>
+                </div>
+              </div>
+              <p className="text-[11px] text-white/45 leading-relaxed">{beschreibung}</p>
+            </div>
+          ))}
+        </div>
+
+        <p className="text-[11px] text-white/30 mt-4 leading-snug">
+          Diese Pflichten findest du bereits als Aufgaben in der Liste unten — einfach abhaken wenn erledigt.
+        </p>
+      </div>
+
       {/* ── Branche Tabs ── */}
-      <div className="flex gap-2 overflow-x-auto pb-1">
+      <div className="relative">
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
         {BRANCHEN.map((b) => {
           const active = activeBranche === b.key;
           return (
             <button
               key={b.key}
               onClick={() => handleBrancheChange(b.key as Branche | "alle")}
-              className="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl text-sm border transition-all duration-150"
+              className="flex-shrink-0 flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl text-sm border transition-all duration-150"
               style={
                 active
                   ? {
@@ -455,6 +543,12 @@ export default function ComplianceView() {
             </button>
           );
         })}
+        </div>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute right-0 top-0 h-full w-8"
+          style={{ background: "linear-gradient(to right, transparent, #241c14)" }}
+        />
       </div>
 
       {/* ── Stats ── */}
@@ -512,7 +606,7 @@ export default function ComplianceView() {
             onChange={(e) =>
               setStatusFilter(e.target.value as ComplianceStatus | "alle")
             }
-            className="text-xs bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white/50 focus:outline-none focus:border-white/25"
+            className="text-xs bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white/50 focus:outline-none focus:border-white/30"
           >
             <option value="alle">Alle Status</option>
             <option value="offen">Offen</option>
@@ -524,7 +618,7 @@ export default function ComplianceView() {
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as Sort)}
-            className="text-xs bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white/50 focus:outline-none focus:border-white/25"
+            className="text-xs bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white/50 focus:outline-none focus:border-white/30"
           >
             <option value="frist">Sortierung: Frist</option>
             <option value="priorität">Sortierung: Priorität</option>
@@ -535,7 +629,7 @@ export default function ComplianceView() {
 
       {/* ── count label ── */}
       <div className="flex items-center justify-between">
-        <p className="text-xs text-white/30">
+        <p className="text-xs text-white/50">
           {visible.length} Aufgabe{visible.length !== 1 ? "n" : ""}
           {statusFilter !== "alle" || activeKategorie !== "alle"
             ? " (gefiltert)"

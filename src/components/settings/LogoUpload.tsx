@@ -108,7 +108,7 @@ export default function LogoUpload({ onLogoChange }: Props) {
 
   return (
     <div className="space-y-4" style={sans}>
-      <p className="text-[10px] text-white/30 uppercase tracking-widest">Firmen-Logo</p>
+      <p className="text-[10px] text-white/50 uppercase tracking-widest">Firmen-Logo</p>
 
       {logoUrl ? (
         <div className="bg-white/5 border border-white/10 rounded-xl p-5 flex items-center gap-4">
@@ -131,7 +131,7 @@ export default function LogoUpload({ onLogoChange }: Props) {
             </button>
             <button
               onClick={() => inputRef.current?.click()}
-              className="text-xs px-3 py-1.5 rounded-lg border border-white/10 text-white/40 hover:text-white/70 transition-colors"
+              className="text-xs px-3 py-1.5 rounded-lg border border-white/10 text-white/55 hover:text-white/70 transition-colors"
             >
               Anderes Logo wählen
             </button>
@@ -151,20 +151,20 @@ export default function LogoUpload({ onLogoChange }: Props) {
         >
           {uploading ? (
             <div className="flex flex-col items-center gap-3">
-              <svg className="w-8 h-8 animate-spin text-white/30" fill="none" viewBox="0 0 24 24">
+              <svg className="w-8 h-8 animate-spin text-white/50" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
               </svg>
-              <p className="text-sm text-white/40">Wird hochgeladen…</p>
+              <p className="text-sm text-white/55">Wird hochgeladen…</p>
             </div>
           ) : (
             <>
-              <svg className="w-8 h-8 text-white/25 mx-auto mb-3" fill="none" viewBox="0 0 24 24">
+              <svg className="w-8 h-8 text-white/45 mx-auto mb-3" fill="none" viewBox="0 0 24 24">
                 <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M17 8l-5-5-5 5M12 3v12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               <p className="text-sm text-white/50 mb-1">Logo hier ablegen oder klicken</p>
-              <p className="text-xs text-white/25">PNG, JPEG, SVG · max. 5 MB</p>
+              <p className="text-xs text-white/45">PNG, JPEG, SVG · max. 5 MB</p>
             </>
           )}
         </div>
@@ -184,7 +184,7 @@ export default function LogoUpload({ onLogoChange }: Props) {
         </p>
       )}
 
-      <p className="text-xs text-white/25 leading-relaxed">
+      <p className="text-xs text-white/45 leading-relaxed">
         Das Logo erscheint automatisch in der Kopfzeile all Ihrer Angebote (PDF-Export).
       </p>
     </div>

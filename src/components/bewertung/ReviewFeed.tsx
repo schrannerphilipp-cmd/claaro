@@ -52,12 +52,12 @@ export default function ReviewFeed({
               className={`text-xs px-3 py-1.5 rounded-md transition-colors ${
                 activeTab === key
                   ? "bg-white/10 text-white"
-                  : "text-white/40 hover:text-white/70"
+                  : "text-white/55 hover:text-white/70"
               }`}
             >
               {label}
               {key === "new" && newCount > 0 && (
-                <span className="ml-1.5 text-[9px] bg-[var(--c-amber)] text-[#1a1814] rounded-full w-4 h-4 inline-flex items-center justify-center font-bold">
+                <span className="ml-1.5 text-[9px] bg-[var(--c-amber)] text-[#241c14] rounded-full w-4 h-4 inline-flex items-center justify-center font-bold">
                   {newCount}
                 </span>
               )}
@@ -78,7 +78,7 @@ export default function ReviewFeed({
           </select>
         )}
 
-        <p className="text-xs text-white/30 ml-auto">
+        <p className="text-xs text-white/50 ml-auto">
           {filtered.length} Bewertung{filtered.length !== 1 ? "en" : ""}
         </p>
       </div>
@@ -88,7 +88,7 @@ export default function ReviewFeed({
         <div className="py-16 bg-white/5 border border-white/10 rounded-xl text-center">
           <p className="text-3xl mb-3">⭐</p>
           <p className="text-sm font-medium text-white mb-1">Noch keine Bewertungen</p>
-          <p className="text-xs text-white/40 leading-relaxed max-w-xs mx-auto">
+          <p className="text-xs text-white/55 leading-relaxed max-w-xs mx-auto">
             Sende Bewertungsanfragen an Kunden — hier erscheinen ihre Rückmeldungen.
           </p>
         </div>

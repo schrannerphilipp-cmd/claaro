@@ -128,8 +128,8 @@ export default function ProfilBearbeiten() {
     const trimmedName = name.trim();
     const trimmedCompany = companyName.trim();
 
-    if (trimmedName.length < 2) { setError("Name mind. 2 Zeichen."); return; }
-    if (trimmedName.length > 50) { setError("Name max. 50 Zeichen."); return; }
+    if (trimmedName.length < 2) { setError("Der Name muss mindestens 2 Zeichen lang sein."); return; }
+    if (trimmedName.length > 50) { setError("Der Name darf maximal 50 Zeichen lang sein."); return; }
 
     setSaving(true);
 
@@ -230,14 +230,25 @@ export default function ProfilBearbeiten() {
               backgroundColor: displayAvatar ? "transparent" : "rgba(var(--c-accent-rgb),0.2)",
             }}
           >
-            {uploading ? (
-              <svg className="w-6 h-6 animate-spin text-white/60" fill="none" viewBox="0 0 24 24">
+            {displayAvatar ? (
+              <>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={displayAvatar} alt="Avatar" className="w-full h-full object-cover" />
+                {uploading && (
+                  /* Semi-transparentes Overlay während Upload — Bild bleibt sichtbar */
+                  <div className="absolute inset-0 bg-black/55 rounded-full flex items-center justify-center">
+                    <svg className="w-6 h-6 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                    </svg>
+                  </div>
+                )}
+              </>
+            ) : uploading ? (
+              <svg className="w-6 h-6 animate-spin text-white/70" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
               </svg>
-            ) : displayAvatar ? (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img src={displayAvatar} alt="Avatar" className="w-full h-full object-cover" />
             ) : (
               <span className="text-white font-semibold text-lg">{initials}</span>
             )}
@@ -266,7 +277,7 @@ export default function ProfilBearbeiten() {
           {(origAvatarUrl || avatarPreview) && !avatarFile && (
             <button
               onClick={handleRemoveAvatar}
-              className="block text-xs text-white/35 hover:text-white/60 transition-colors"
+              className="block text-xs text-white/50 hover:text-white/60 transition-colors"
             >
               Bild entfernen
             </button>
@@ -274,18 +285,18 @@ export default function ProfilBearbeiten() {
           {avatarFile && (
             <button
               onClick={() => { setAvatarFile(null); setAvatarPreview(null); }}
-              className="block text-xs text-white/35 hover:text-white/60 transition-colors"
+              className="block text-xs text-white/50 hover:text-white/60 transition-colors"
             >
               Auswahl verwerfen
             </button>
           )}
-          <p className="text-xs text-white/25">PNG, JPEG, WebP · max. 3 MB</p>
+          <p className="text-xs text-white/45">PNG, JPEG, WebP · max. 3 MB</p>
         </div>
       </div>
 
       {/* Name */}
       <div>
-        <label className="block text-xs text-white/40 mb-1.5">Name</label>
+        <label className="block text-xs text-white/55 mb-1.5">Name</label>
         <input
           className={inputClass}
           value={name}
@@ -293,12 +304,12 @@ export default function ProfilBearbeiten() {
           maxLength={50}
           placeholder="Dein Name"
         />
-        <p className="text-xs text-white/25 mt-1">2–50 Zeichen</p>
+        <p className="text-xs text-white/45 mt-1">2–50 Zeichen</p>
       </div>
 
       {/* Firmenname */}
       <div>
-        <label className="block text-xs text-white/40 mb-1.5">Firmenname <span className="text-white/20">(optional)</span></label>
+        <label className="block text-xs text-white/55 mb-1.5">Firmenname <span className="text-white/40">(optional)</span></label>
         <input
           className={inputClass}
           value={companyName}
@@ -328,7 +339,7 @@ export default function ProfilBearbeiten() {
       </button>
 
       {!supabaseConfigured && (
-        <p className="text-xs text-white/25 text-center">
+        <p className="text-xs text-white/45 text-center">
           Für Avatar-Upload Supabase konfigurieren.
         </p>
       )}

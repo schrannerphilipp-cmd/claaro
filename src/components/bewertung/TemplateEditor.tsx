@@ -6,7 +6,7 @@ import { MessageTemplate, Channel, TemplateType } from "@/types/bewertung";
 const sans = { fontFamily: "var(--font-dm-sans)" } as const;
 const inputClass =
   "w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-white/30 transition-colors";
-const labelClass = "block text-xs text-white/40 mb-1";
+const labelClass = "block text-xs text-white/55 mb-1";
 
 const VARIABLES = ["{kunde}", "{betrieb}", "{link}"];
 
@@ -106,12 +106,12 @@ export default function TemplateEditor({
           placeholder="Nachrichtentext mit {kunde}, {betrieb}, {link} Variablen…"
           className={`${inputClass} resize-none leading-relaxed`}
         />
-        <p className="mt-1 text-[10px] text-white/25">{template.body.length} Zeichen</p>
+        <p className="mt-1 text-[10px] text-white/45">{template.body.length} Zeichen</p>
       </div>
 
       {/* Live preview */}
-      <div className="bg-[#1a1814] border border-white/10 rounded-xl p-3">
-        <p className="text-[10px] text-white/30 mb-1.5 uppercase tracking-wider">Vorschau</p>
+      <div className="bg-[#241c14] border border-white/10 rounded-xl p-3">
+        <p className="text-[10px] text-white/50 mb-1.5 uppercase tracking-wider">Vorschau</p>
         <p className="text-xs text-white/60 leading-relaxed whitespace-pre-wrap">{preview}</p>
       </div>
 

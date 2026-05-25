@@ -58,7 +58,7 @@ function LineChart({ data, height = 100 }: { data: DataPoint[]; height?: number 
   if (!hasData) {
     return (
       <div className="flex items-center justify-center" style={{ height }}>
-        <p className="text-xs text-white/20">Noch keine Daten für diesen Zeitraum.</p>
+        <p className="text-xs text-white/45">Noch keine Daten für diesen Zeitraum.</p>
       </div>
     );
   }
@@ -111,7 +111,7 @@ function LineChart({ data, height = 100 }: { data: DataPoint[]; height?: number 
       )}
       {/* Dots */}
       {points.filter((p) => p.y >= 0 && p.count > 0).map((p, i) => (
-        <circle key={i} cx={p.x} cy={p.y} r="3" fill="var(--c-teal)" stroke="#1a1814" strokeWidth="1.5"/>
+        <circle key={i} cx={p.x} cy={p.y} r="3" fill="var(--c-teal)" stroke="#241c14" strokeWidth="1.5"/>
       ))}
       {/* X-axis labels (show every 3rd) */}
       {points.map((p, i) => {
@@ -152,7 +152,7 @@ export default function RatingChart({ entries }: RatingChartProps) {
                 key={r}
                 onClick={() => setRange(r)}
                 className={`text-xs px-2.5 py-1 rounded-md transition-colors ${
-                  range === r ? "bg-white/10 text-white" : "text-white/40 hover:text-white/70"
+                  range === r ? "bg-white/10 text-white" : "text-white/55 hover:text-white/70"
                 }`}
               >
                 {r} Tage
@@ -168,13 +168,13 @@ export default function RatingChart({ entries }: RatingChartProps) {
         <p className="text-xs font-medium text-white/60 mb-4">Sternverteilung</p>
         {entries.length === 0 ? (
           <div className="flex items-center justify-center h-24">
-            <p className="text-xs text-white/20">Keine Daten</p>
+            <p className="text-xs text-white/45">Keine Daten</p>
           </div>
         ) : (
           <div className="space-y-2">
             {starDist.map(({ star, count, pct }) => (
               <div key={star} className="flex items-center gap-2">
-                <span className="text-xs text-white/40 w-3">{star}</span>
+                <span className="text-xs text-white/55 w-3">{star}</span>
                 <svg className="w-3 h-3 shrink-0" viewBox="0 0 12 12" fill="var(--c-amber)">
                   <path d="M6 1l1.4 2.8 3.1.5-2.2 2.1.5 3.1L6 8.2 3.2 9.5l.5-3.1L1.5 4.3l3.1-.5z"/>
                 </svg>
@@ -184,7 +184,7 @@ export default function RatingChart({ entries }: RatingChartProps) {
                     style={{ width: `${pct}%`, backgroundColor: "var(--c-amber)" }}
                   />
                 </div>
-                <span className="text-xs text-white/30 w-4 text-right">{count}</span>
+                <span className="text-xs text-white/50 w-4 text-right">{count}</span>
               </div>
             ))}
           </div>

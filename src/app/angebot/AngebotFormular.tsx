@@ -51,9 +51,9 @@ function toTitleCase(str: string): string {
 const SCHRITTE = ["Kundendaten", "Leistungen", "Vorschau"];
 
 const inputClass =
-  "w-full border border-[#1a1814]/20 rounded-lg px-3.5 py-2.5 text-sm text-[#1a1814] placeholder:text-[#1a1814]/30 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--c-accent)] focus:border-transparent";
+  "w-full border border-[#241c14]/20 rounded-lg px-3.5 py-2.5 text-sm text-[#241c14] placeholder:text-[#241c14]/30 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--c-accent)] focus:border-transparent";
 const selectClass =
-  "w-full border border-[#1a1814]/20 rounded-lg px-3 py-2.5 text-sm text-[#1a1814] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--c-accent)] focus:border-transparent";
+  "w-full border border-[#241c14]/20 rounded-lg px-3 py-2.5 text-sm text-[#241c14] bg-white focus:outline-none focus:ring-2 focus:ring-[var(--c-accent)] focus:border-transparent";
 
 interface Props {
   onSaved?: () => void;
@@ -79,10 +79,11 @@ export default function AngebotFormular({ onSaved }: Props) {
   const [emailFehler, setEmailFehler]       = useState<string | null>(null);
 
   // Kundenliste
-  const [kunden, setKunden]               = useState<Kundendaten[]>([]);
-  const [suche, setSuche]                 = useState("");
-  const [dropdownOffen, setDropdownOffen] = useState(false);
-  const sucheRef                          = useRef<HTMLDivElement>(null);
+  const [kunden, setKunden]                       = useState<Kundendaten[]>([]);
+  const [suche, setSuche]                         = useState("");
+  const [dropdownOffen, setDropdownOffen]         = useState(false);
+  const [activeKundeIdx, setActiveKundeIdx]       = useState(-1);
+  const sucheRef                                  = useRef<HTMLDivElement>(null);
 
   const [angebotsnummer] = useState(
     () => `AN-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000)}`
@@ -326,12 +327,13 @@ export default function AngebotFormular({ onSaved }: Props) {
       <div className="flex items-center gap-2 mb-8 print:hidden">
         {SCHRITTE.map((name, i) => (
           <div key={name} className="flex items-center gap-2">
-            <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold transition-colors ${i <= schritt ? "bg-[var(--c-accent)] text-white" : "bg-white/20 text-white/40"}`}>
+            <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold transition-colors shrink-0 ${i <= schritt ? "bg-[var(--c-accent)] text-white" : "bg-white/20 text-white/55"}`}>
               {i < schritt ? "✓" : i + 1}
             </div>
-            <span className={`text-sm font-medium ${i === schritt ? "text-white" : "text-white/40"}`}>{name}</span>
+            {/* Labels nur ab sm sichtbar – auf 375px passt der Text sonst nicht */}
+            <span className={`hidden sm:inline text-sm font-medium ${i === schritt ? "text-white" : "text-white/55"}`}>{name}</span>
             {i < SCHRITTE.length - 1 && (
-              <div className={`h-px w-8 ${i < schritt ? "bg-[var(--c-accent)]" : "bg-white/20"}`} />
+              <div className={`h-px w-6 sm:w-8 shrink-0 ${i < schritt ? "bg-[var(--c-accent)]" : "bg-white/20"}`} />
             )}
           </div>
         ))}
@@ -339,69 +341,98 @@ export default function AngebotFormular({ onSaved }: Props) {
 
       {/* ── Schritt 1: Kundendaten ── */}
       {schritt === 0 && (
-        <div className="bg-[#f2ede4] rounded-xl border border-[#1a1814]/10 p-8">
-          <h2 className="text-xl font-semibold text-[#1a1814] mb-6">Kundendaten</h2>
+        <div className="bg-[#f2ede4] rounded-xl border border-[#241c14]/10 p-4 sm:p-8">
+          <h2 className="text-xl font-semibold text-[#241c14] mb-6">Kundendaten</h2>
 
           {/* Kundensuche */}
           <div ref={sucheRef} className="relative mb-6">
             <div className="relative">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1a1814]/30" fill="none" viewBox="0 0 16 16">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#241c14]/30" fill="none" viewBox="0 0 16 16">
                 <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.4"/>
                 <path d="M11 11l3 3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
               </svg>
-              <input
-                type="text"
-                value={suche}
-                onChange={e => { setSuche(e.target.value); setDropdownOffen(true); }}
-                onFocus={() => setDropdownOffen(true)}
-                placeholder="Bestehenden Kunden suchen…"
-                className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-[#1a1814]/15 bg-white text-sm text-[#1a1814] placeholder:text-[#1a1814]/30 focus:outline-none focus:ring-2 focus:ring-[var(--c-accent)] focus:border-transparent"
-              />
+              {(() => {
+                const filteredKunden = kunden.filter(k =>
+                  k.firma.toLowerCase().includes(suche.toLowerCase()) ||
+                  (k.kontakt ?? "").toLowerCase().includes(suche.toLowerCase())
+                );
+                return (
+                  <>
+                    <input
+                      type="text"
+                      value={suche}
+                      onChange={e => { setSuche(e.target.value); setDropdownOffen(true); setActiveKundeIdx(-1); }}
+                      onFocus={() => setDropdownOffen(true)}
+                      onKeyDown={e => {
+                        if (!dropdownOffen || filteredKunden.length === 0) return;
+                        if (e.key === "ArrowDown") {
+                          e.preventDefault();
+                          setActiveKundeIdx(i => Math.min(i + 1, filteredKunden.length - 1));
+                        } else if (e.key === "ArrowUp") {
+                          e.preventDefault();
+                          setActiveKundeIdx(i => Math.max(i - 1, 0));
+                        } else if (e.key === "Enter" && activeKundeIdx >= 0) {
+                          e.preventDefault();
+                          const k = filteredKunden[activeKundeIdx];
+                          setKunde({ ...k }); setSuche(""); setDropdownOffen(false); setActiveKundeIdx(-1);
+                        } else if (e.key === "Escape") {
+                          setDropdownOffen(false); setActiveKundeIdx(-1);
+                        }
+                      }}
+                      placeholder="Bestehenden Kunden suchen…"
+                      aria-autocomplete="list"
+                      aria-expanded={dropdownOffen && filteredKunden.length > 0}
+                      className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-[#241c14]/15 bg-white text-sm text-[#241c14] placeholder:text-[#241c14]/30 focus:outline-none focus:ring-2 focus:ring-[var(--c-accent)] focus:border-transparent"
+                    />
+                    {dropdownOffen && filteredKunden.length > 0 && (
+                      <ul
+                        role="listbox"
+                        className="absolute z-20 w-full mt-1 bg-white border border-[#241c14]/10 rounded-lg shadow-lg overflow-hidden max-h-52 overflow-y-auto"
+                      >
+                        {filteredKunden.map((k, idx) => (
+                          <li key={k.firma} role="option" aria-selected={idx === activeKundeIdx}>
+                            <button
+                              type="button"
+                              onClick={() => { setKunde({ ...k }); setSuche(""); setDropdownOffen(false); setActiveKundeIdx(-1); }}
+                              className={`w-full text-left px-4 py-2.5 transition-colors ${idx === activeKundeIdx ? "bg-[#f2ede4]" : "hover:bg-[#f2ede4]"}`}
+                            >
+                              <span className="text-sm font-medium text-[#241c14]">{k.firma}</span>
+                              {k.kontakt && <span className="text-xs text-[#241c14]/40 ml-2">{k.kontakt}</span>}
+                              <span className="block text-xs text-[#241c14]/40">{k.plz} {k.ort}</span>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
+                );
+              })()}
             </div>
-            {dropdownOffen && kunden.filter(k =>
-              k.firma.toLowerCase().includes(suche.toLowerCase()) ||
-              (k.kontakt ?? "").toLowerCase().includes(suche.toLowerCase())
-            ).length > 0 && (
-              <ul className="absolute z-20 w-full mt-1 bg-white border border-[#1a1814]/10 rounded-lg shadow-lg overflow-hidden max-h-52 overflow-y-auto">
-                {kunden
-                  .filter(k => k.firma.toLowerCase().includes(suche.toLowerCase()) || (k.kontakt ?? "").toLowerCase().includes(suche.toLowerCase()))
-                  .map(k => (
-                    <li key={k.firma}>
-                      <button type="button" onClick={() => { setKunde({ ...k }); setSuche(""); setDropdownOffen(false); }}
-                        className="w-full text-left px-4 py-2.5 hover:bg-[#f2ede4] transition-colors">
-                        <span className="text-sm font-medium text-[#1a1814]">{k.firma}</span>
-                        {k.kontakt && <span className="text-xs text-[#1a1814]/40 ml-2">{k.kontakt}</span>}
-                        <span className="block text-xs text-[#1a1814]/40">{k.plz} {k.ort}</span>
-                      </button>
-                    </li>
-                  ))}
-              </ul>
-            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-[#1a1814] mb-1.5">Firma / Kundenname <span className="text-[var(--c-accent)]">*</span></label>
+              <label className="block text-sm font-medium text-[#241c14] mb-1.5">Firma / Kundenname <span className="text-[var(--c-accent)]">*</span></label>
               <input type="text" value={kunde.firma} onChange={e => setKunde({ ...kunde, firma: e.target.value })} placeholder="Mustermann GmbH" className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#1a1814] mb-1.5">Ansprechpartner</label>
+              <label className="block text-sm font-medium text-[#241c14] mb-1.5">Ansprechpartner</label>
               <input type="text" value={kunde.kontakt} onChange={e => setKunde({ ...kunde, kontakt: e.target.value })} placeholder="Max Mustermann" className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#1a1814] mb-1.5">E-Mail</label>
+              <label className="block text-sm font-medium text-[#241c14] mb-1.5">E-Mail</label>
               <input type="email" value={kunde.email} onChange={e => setKunde({ ...kunde, email: e.target.value })} placeholder="max@beispiel.de" className={inputClass} />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-[#1a1814] mb-1.5">Straße und Hausnummer <span className="text-[var(--c-accent)]">*</span></label>
+              <label className="block text-sm font-medium text-[#241c14] mb-1.5">Straße und Hausnummer <span className="text-[var(--c-accent)]">*</span></label>
               <input type="text" value={kunde.strasse} onChange={e => setKunde({ ...kunde, strasse: e.target.value })} placeholder="Musterstraße 1" className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#1a1814] mb-1.5">PLZ <span className="text-[var(--c-accent)]">*</span></label>
+              <label className="block text-sm font-medium text-[#241c14] mb-1.5">PLZ <span className="text-[var(--c-accent)]">*</span></label>
               <input type="text" value={kunde.plz} onChange={e => setKunde({ ...kunde, plz: e.target.value })} placeholder="12345" maxLength={5} className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#1a1814] mb-1.5">Ort <span className="text-[var(--c-accent)]">*</span></label>
+              <label className="block text-sm font-medium text-[#241c14] mb-1.5">Ort <span className="text-[var(--c-accent)]">*</span></label>
               <input type="text" value={kunde.ort} onChange={e => setKunde({ ...kunde, ort: e.target.value })} placeholder="Musterstadt" className={inputClass} />
             </div>
           </div>
@@ -416,12 +447,12 @@ export default function AngebotFormular({ onSaved }: Props) {
 
       {/* ── Schritt 2: Leistungen ── */}
       {schritt === 1 && (
-        <div className="bg-[#f2ede4] rounded-xl border border-[#1a1814]/10 p-8">
-          <h2 className="text-xl font-semibold text-[#1a1814] mb-6">Leistungen &amp; Positionen</h2>
+        <div className="bg-[#f2ede4] rounded-xl border border-[#241c14]/10 p-4 sm:p-8">
+          <h2 className="text-xl font-semibold text-[#241c14] mb-6">Leistungen &amp; Positionen</h2>
 
           <div className="space-y-3">
             {/* Tabellenkopf (Desktop) */}
-            <div className="hidden md:grid grid-cols-12 gap-3 text-xs font-medium text-[#1a1814]/50 uppercase tracking-wide px-1">
+            <div className="hidden md:grid grid-cols-12 gap-3 text-xs font-medium text-[#241c14]/50 uppercase tracking-wide px-1">
               <div className="col-span-4">Beschreibung</div>
               <div className="col-span-1">Menge</div>
               <div className="col-span-2">Einheit</div>
@@ -467,12 +498,12 @@ export default function AngebotFormular({ onSaved }: Props) {
                 <div className="col-span-2 md:col-span-1 flex items-center justify-end gap-1 pt-1">
                   <button onClick={() => vorlageSpeichern(l)} disabled={!l.beschreibung.trim()}
                     title="Als Vorlage speichern"
-                    className="text-[#1a1814]/25 hover:text-[var(--c-accent)] transition-colors disabled:opacity-0 text-base leading-none px-0.5">
+                    className="text-[#241c14]/25 hover:text-[var(--c-accent)] transition-colors disabled:opacity-0 text-base leading-none px-0.5">
                     ★
                   </button>
                   <button onClick={() => leistungEntfernen(l.id)} disabled={leistungen.length === 1}
                     title="Position entfernen"
-                    className="text-[#1a1814]/30 hover:text-[var(--c-accent)] transition-colors disabled:opacity-20 disabled:cursor-not-allowed text-lg leading-none px-0.5">
+                    className="text-[#241c14]/30 hover:text-[var(--c-accent)] transition-colors disabled:opacity-20 disabled:cursor-not-allowed text-lg leading-none px-0.5">
                     ×
                   </button>
                 </div>
@@ -490,27 +521,27 @@ export default function AngebotFormular({ onSaved }: Props) {
             {/* Vorlagen-Dropdown */}
             <div ref={vorlagenRef} className="relative">
               <button onClick={() => setVorlagenOffen(!vorlagenOffen)}
-                className="text-sm text-[#1a1814]/50 hover:text-[#1a1814] font-medium transition-colors flex items-center gap-1.5">
+                className="text-sm text-[#241c14]/50 hover:text-[#241c14] font-medium transition-colors flex items-center gap-1.5">
                 <span className="text-[var(--c-accent)]">★</span> Aus Vorlage
               </button>
 
               {vorlagenOffen && (
-                <div className="absolute left-0 top-8 z-20 w-80 bg-white border border-[#1a1814]/10 rounded-xl shadow-xl overflow-hidden">
-                  <div className="px-4 py-3 border-b border-[#1a1814]/8 bg-[#f9f7f3]">
-                    <p className="text-xs font-semibold text-[#1a1814]/50 uppercase tracking-wide">Gespeicherte Vorlagen</p>
+                <div className="absolute right-0 sm:right-auto sm:left-0 top-8 z-20 w-72 sm:w-80 bg-white border border-[#241c14]/10 rounded-xl shadow-xl overflow-hidden">
+                  <div className="px-4 py-3 border-b border-[#241c14]/8 bg-[#f9f7f3]">
+                    <p className="text-xs font-semibold text-[#241c14]/50 uppercase tracking-wide">Gespeicherte Vorlagen</p>
                   </div>
                   {vorlagen.length === 0 ? (
                     <div className="px-4 py-6 text-center">
-                      <p className="text-sm text-[#1a1814]/40">Noch keine Vorlagen gespeichert.</p>
-                      <p className="text-xs text-[#1a1814]/30 mt-1">Klicke auf ★ in einer Position zum Speichern.</p>
+                      <p className="text-sm text-[#241c14]/40">Noch keine Vorlagen gespeichert.</p>
+                      <p className="text-xs text-[#241c14]/30 mt-1">Klicke auf ★ in einer Position zum Speichern.</p>
                     </div>
                   ) : (
-                    <ul className="max-h-64 overflow-y-auto divide-y divide-[#1a1814]/5">
+                    <ul className="max-h-64 overflow-y-auto divide-y divide-[#241c14]/5">
                       {vorlagen.map(v => (
                         <li key={v.id} className="flex items-center gap-3 px-4 py-3 hover:bg-[#f2ede4] transition-colors">
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-[#1a1814] truncate">{v.beschreibung}</p>
-                            <p className="text-xs text-[#1a1814]/40 mt-0.5">
+                            <p className="text-sm font-medium text-[#241c14] truncate">{v.beschreibung}</p>
+                            <p className="text-xs text-[#241c14]/40 mt-0.5">
                               {v.menge} {v.einheit} · {formatEuro(parseDecimal(v.einzelpreis))} € · {v.mwst} % MwSt
                             </p>
                           </div>
@@ -519,7 +550,7 @@ export default function AngebotFormular({ onSaved }: Props) {
                             Übernehmen
                           </button>
                           <button onClick={() => vorlageLoeschen(v.id)} title="Vorlage löschen"
-                            className="shrink-0 text-[#1a1814]/25 hover:text-red-500 transition-colors text-lg leading-none">
+                            className="shrink-0 text-[#241c14]/25 hover:text-red-500 transition-colors text-lg leading-none">
                             ×
                           </button>
                         </li>
@@ -532,27 +563,27 @@ export default function AngebotFormular({ onSaved }: Props) {
           </div>
 
           {/* Rabatt + Summen */}
-          <div className="mt-8 border-t border-[#1a1814]/10 pt-6">
+          <div className="mt-8 border-t border-[#241c14]/10 pt-6">
             {/* Rabatt-Feld */}
             <div className="flex justify-end mb-5">
               <div className="flex items-center gap-3">
-                <label className="text-sm text-[#1a1814]/60 font-medium">Rabatt</label>
+                <label className="text-sm text-[#241c14]/60 font-medium">Rabatt</label>
                 <div className="relative w-24">
                   <input
                     type="number" min="0" max="100" step="1"
                     value={rabatt === 0 ? "" : rabatt}
                     onChange={e => setRabatt(Math.min(100, Math.max(0, parseFloat(e.target.value) || 0)))}
                     placeholder="0"
-                    className="w-full border border-[#1a1814]/20 rounded-lg px-3 py-2 text-sm text-[#1a1814] bg-white text-right pr-7 focus:outline-none focus:ring-2 focus:ring-[var(--c-accent)] focus:border-transparent"
+                    className="w-full border border-[#241c14]/20 rounded-lg px-3 py-2 text-sm text-[#241c14] bg-white text-right pr-7 focus:outline-none focus:ring-2 focus:ring-[var(--c-accent)] focus:border-transparent"
                   />
-                  <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sm text-[#1a1814]/40 pointer-events-none">%</span>
+                  <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sm text-[#241c14]/40 pointer-events-none">%</span>
                 </div>
               </div>
             </div>
 
             {/* Summen */}
             <div className="flex flex-col items-end gap-1.5 text-sm">
-              <div className="flex gap-8 text-[#1a1814]/60">
+              <div className="flex gap-8 text-[#241c14]/60">
                 <span>Nettobetrag</span>
                 <span className="w-28 text-right">{formatEuro(nettoOhneRabatt)} €</span>
               </div>
@@ -562,19 +593,19 @@ export default function AngebotFormular({ onSaved }: Props) {
                     <span>Rabatt ({rabatt} %)</span>
                     <span className="w-28 text-right">− {formatEuro(rabattBetrag)} €</span>
                   </div>
-                  <div className="flex gap-8 text-[#1a1814]/60">
+                  <div className="flex gap-8 text-[#241c14]/60">
                     <span>Netto nach Rabatt</span>
                     <span className="w-28 text-right">{formatEuro(nettoNachRabatt)} €</span>
                   </div>
                 </>
               )}
               {mwstGruppen.map(g => (
-                <div key={g.rate} className="flex gap-8 text-[#1a1814]/60">
+                <div key={g.rate} className="flex gap-8 text-[#241c14]/60">
                   <span>zzgl. {g.rate} % MwSt.</span>
                   <span className="w-28 text-right">{formatEuro(g.betrag)} €</span>
                 </div>
               ))}
-              <div className="flex gap-8 font-semibold text-[#1a1814] text-base mt-1 pt-2 border-t border-[#1a1814]/10">
+              <div className="flex gap-8 font-semibold text-[#241c14] text-base mt-1 pt-2 border-t border-[#241c14]/10">
                 <span>Gesamtbetrag</span>
                 <span className="w-28 text-right">{formatEuro(brutto)} €</span>
               </div>
@@ -583,7 +614,7 @@ export default function AngebotFormular({ onSaved }: Props) {
 
           <div className="flex justify-between mt-8">
             <button onClick={() => setSchritt(0)}
-              className="text-[#1a1814]/70 px-6 py-2.5 rounded-lg font-medium text-sm hover:bg-[#1a1814]/10 transition-colors border border-[#1a1814]/20">
+              className="text-[#241c14]/70 px-6 py-2.5 rounded-lg font-medium text-sm hover:bg-[#241c14]/10 transition-colors border border-[#241c14]/20">
               ← Zurück
             </button>
             <button onClick={() => { setSchritt(2); triggerZeitersparnisToast("Angebot erstellt", 45); void angebotSpeichern(); }}
@@ -668,7 +699,7 @@ export default function AngebotFormular({ onSaved }: Props) {
             {/* Positionstabelle */}
             <table className="w-full text-sm mb-8">
               <thead>
-                <tr className="bg-[#f2ede4] text-[#1a1814]/70">
+                <tr className="bg-[#f2ede4] text-[#241c14]/70">
                   <th className="text-left px-4 py-3 rounded-l-lg font-medium w-8">Pos.</th>
                   <th className="text-left px-4 py-3 font-medium">Beschreibung</th>
                   <th className="text-right px-4 py-3 font-medium w-20">Menge</th>
@@ -758,37 +789,42 @@ export default function AngebotFormular({ onSaved }: Props) {
           onClick={e => { if (e.target === e.currentTarget) setEmailOffen(false); }}>
           <div className="bg-[#f2ede4] rounded-2xl w-full max-w-md mx-4 shadow-2xl">
             {/* Header */}
-            <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#1a1814]/10">
+            <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#241c14]/10">
               <div>
-                <h3 className="text-base font-semibold text-[#1a1814]">Angebot per E-Mail senden</h3>
-                <p className="text-xs text-[#1a1814]/40 mt-0.5">{angebotsnummer}</p>
+                <h3 className="text-base font-semibold text-[#241c14]">Angebot per E-Mail senden</h3>
+                <p className="text-xs text-[#241c14]/40 mt-0.5">{angebotsnummer}</p>
               </div>
-              <button onClick={() => setEmailOffen(false)}
-                className="text-[#1a1814]/30 hover:text-[#1a1814] transition-colors text-2xl leading-none w-8 h-8 flex items-center justify-center">
-                ×
+              <button
+                onClick={() => setEmailOffen(false)}
+                aria-label="Schließen"
+                className="text-[#241c14]/30 hover:text-[#241c14] transition-colors w-8 h-8 flex items-center justify-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#241c14]/30"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16">
+                  <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
               </button>
             </div>
 
             {/* Felder */}
             <div className="px-6 py-5 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-[#1a1814]/50 uppercase tracking-wide mb-1.5">Empfänger</label>
+                <label className="block text-xs font-semibold text-[#241c14]/50 uppercase tracking-wide mb-1.5">Empfänger</label>
                 <input type="email" value={emailAn} onChange={e => setEmailAn(e.target.value)}
                   placeholder="kunde@beispiel.de" className={inputClass} autoFocus />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-[#1a1814]/50 uppercase tracking-wide mb-1.5">Betreff</label>
+                <label className="block text-xs font-semibold text-[#241c14]/50 uppercase tracking-wide mb-1.5">Betreff</label>
                 <input type="text" value={emailBetreff} readOnly
-                  className="w-full border border-[#1a1814]/10 rounded-lg px-3.5 py-2.5 text-sm text-[#1a1814]/50 bg-[#1a1814]/5 cursor-default select-all" />
+                  className="w-full border border-[#241c14]/10 rounded-lg px-3.5 py-2.5 text-sm text-[#241c14]/50 bg-[#241c14]/5 cursor-default select-all" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-[#1a1814]/50 uppercase tracking-wide mb-1.5">Nachricht (optional)</label>
+                <label className="block text-xs font-semibold text-[#241c14]/50 uppercase tracking-wide mb-1.5">Nachricht (optional)</label>
                 <textarea value={emailNachricht} onChange={e => setEmailNachricht(e.target.value)}
                   rows={3}
                   placeholder="Vielen Dank für Ihre Anfrage. Anbei finden Sie unser Angebot…"
-                  className="w-full border border-[#1a1814]/20 rounded-lg px-3.5 py-2.5 text-sm text-[#1a1814] placeholder:text-[#1a1814]/30 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--c-accent)] focus:border-transparent resize-none" />
+                  className="w-full border border-[#241c14]/20 rounded-lg px-3.5 py-2.5 text-sm text-[#241c14] placeholder:text-[#241c14]/30 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--c-accent)] focus:border-transparent resize-none" />
               </div>
-              <p className="text-xs text-[#1a1814]/35 leading-relaxed">
+              <p className="text-xs text-[#241c14]/35 leading-relaxed">
                 Das vollständige Angebot wird als Text im E-Mail-Inhalt mitgesendet. Für eine PDF-Version nutze „Als PDF / Drucken".
               </p>
               {emailFehler && (
@@ -802,7 +838,7 @@ export default function AngebotFormular({ onSaved }: Props) {
             {/* Buttons */}
             <div className="flex gap-3 px-6 pb-6">
               <button onClick={() => setEmailOffen(false)}
-                className="flex-1 py-2.5 rounded-lg text-sm font-medium text-[#1a1814]/60 border border-[#1a1814]/15 hover:bg-[#1a1814]/5 transition-colors">
+                className="flex-1 py-2.5 rounded-lg text-sm font-medium text-[#241c14]/60 border border-[#241c14]/15 hover:bg-[#241c14]/5 transition-colors">
                 Abbrechen
               </button>
               <button onClick={angebotSenden}

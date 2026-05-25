@@ -18,7 +18,7 @@ export default function QuizRunner({ content, onComplete }: QuizRunnerProps) {
   const { questions } = content;
   if (questions.length === 0) {
     return (
-      <div className="text-center py-8 text-white/30 text-sm" style={sans}>
+      <div className="text-center py-8 text-white/50 text-sm" style={sans}>
         Dieses Quiz hat keine Fragen.
       </div>
     );
@@ -69,7 +69,7 @@ export default function QuizRunner({ content, onComplete }: QuizRunnerProps) {
 
       {/* Question */}
       <div>
-        <p className="text-xs text-white/40 mb-2">
+        <p className="text-xs text-white/55 mb-2">
           Frage {qIdx + 1} von {questions.length}
         </p>
         <p className="text-base font-medium text-white leading-relaxed">{q.question}</p>
@@ -85,7 +85,7 @@ export default function QuizRunner({ content, onComplete }: QuizRunnerProps) {
             } else if (optIdx === selected) {
               style = "border-[var(--c-accent)]/60 bg-[var(--c-accent)]/10 text-[var(--c-accent)]";
             } else {
-              style = "border-white/5 bg-white/[0.02] text-white/30";
+              style = "border-white/5 bg-white/[0.02] text-white/50";
             }
           }
           return (

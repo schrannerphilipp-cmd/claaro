@@ -6,7 +6,7 @@ import ChannelBadge from "./ChannelBadge";
 const sans = { fontFamily: "var(--font-dm-sans)" } as const;
 
 const STATUS_STYLE: Record<string, string> = {
-  pending: "text-white/40 bg-white/5 border-white/10",
+  pending: "text-white/55 bg-white/5 border-white/10",
   sent: "text-[var(--c-amber)] bg-[var(--c-amber)]/10 border-[var(--c-amber)]/20",
   delivered: "text-[var(--c-teal)] bg-[var(--c-teal)]/10 border-[var(--c-teal)]/20",
   clicked: "text-[var(--c-teal)] bg-[var(--c-teal)]/15 border-[var(--c-teal)]/30",
@@ -40,7 +40,7 @@ export default function RequestStatusList({
       <div className="py-16 bg-white/5 border border-white/10 rounded-xl text-center" style={sans}>
         <p className="text-3xl mb-3">📨</p>
         <p className="text-sm font-medium text-white mb-1">Noch keine Anfragen gesendet</p>
-        <p className="text-xs text-white/40">
+        <p className="text-xs text-white/55">
           Nutze den „Jetzt anfragen"-Button, um die erste Bewertungsanfrage zu senden.
         </p>
       </div>
@@ -49,7 +49,7 @@ export default function RequestStatusList({
 
   return (
     <div className="border border-white/10 rounded-xl overflow-hidden" style={sans}>
-      <div className="grid grid-cols-[1fr_auto_120px_110px_80px] gap-3 px-5 py-2.5 border-b border-white/10 text-xs text-white/30">
+      <div className="grid grid-cols-[1fr_auto_120px_110px_80px] gap-3 px-5 py-2.5 border-b border-white/10 text-xs text-white/50">
         <span>Kunde</span>
         <span>Kanal</span>
         <span>Plattform</span>
@@ -67,7 +67,7 @@ export default function RequestStatusList({
           >
             <div>
               <p className="text-sm text-white">{r.customerName}</p>
-              <p className="text-[10px] text-white/30">
+              <p className="text-[10px] text-white/50">
                 {new Date(r.sentAt).toLocaleDateString("de-DE", {
                   day: "2-digit",
                   month: "2-digit",

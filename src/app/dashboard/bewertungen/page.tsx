@@ -24,9 +24,9 @@ function genId(): string {
 function KpiTile({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div className="c-card bg-white/5 border border-white/10 rounded-xl p-4">
-      <p className="text-xs text-white/40 mb-2">{label}</p>
+      <p className="text-xs text-white/55 mb-2">{label}</p>
       <p className="text-2xl font-bold text-white">{value}</p>
-      {sub && <p className="text-[10px] text-white/30 mt-1">{sub}</p>}
+      {sub && <p className="text-[10px] text-white/50 mt-1">{sub}</p>}
     </div>
   );
 }
@@ -185,7 +185,7 @@ export default function BewertungenPage() {
 
       {/* Review feed */}
       <div className="mb-24" style={sans}>
-        <p className="text-xs font-medium text-white/40 uppercase tracking-wider mb-4">
+        <p className="text-xs font-medium text-white/55 uppercase tracking-wider mb-4">
           Bewertungen
         </p>
         <ReviewFeed
@@ -204,7 +204,7 @@ export default function BewertungenPage() {
           {pendingToasts.map((t) => (
             <div
               key={t.id}
-              className="flex items-center gap-3 bg-[#1a1814] border border-white/15 rounded-xl px-4 py-3 shadow-lg max-w-[260px]"
+              className="flex items-center gap-3 bg-[#241c14] border border-white/15 rounded-xl px-4 py-3 shadow-lg max-w-[260px]"
             >
               <span
                 className="w-2 h-2 rounded-full bg-[var(--c-amber)] shrink-0"
@@ -212,12 +212,12 @@ export default function BewertungenPage() {
               />
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium text-white truncate">{t.customerName}</p>
-                <p className="text-[10px] text-white/40">Anfrage in {t.delayMinutes} Min.</p>
+                <p className="text-[10px] text-white/55">Anfrage in {t.delayMinutes} Min.</p>
               </div>
               <button
                 onClick={() => cancelTrigger(t.id)}
                 title="Abbrechen"
-                className="text-white/30 hover:text-[var(--c-accent)] transition-colors shrink-0"
+                className="text-white/50 hover:text-[var(--c-accent)] transition-colors shrink-0"
               >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 14 14">
                   <path

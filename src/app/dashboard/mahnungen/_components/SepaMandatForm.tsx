@@ -53,7 +53,7 @@ export default function SepaMandatForm({
 
   const inputClass =
     "w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-white/30 transition-colors";
-  const labelClass = "block text-xs text-white/40 mb-1";
+  const labelClass = "block text-xs text-white/55 mb-1";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3 pt-1">
@@ -138,7 +138,7 @@ export default function SepaMandatForm({
             )}
           </div>
         </div>
-        <span className="text-xs text-white/40 leading-relaxed group-hover:text-white/60 transition-colors">
+        <span className="text-xs text-white/55 leading-relaxed group-hover:text-white/60 transition-colors">
           Ich erteile hiermit ein SEPA-Lastschriftmandat und ermächtige zur
           Einziehung des fälligen Betrags von meinem Konto. Dieses Mandat dient
           als digitale Unterschrift.

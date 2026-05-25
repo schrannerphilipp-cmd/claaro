@@ -57,6 +57,7 @@ export default function TemplatesPage() {
     <FeatureLayout
       name="Template-Bibliothek"
       description="Verwalte deine Einarbeitungs-Templates und weise sie Mitarbeitern zu."
+      backHref="/dashboard/onboarding"
     >
       <div className="space-y-5" style={sans}>
         {/* Toolbar */}
@@ -108,14 +109,18 @@ export default function TemplatesPage() {
         </div>
 
         {!isLoaded ? (
-          <div className="py-16 text-center text-white/30 text-sm">Lädt…</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="c-skeleton rounded-xl h-36" />
+            ))}
+          </div>
         ) : filtered.length === 0 ? (
           <div className="py-16 bg-white/5 border border-white/10 rounded-xl text-center">
             {templates.length === 0 ? (
               <>
                 <p className="text-4xl mb-4">📋</p>
                 <p className="text-sm font-medium text-white mb-1">Noch keine Templates</p>
-                <p className="text-xs text-white/40 mb-5">
+                <p className="text-xs text-white/55 mb-5">
                   Erstelle dein erstes Einarbeitungs-Template.
                 </p>
                 <Link
@@ -127,7 +132,7 @@ export default function TemplatesPage() {
                 </Link>
               </>
             ) : (
-              <p className="text-sm text-white/40">
+              <p className="text-sm text-white/55">
                 Keine Templates gefunden für „{search}".
               </p>
             )}

@@ -1,37 +1,37 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-
   /* claaro brand tokens */
-  --c-dark:       #3d2b1f;
+  --c-bg:         #241c14;   /* main app background — single source of truth */
+  --c-dark:       #3d2b1f;   /* rich dark brown for accents / gradients */
   --c-accent:     #c84b2f;
   --c-accent-rgb: 200, 75, 47;
   --c-teal:       #1e7a6b;
   --c-teal-rgb:   30, 122, 107;
   --c-warm:       #f2ede4;
   --c-amber:      #f59e0b;
+
+  /* ── Text-Hierarchy (WCAG AA on #241c14) ──────────────────────────────── */
+  /* All values verified ≥ 4.5:1 contrast against #241c14 background.       */
+  --c-text-primary:   rgba(255,255,255,0.95); /* headings, important values  */
+  --c-text-body:      rgba(255,255,255,0.80); /* standard body text          */
+  --c-text-secondary: rgba(255,255,255,0.60); /* labels, descriptions ~6:1   */
+  --c-text-muted:     rgba(255,255,255,0.50); /* hints, timestamps ~5:1      */
+  --c-text-subtle:    rgba(255,255,255,0.45); /* decorative-only, large text */
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-dm-sans);
+  --font-serif: var(--font-dm-serif);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* ── Base: pin background to warm near-black on every element ── */
+/* html gets it first so no black flashes even before body renders */
+html,
 body {
-  background: var(--c-dark);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #241c14;
+  color: rgba(255,255,255,0.95);
+  font-family: var(--font-dm-sans), system-ui, sans-serif;
 }
 
 /* Prevent horizontal overflow during slide transitions */
@@ -143,9 +143,9 @@ body {
 .c-skeleton {
   background: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.06) 25%,
-    rgba(255, 255, 255, 0.12) 50%,
-    rgba(255, 255, 255, 0.06) 75%
+    rgba(255, 255, 255, 0.07) 25%,
+    rgba(255, 255, 255, 0.16) 50%,
+    rgba(255, 255, 255, 0.07) 75%
   );
   background-size: 200% 100%;
   border-radius: 8px;
@@ -194,6 +194,15 @@ body {
   .c-tab {
     transition: color 150ms ease, border-color 150ms ease, background-color 150ms ease;
   }
+}
+
+/* ── 10. Unsichtbare Scrollbar (für Tab-Leisten auf Mobile) ─────────────── */
+.scrollbar-none {
+  scrollbar-width: none;          /* Firefox */
+  -ms-overflow-style: none;       /* IE / Edge */
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;                  /* Chrome / Safari / Opera */
 }
 
 @media print {

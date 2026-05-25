@@ -12,7 +12,17 @@ export default function VorlagenPage() {
     useMessageTemplates();
   const { settings } = useReviewSettings();
 
-  if (!isLoaded) return null;
+  if (!isLoaded) {
+    return (
+      <FeatureLayout name="Nachrichtenvorlagen" description="Vorlagen für Bewertungsanfragen und Antworten verwalten." backHref="/dashboard/bewertungen">
+        <div className="space-y-3" style={sans}>
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="c-skeleton rounded-xl h-20" />
+          ))}
+        </div>
+      </FeatureLayout>
+    );
+  }
 
   const requestTemplates = templates.filter((t) => t.type === "request");
   const responseTemplates = templates.filter((t) => t.type === "response");
@@ -37,7 +47,7 @@ export default function VorlagenPage() {
       <div className="space-y-10" style={sans}>
         {/* Anfrage-Vorlagen */}
         <section>
-          <p className="text-xs font-medium text-white/40 uppercase tracking-wider mb-4">
+          <p className="text-xs font-medium text-white/55 uppercase tracking-wider mb-4">
             Anfrage-Vorlagen
           </p>
           <div className="space-y-3">
@@ -55,7 +65,7 @@ export default function VorlagenPage() {
 
         {/* Antwort-Vorlagen */}
         <section>
-          <p className="text-xs font-medium text-white/40 uppercase tracking-wider mb-4">
+          <p className="text-xs font-medium text-white/55 uppercase tracking-wider mb-4">
             Antwort-Vorlagen
           </p>
           <div className="space-y-3">
@@ -74,7 +84,7 @@ export default function VorlagenPage() {
         {/* Add template */}
         <button
           onClick={handleCreate}
-          className="c-btn flex items-center gap-1.5 text-xs text-white/40 hover:text-white/70 transition-colors"
+          className="c-btn flex items-center gap-1.5 text-xs text-white/55 hover:text-white/70 transition-colors"
         >
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 14 14">
             <path

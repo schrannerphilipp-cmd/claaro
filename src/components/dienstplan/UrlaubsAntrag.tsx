@@ -7,7 +7,7 @@ import { triggerZeitersparnisToast } from "@/lib/zeitersparnis";
 const sans = { fontFamily: "var(--font-dm-sans)" } as const;
 const inputClass =
   "w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-white/30 transition-colors";
-const labelClass = "block text-xs text-white/40 mb-1";
+const labelClass = "block text-xs text-white/55 mb-1";
 
 function statusStyle(status: Vacation["status"]) {
   if (status === "genehmigt")
@@ -112,17 +112,17 @@ export default function UrlaubsAntrag({ employeeId, urlaubTageJahr = 25, isAdmin
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3">
             <p className="text-xl font-semibold text-white">{urlaubTageJahr}</p>
-            <p className="text-xs text-white/40 mt-0.5">Tage gesamt</p>
+            <p className="text-xs text-white/55 mt-0.5">Tage gesamt</p>
           </div>
           <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3">
             <p className="text-xl font-semibold" style={{ color: "var(--c-accent)" }}>{genehmigteTage}</p>
-            <p className="text-xs text-white/40 mt-0.5">Genommen</p>
+            <p className="text-xs text-white/55 mt-0.5">Genommen</p>
           </div>
           <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3">
             <p className="text-xl font-semibold" style={{ color: "var(--c-teal)" }}>
               {Math.max(0, urlaubTageJahr - genehmigteTage)}
             </p>
-            <p className="text-xs text-white/40 mt-0.5">Verbleibend</p>
+            <p className="text-xs text-white/55 mt-0.5">Verbleibend</p>
           </div>
         </div>
       )}
@@ -143,7 +143,7 @@ export default function UrlaubsAntrag({ employeeId, urlaubTageJahr = 25, isAdmin
               </div>
             </div>
             {von && bis && von <= bis && (
-              <p className="text-xs text-white/40">{daysBetween(von, bis)} Arbeitstage</p>
+              <p className="text-xs text-white/55">{daysBetween(von, bis)} Arbeitstage</p>
             )}
             <div>
               <label className={labelClass}>Notiz (optional)</label>
@@ -170,11 +170,11 @@ export default function UrlaubsAntrag({ employeeId, urlaubTageJahr = 25, isAdmin
         {loading ? (
           <div className="space-y-2">
             {[1, 2].map((i) => (
-              <div key={i} className="h-14 bg-white/5 border border-white/10 rounded-xl animate-pulse" />
+              <div key={i} className="c-skeleton h-14 rounded-xl" />
             ))}
           </div>
         ) : vacations.length === 0 ? (
-          <p className="text-sm text-white/30 text-center py-8">Keine Urlaubsanträge.</p>
+          <p className="text-sm text-white/50 text-center py-8">Keine Urlaubsanträge.</p>
         ) : (
           <div className="space-y-2">
             {vacations.map((v) => {
@@ -192,9 +192,9 @@ export default function UrlaubsAntrag({ employeeId, urlaubTageJahr = 25, isAdmin
                       )}
                       <p className="text-sm text-white">
                         {formatDate(v.von)} – {formatDate(v.bis)}
-                        <span className="text-white/40 text-xs ml-2">({daysBetween(v.von, v.bis)} Tage)</span>
+                        <span className="text-white/55 text-xs ml-2">({daysBetween(v.von, v.bis)} Tage)</span>
                       </p>
-                      {v.notiz && <p className="text-xs text-white/40 mt-0.5">{v.notiz}</p>}
+                      {v.notiz && <p className="text-xs text-white/55 mt-0.5">{v.notiz}</p>}
                       {v.ablehngrund && (
                         <p className="text-xs mt-0.5" style={{ color: "var(--c-accent)" }}>
                           Grund: {v.ablehngrund}

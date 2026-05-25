@@ -1,22 +1,34 @@
-import { DM_Serif_Display, DM_Sans } from "next/font/google";
+"use client";
 
-const dmSerif = DM_Serif_Display({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-dm-serif",
-});
+// Fonts werden global in src/app/layout.tsx geladen (DM_Serif_Display + DM_Sans).
+// Dieses Layout steuert den Trial-Status für alle Dashboard-Seiten.
 
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  variable: "--font-dm-sans",
-});
+import { usePathname } from "next/navigation";
+import { useTrial } from "@/hooks/useTrial";
+import TrialBanner from "@/components/trial/TrialBanner";
+import TrialGate from "@/components/trial/TrialGate";
+
+// Routen die auch nach Ablauf des Testzeitraums zugänglich bleiben
+const ALWAYS_ALLOWED = ["/dashboard/konto"];
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const trial = useTrial();
+  const pathname = usePathname();
+
+  const isAllowed = ALWAYS_ALLOWED.some((r) => pathname.startsWith(r));
+  const showGate = trial.status === "expired" && !isAllowed;
+
   return (
-    <div className={`${dmSerif.variable} ${dmSans.variable}`}>{children}</div>
+    <>
+      {/* Dezentes Banner während des Testzeitraums */}
+      <TrialBanner trial={trial} />
+
+      {/* Sperr-Seite wenn Trial abgelaufen – außer auf erlaubten Routen */}
+      {showGate ? <TrialGate /> : children}
+    </>
   );
 }

@@ -146,7 +146,7 @@ export default function VerfuegbarkeitsForm({ employeeId }: Props) {
       </div>
 
       {/* Deadline info */}
-      <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white/40">
+      <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white/55">
         <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 16 16">
           <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.4" />
           <path d="M8 5v4l2.5 1.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
@@ -158,7 +158,7 @@ export default function VerfuegbarkeitsForm({ employeeId }: Props) {
       {loading ? (
         <div className="space-y-2">
           {TAGE.map((_, i) => (
-            <div key={i} className="h-16 bg-white/5 border border-white/10 rounded-xl animate-pulse" />
+            <div key={i} className="c-skeleton h-16 rounded-xl" />
           ))}
         </div>
       ) : (
@@ -200,7 +200,7 @@ export default function VerfuegbarkeitsForm({ employeeId }: Props) {
                           value={d.von}
                           onChange={(e) => updateDay(i, { von: e.target.value })}
                         />
-                        <span className="text-white/30 text-sm">–</span>
+                        <span className="text-white/50 text-sm">–</span>
                         <input
                           type="time"
                           className={inputClass}
@@ -219,7 +219,7 @@ export default function VerfuegbarkeitsForm({ employeeId }: Props) {
                   )}
 
                   {!d.verfuegbar && (
-                    <span className="text-xs text-white/30">Nicht verfügbar</span>
+                    <span className="text-xs text-white/50">Nicht verfügbar</span>
                   )}
 
                   {/* Save indicator */}
@@ -229,7 +229,7 @@ export default function VerfuegbarkeitsForm({ employeeId }: Props) {
                     className="flex-shrink-0 ml-auto"
                   >
                     {d.saving ? (
-                      <svg className="w-4 h-4 animate-spin text-white/30" fill="none" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 animate-spin text-white/50" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
                       </svg>

@@ -32,7 +32,7 @@ const EMPTY: Firmendaten = {
 
 const inputClass =
   "w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-white/30 transition-colors";
-const labelClass = "block text-xs text-white/40 mb-1";
+const labelClass = "block text-xs text-white/55 mb-1";
 
 function loadFromStorage(): Firmendaten {
   try {
@@ -110,7 +110,7 @@ export default function FirmendatenForm() {
 
   return (
     <div className="space-y-4" style={sans}>
-      <p className="text-[10px] text-white/30 uppercase tracking-widest">Firmendaten</p>
+      <p className="text-[10px] text-white/50 uppercase tracking-widest">Firmendaten</p>
 
       <form onSubmit={handleSave} className="space-y-4">
         {/* Firmenname */}
@@ -182,7 +182,7 @@ export default function FirmendatenForm() {
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className={labelClass}>Website <span className="text-white/20">(optional)</span></label>
+            <label className={labelClass}>Website <span className="text-white/40">(optional)</span></label>
             <input
               className={inputClass}
               value={form.website}
@@ -191,7 +191,7 @@ export default function FirmendatenForm() {
             />
           </div>
           <div>
-            <label className={labelClass}>USt-IdNr. <span className="text-white/20">(optional)</span></label>
+            <label className={labelClass}>USt-IdNr. <span className="text-white/40">(optional)</span></label>
             <input
               className={inputClass}
               value={form.ust_id_nr}
@@ -221,7 +221,7 @@ export default function FirmendatenForm() {
         </button>
       </form>
 
-      <p className="text-xs text-white/25 leading-relaxed">
+      <p className="text-xs text-white/45 leading-relaxed">
         Diese Daten erscheinen automatisch als Absender auf all Ihren Angeboten.
       </p>
     </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { getBrowserClient, supabaseConfigured } from "@/lib/supabase";
+import { useTrial } from "@/hooks/useTrial";
 
 const sans = { fontFamily: "var(--font-dm-sans)" } as const;
 const serif = { fontFamily: "var(--font-dm-serif)" } as const;
@@ -13,6 +14,7 @@ type Interval = "monatlich" | "jaehrlich";
 
 interface PlanData {
   name: string;
+  subtitle: string;
   monthly: number;
   yearly: number;
   badge?: string;
@@ -23,26 +25,28 @@ interface PlanData {
 const PLANS: Record<Plan, PlanData> = {
   starter: {
     name: "Starter",
+    subtitle: "Für kleine Teams & Einsteiger",
     monthly: 29,
     yearly: 23,
     features: [
-      "3 Module nach Wahl",
-      "Bis zu 3 Nutzer",
-      "50 Angebote/Monat",
+      "Wähle 3 der 6 Module",
+      "Bis zu 3 Mitarbeiter",
+      "50 Angebote pro Monat",
       "E-Mail-Support",
       "Basis-KI-Funktionen",
-      "Deutsche Datenhaltung",
+      "Datenhaltung in Deutschland",
     ],
     color: "rgba(255,255,255,0.6)",
   },
   profi: {
     name: "Profi",
+    subtitle: "Für wachsende Unternehmen",
     monthly: 59,
     yearly: 47,
     badge: "Beliebtester Plan",
     features: [
-      "Alle 6 Module",
-      "Bis zu 15 Nutzer",
+      "Alle 6 Module inklusive",
+      "Bis zu 15 Mitarbeiter",
       "Unbegrenzte Angebote",
       "Volle KI-Unterstützung",
       "Telefon & Chat-Support",
@@ -53,17 +57,18 @@ const PLANS: Record<Plan, PlanData> = {
   },
   team: {
     name: "Team",
+    subtitle: "Für große Teams & Filialisten",
     monthly: 99,
     yearly: 79,
     features: [
       "Alles aus Profi",
-      "Unbegrenzte Nutzer",
+      "Unbegrenzte Mitarbeiterzahl",
       "Mehrere Standorte",
       "Dedizierter Account Manager",
       "Custom Branding",
-      "Prioritäts-Support (2h)",
-      "Onboarding-Session",
-      "SLA 99,9 % Uptime",
+      "Prioritäts-Support (2h SLA)",
+      "Persönliche Onboarding-Session",
+      "99,9 % Uptime-Garantie",
     ],
     color: "var(--c-teal)",
   },
@@ -199,6 +204,38 @@ function CheckIcon() {
   );
 }
 
+/** Ersetzt mailto-Links — kopiert E-Mail-Adresse in die Zwischenablage */
+function CopyEmailButton() {
+  const [copied, setCopied] = useState(false);
+  function handleCopy() {
+    try { navigator.clipboard.writeText("upgrade@claaro.de"); } catch {/* ignore */}
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  }
+  return (
+    <button
+      onClick={handleCopy}
+      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs shrink-0 transition-colors"
+      style={copied
+        ? { backgroundColor: "rgba(var(--c-teal-rgb),0.15)", color: "var(--c-teal)", border: "1px solid rgba(var(--c-teal-rgb),0.25)" }
+        : { backgroundColor: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.55)", border: "1px solid rgba(255,255,255,0.1)" }
+      }
+    >
+      {copied ? (
+        "✓ Kopiert"
+      ) : (
+        <>
+          <svg className="w-3 h-3 flex-none" fill="none" viewBox="0 0 12 12">
+            <rect x="1" y="3" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.2"/>
+            <path d="M4 3V2a1 1 0 011-1h5a1 1 0 011 1v7a1 1 0 01-1 1H9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+          </svg>
+          upgrade@claaro.de
+        </>
+      )}
+    </button>
+  );
+}
+
 const PLAN_ORDER: Plan[] = ["starter", "profi", "team"];
 
 interface Props {
@@ -207,6 +244,7 @@ interface Props {
 }
 
 export default function AboAbrechnung({ showSuccess: showSuccessProp = false, onSuccessDismissed }: Props) {
+  const trial = useTrial();
   const [plan, setPlan] = useState<Plan>("starter");
   const [hasPlan, setHasPlan] = useState<boolean | null>(null);
   const [interval, setInterval] = useState<Interval>("monatlich");
@@ -246,12 +284,18 @@ export default function AboAbrechnung({ showSuccess: showSuccessProp = false, on
         .maybeSingle()
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .then(({ data }: { data: any }) => {
-          if (data?.abo_plan) {
-            const p = data.abo_plan as Plan;
+          // abo_seit = Stripe hat die Zahlung bestätigt (konsistent mit useTrial).
+          // abo_plan allein reicht nicht – es kann auf 'starter' defaulten ohne Zahlung.
+          const hasActivePlan = !!data?.abo_seit;
+          if (hasActivePlan) {
+            const p = (data.abo_plan ?? "starter") as Plan;
             setPlan(p);
             setHasPlan(true);
             if (data.abo_zahlungsintervall) setInterval(data.abo_zahlungsintervall as Interval);
-            if (data.abo_seit) setAboSeit(data.abo_seit);
+            setAboSeit(data.abo_seit);
+            // useTrial-Hook (im Layout) über Abo-Aktivierung informieren →
+            // Banner verschwindet sofort, kein Seiten-Reload nötig
+            window.dispatchEvent(new CustomEvent("claaro:abo-updated"));
           } else if (showSuccessProp && retries < maxRetries) {
             retries++;
             setTimeout(loadPlan, 2000);
@@ -299,7 +343,10 @@ export default function AboAbrechnung({ showSuccess: showSuccessProp = false, on
       <span className="text-sm text-white/50" style={{ minWidth: "4rem" }}>Monatlich</span>
       <button
         onClick={toggleInterval}
-        className="relative w-10 h-5 rounded-full transition-colors overflow-hidden flex-none"
+        role="switch"
+        aria-checked={interval === "jaehrlich"}
+        aria-label="Jährliche Abrechnung (20% Rabatt)"
+        className="relative w-10 h-5 rounded-full transition-colors overflow-hidden flex-none focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
         style={{ backgroundColor: interval === "jaehrlich" ? "var(--c-teal)" : "rgba(255,255,255,0.2)" }}
       >
         <span
@@ -387,7 +434,7 @@ export default function AboAbrechnung({ showSuccess: showSuccessProp = false, on
                 {" "}Plan!
               </p>
             ) : (
-              <p className="text-white/40 text-sm mb-8">Ihr Plan wird aktiviert …</p>
+              <p className="text-white/55 text-sm mb-8">Ihr Plan wird aktiviert …</p>
             )}
             <button
               onClick={dismissModal}
@@ -414,7 +461,7 @@ export default function AboAbrechnung({ showSuccess: showSuccessProp = false, on
       <>
         <style>{SHARED_STYLES}</style>
         {successModal}
-        <div className="h-40 flex items-center justify-center text-white/30 text-sm" style={sans}>
+        <div className="h-40 flex items-center justify-center text-white/50 text-sm" style={sans}>
           Laden …
         </div>
       </>
@@ -423,12 +470,71 @@ export default function AboAbrechnung({ showSuccess: showSuccessProp = false, on
 
   // No active plan → show all 3 plans for selection
   if (!hasPlan) {
+    // Trial-Status-Info für den Nutzer
+    const trialInfoBanner = (() => {
+      if (trial.status === "loading" || trial.status === "paid") return null;
+      if (trial.status === "expired") {
+        return (
+          <div
+            className="flex items-start gap-3 px-4 py-3 rounded-xl"
+            style={{
+              backgroundColor: "rgba(var(--c-accent-rgb),0.1)",
+              border: "1px solid rgba(var(--c-accent-rgb),0.2)",
+            }}
+          >
+            <svg className="w-4 h-4 mt-0.5 shrink-0" fill="none" viewBox="0 0 16 16" style={{ color: "var(--c-accent)" }}>
+              <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.4"/>
+              <path d="M8 5v3.5M8 11h.01" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+            </svg>
+            <div>
+              <p className="text-sm font-medium" style={{ color: "var(--c-accent)" }}>
+                Dein Testzeitraum ist abgelaufen
+              </p>
+              <p className="text-xs text-white/55 mt-0.5">
+                Wähle einen Plan um weiterhin auf alle Funktionen zuzugreifen.{" "}
+                Die meisten Unternehmen starten mit{" "}
+                <span style={{ color: "var(--c-accent)" }}>Profi</span>.
+              </p>
+            </div>
+          </div>
+        );
+      }
+      const urgent = trial.status === "expiring";
+      return (
+        <div
+          className="flex items-center justify-between px-4 py-3 rounded-xl"
+          style={{
+            backgroundColor: urgent ? "rgba(245,158,11,0.1)" : "rgba(var(--c-teal-rgb),0.08)",
+            border: urgent ? "1px solid rgba(245,158,11,0.2)" : "1px solid rgba(var(--c-teal-rgb),0.15)",
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 16 16" style={{ color: urgent ? "rgb(245,158,11)" : "var(--c-teal)" }}>
+              <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.4"/>
+              <path d="M8 5v3L10 9.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+            </svg>
+            <p className="text-sm" style={{ color: urgent ? "rgb(245,158,11)" : "var(--c-teal)" }}>
+              <span className="font-medium">Testzeitraum aktiv</span>
+              {" "}— noch{" "}
+              <span className="font-medium">{trial.daysLeft} {trial.daysLeft === 1 ? "Tag" : "Tage"}</span>
+              {trial.trialEndsAt && (
+                <span className="text-white/45 ml-1 text-xs">
+                  (bis {trial.trialEndsAt.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" })})
+                </span>
+              )}
+            </p>
+          </div>
+        </div>
+      );
+    })();
+
     return (
       <>
         <style>{SHARED_STYLES}</style>
         {successModal}
         <div className="space-y-8" style={sans}>
           <div className="space-y-3">
+            {trialInfoBanner}
             <p className="text-white/50 text-sm">Wählen Sie einen Plan um loszulegen.</p>
             {intervalToggle}
           </div>
@@ -474,7 +580,8 @@ export default function AboAbrechnung({ showSuccess: showSuccessProp = false, on
                         {p.badge}
                       </span>
                     )}
-                    <h3 className="text-xl sm:text-2xl text-white mb-3" style={serif}>{p.name}</h3>
+                    <h3 className="text-xl sm:text-2xl text-white mb-0.5" style={serif}>{p.name}</h3>
+                    <p className="text-xs text-white/45 mb-3">{p.subtitle}</p>
                     <div className="flex items-baseline gap-1.5">
                       <span
                         key={`${key}-${priceVersion}`}
@@ -483,10 +590,10 @@ export default function AboAbrechnung({ showSuccess: showSuccessProp = false, on
                       >
                         {price} €
                       </span>
-                      <span className="text-sm text-white/40">/ Monat</span>
+                      <span className="text-sm text-white/55">/ Monat</span>
                     </div>
                     {interval === "jaehrlich" && (
-                      <p className="text-xs text-white/30 mt-1">jährlich abgerechnet</p>
+                      <p className="text-xs text-white/50 mt-1">jährlich abgerechnet</p>
                     )}
                   </div>
 
@@ -513,7 +620,7 @@ export default function AboAbrechnung({ showSuccess: showSuccessProp = false, on
                     className="w-full text-sm py-3 rounded-xl font-semibold"
                     style={{
                       backgroundColor: isProfi ? "var(--c-accent)" : "rgba(255,255,255,0.92)",
-                      color: isProfi ? "white" : "#1a1814",
+                      color: isProfi ? "white" : "#241c14",
                       opacity: loadingPlan && !isLoading ? 0.4 : 1,
                       transform: isBtnPressed ? "translateY(0)" : isBtnHovered ? "translateY(-2px)" : "translateY(0)",
                       boxShadow: isBtnHovered && !isBtnPressed
@@ -545,20 +652,20 @@ export default function AboAbrechnung({ showSuccess: showSuccessProp = false, on
 
           {/* Add-ons */}
           <div>
-            <p className="text-xs text-white/30 uppercase tracking-widest mb-3">Add-ons</p>
+            <p className="text-xs text-white/50 uppercase tracking-widest mb-3">Add-ons</p>
             <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10 mt-2">
               <div>
                 <p className="text-white text-sm font-medium">Zusatz-Standort</p>
                 <p className="text-white/50 text-xs">19 €/Monat — ab Profi-Plan</p>
               </div>
-              <a href="mailto:upgrade@claaro.de?subject=Add-on: Zusatz-Standort" className="px-3 py-1.5 text-xs rounded-md bg-[#c84b2f] text-white hover:opacity-90 transition">Anfragen</a>
+              <CopyEmailButton />
             </div>
             <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10 mt-2">
               <div>
                 <p className="text-white text-sm font-medium">Einzel-Onboarding</p>
                 <p className="text-white/50 text-xs">149 € einmalig — persönliche Einführung</p>
               </div>
-              <a href="mailto:upgrade@claaro.de?subject=Add-on: Einzel-Onboarding" className="px-3 py-1.5 text-xs rounded-md bg-[#1e7a6b] text-white hover:opacity-90 transition">Anfragen</a>
+              <CopyEmailButton />
             </div>
           </div>
         </div>
@@ -613,18 +720,19 @@ export default function AboAbrechnung({ showSuccess: showSuccessProp = false, on
                       </span>
                     )}
                   </div>
-                  <h3 className="text-xl sm:text-2xl text-white mb-3" style={serif}>{p.name}</h3>
+                  <h3 className="text-xl sm:text-2xl text-white mb-0.5" style={serif}>{p.name}</h3>
+                  <p className="text-xs text-white/45 mb-3">{p.subtitle}</p>
                   <div className="flex items-baseline gap-1.5">
                     <span key={`${key}-${priceVersion}`} className="abo-price-in text-3xl sm:text-4xl font-bold text-white" style={serif}>
                       {price} €
                     </span>
-                    <span className="text-sm text-white/40">/ Monat</span>
+                    <span className="text-sm text-white/55">/ Monat</span>
                   </div>
                   {interval === "jaehrlich" && (
-                    <p className="text-xs text-white/30 mt-1">jährlich abgerechnet</p>
+                    <p className="text-xs text-white/50 mt-1">jährlich abgerechnet</p>
                   )}
                   {isActive && aboSeit && (
-                    <p className="text-xs text-white/30 mt-1">
+                    <p className="text-xs text-white/50 mt-1">
                       Aktiv seit {new Date(aboSeit).toLocaleDateString("de-DE", { day: "2-digit", month: "long", year: "numeric" })}
                     </p>
                   )}
@@ -642,7 +750,7 @@ export default function AboAbrechnung({ showSuccess: showSuccessProp = false, on
 
                 {/* CTA */}
                 {isActive ? null : isBelow ? (
-                  <p className="text-sm text-white/30 text-center py-1">Nicht verfügbar</p>
+                  <p className="text-sm text-white/50 text-center py-1">Nicht verfügbar</p>
                 ) : isAbove ? (
                   <button
                     onClick={() => handleCheckout(key)}
@@ -666,20 +774,20 @@ export default function AboAbrechnung({ showSuccess: showSuccessProp = false, on
 
         {/* Add-ons */}
         <div>
-          <p className="text-xs text-white/30 uppercase tracking-widest mb-3">Add-ons</p>
+          <p className="text-xs text-white/50 uppercase tracking-widest mb-3">Add-ons</p>
           <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10 mt-2">
             <div>
               <p className="text-white text-sm font-medium">Zusatz-Standort</p>
               <p className="text-white/50 text-xs">19 €/Monat — ab Profi-Plan</p>
             </div>
-            <a href="mailto:upgrade@claaro.de?subject=Add-on: Zusatz-Standort" className="px-3 py-1.5 text-xs rounded-md bg-[#c84b2f] text-white hover:opacity-90 transition">Anfragen</a>
+            <CopyEmailButton />
           </div>
           <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10 mt-2">
             <div>
               <p className="text-white text-sm font-medium">Einzel-Onboarding</p>
               <p className="text-white/50 text-xs">149 € einmalig — persönliche Einführung</p>
             </div>
-            <a href="mailto:upgrade@claaro.de?subject=Add-on: Einzel-Onboarding" className="px-3 py-1.5 text-xs rounded-md bg-[#1e7a6b] text-white hover:opacity-90 transition">Anfragen</a>
+            <CopyEmailButton />
           </div>
         </div>
       </div>

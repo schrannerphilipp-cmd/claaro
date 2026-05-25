@@ -39,7 +39,7 @@ export default function ChecklistEditor({ content, onChange }: ChecklistEditorPr
   return (
     <div className="space-y-2">
       {content.items.length === 0 && (
-        <p className="text-xs text-white/30 py-3 text-center">
+        <p className="text-xs text-white/50 py-3 text-center">
           Noch keine Aufgaben — füge die erste hinzu.
         </p>
       )}
@@ -58,14 +58,14 @@ export default function ChecklistEditor({ content, onChange }: ChecklistEditorPr
             className={`shrink-0 text-xs px-2 py-1 rounded border transition-colors ${
               item.required
                 ? "border-[var(--c-accent)]/40 text-[var(--c-accent)] bg-[var(--c-accent)]/10"
-                : "border-white/10 text-white/30 bg-white/5"
+                : "border-white/10 text-white/50 bg-white/5"
             }`}
           >
             {item.required ? "Pflicht" : "Optional"}
           </button>
           <button
             onClick={() => removeItem(item.id)}
-            className="shrink-0 text-white/30 hover:text-white/70 transition-colors"
+            className="shrink-0 text-white/50 hover:text-white/70 transition-colors"
             title="Entfernen"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16">
@@ -76,7 +76,7 @@ export default function ChecklistEditor({ content, onChange }: ChecklistEditorPr
       ))}
       <button
         onClick={addItem}
-        className="mt-1 flex items-center gap-1.5 text-xs text-white/40 hover:text-white/70 transition-colors"
+        className="mt-1 flex items-center gap-1.5 text-xs text-white/55 hover:text-white/70 transition-colors"
       >
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 16 16">
           <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>

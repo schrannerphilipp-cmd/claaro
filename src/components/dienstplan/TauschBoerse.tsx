@@ -198,11 +198,11 @@ export default function TauschBoerse({ employeeId, hauptaccountId, isAdmin, mySh
           {loading ? (
             <div className="space-y-2">
               {[1, 2].map((i) => (
-                <div key={i} className="h-16 bg-white/5 border border-white/10 rounded-xl animate-pulse" />
+                <div key={i} className="c-skeleton h-16 rounded-xl" />
               ))}
             </div>
           ) : swaps.length === 0 ? (
-            <p className="text-sm text-white/30 text-center py-8">Keine Tausch-Anfragen.</p>
+            <p className="text-sm text-white/50 text-center py-8">Keine Tausch-Anfragen.</p>
           ) : (
             <div className="space-y-2">
               {swaps.map((swap) => (
@@ -223,12 +223,12 @@ export default function TauschBoerse({ employeeId, hauptaccountId, isAdmin, mySh
                       </p>
                       <div className="flex gap-4 mt-1">
                         {swap.shift_original && (
-                          <p className="text-[10px] text-white/35">
+                          <p className="text-[10px] text-white/50">
                             Original: {formatDate(swap.shift_original.datum)} {swap.shift_original.von.slice(0, 5)}–{swap.shift_original.bis.slice(0, 5)}
                           </p>
                         )}
                         {swap.shift_angebot && (
-                          <p className="text-[10px] text-white/35">
+                          <p className="text-[10px] text-white/50">
                             Gegenangebot: {formatDate(swap.shift_angebot.datum)} {swap.shift_angebot.von.slice(0, 5)}–{swap.shift_angebot.bis.slice(0, 5)}
                           </p>
                         )}

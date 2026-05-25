@@ -4,7 +4,7 @@ import { QuizContent, QuizQuestion } from "@/types/onboard";
 
 const inputClass =
   "w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-white/30 transition-colors";
-const labelClass = "block text-xs text-white/40 mb-1";
+const labelClass = "block text-xs text-white/55 mb-1";
 
 function genId(): string {
   return Math.random().toString(36).slice(2) + Date.now().toString(36);
@@ -51,7 +51,7 @@ export default function QuizEditor({ content, onChange }: QuizEditorProps) {
   return (
     <div className="space-y-5">
       {content.questions.length === 0 && (
-        <p className="text-xs text-white/30 py-3 text-center">
+        <p className="text-xs text-white/50 py-3 text-center">
           Noch keine Fragen — füge die erste hinzu.
         </p>
       )}
@@ -62,7 +62,7 @@ export default function QuizEditor({ content, onChange }: QuizEditorProps) {
             <p className="text-xs font-medium text-white/50">Frage {qIdx + 1}</p>
             <button
               onClick={() => removeQuestion(q.id)}
-              className="text-white/30 hover:text-white/70 transition-colors"
+              className="text-white/50 hover:text-white/70 transition-colors"
               title="Frage löschen"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16">
@@ -124,7 +124,7 @@ export default function QuizEditor({ content, onChange }: QuizEditorProps) {
 
       <button
         onClick={addQuestion}
-        className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white/70 transition-colors"
+        className="flex items-center gap-1.5 text-xs text-white/55 hover:text-white/70 transition-colors"
       >
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 16 16">
           <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>

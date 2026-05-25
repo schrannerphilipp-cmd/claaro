@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import emailjs from "@emailjs/browser";
 
 const EMAILJS_SERVICE_ID  = "service_8b5ibjd";
@@ -12,7 +12,7 @@ const serif = { fontFamily: "var(--font-dm-serif)" } as const;
 
 const inputClass =
   "w-full bg-[#2a2620] border border-white/15 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-white/30 transition-colors";
-const labelClass = "block text-xs text-white/40 mb-1";
+const labelClass = "block text-xs text-white/55 mb-1";
 
 const KATEGORIEN = ["Fehler melden", "Funktion vorschlagen", "Lob", "Sonstiges"];
 
@@ -28,6 +28,7 @@ export default function FeedbackModal({ open, onClose }: Props) {
   const [nachricht, setNachricht] = useState("");
   const [sterne, setSterne] = useState(0);
   const [sterneHover, setSterneHover] = useState(0);
+  const starRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -80,16 +81,17 @@ export default function FeedbackModal({ open, onClose }: Props) {
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-md bg-[#1a1814] border border-white/15 rounded-2xl shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-md bg-[#241c14] border border-white/15 rounded-2xl shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
           <div>
             <h2 className="text-lg text-white" style={serif}>Feedback senden</h2>
-            <p className="text-xs text-white/40 mt-0.5">Direkt an das Claaro-Team</p>
+            <p className="text-xs text-white/55 mt-0.5">Direkt an das Claaro-Team</p>
           </div>
           <button
             onClick={onClose}
-            className="text-white/30 hover:text-white transition-colors p-1"
+            aria-label="Schließen"
+            className="text-white/50 hover:text-white transition-colors p-1 rounded focus-visible:ring-2 focus-visible:ring-white/40 focus:outline-none"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 16 16">
               <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -152,19 +154,47 @@ export default function FeedbackModal({ open, onClose }: Props) {
               </div>
 
               <div>
-                <label className={labelClass}>Bewertung</label>
-                <div className="flex gap-1.5 mt-1">
+                <label className={labelClass}>Bewertung <span className="text-white/35">(optional)</span></label>
+                <div
+                  role="group"
+                  aria-label="Sternebewertung 1 bis 5 — Pfeiltasten zum Ändern"
+                  className="flex gap-1.5 mt-1"
+                >
                   {[1, 2, 3, 4, 5].map((n) => {
                     const filled = n <= (sterneHover || sterne);
                     return (
                       <button
                         key={n}
+                        ref={(el) => { starRefs.current[n - 1] = el; }}
                         type="button"
+                        tabIndex={n === (sterne || 1) ? 0 : -1}
                         onClick={() => setSterne(n)}
                         onMouseEnter={() => setSterneHover(n)}
                         onMouseLeave={() => setSterneHover(0)}
+                        onKeyDown={(e) => {
+                          if (e.key === "ArrowRight" || e.key === "ArrowUp") {
+                            e.preventDefault();
+                            const next = Math.min(5, n + 1);
+                            setSterne(next);
+                            starRefs.current[next - 1]?.focus();
+                          } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+                            e.preventDefault();
+                            const prev = Math.max(1, n - 1);
+                            setSterne(prev);
+                            starRefs.current[prev - 1]?.focus();
+                          } else if (e.key === "Home") {
+                            e.preventDefault();
+                            setSterne(1);
+                            starRefs.current[0]?.focus();
+                          } else if (e.key === "End") {
+                            e.preventDefault();
+                            setSterne(5);
+                            starRefs.current[4]?.focus();
+                          }
+                        }}
                         aria-label={`${n} Stern${n > 1 ? "e" : ""}`}
-                        className="transition-transform hover:scale-110"
+                        aria-pressed={sterne === n}
+                        className="transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded"
                       >
                         <svg
                           className="w-7 h-7 transition-colors duration-100"
@@ -191,8 +221,15 @@ export default function FeedbackModal({ open, onClose }: Props) {
                   onChange={(e) => setNachricht(e.target.value)}
                   placeholder="Was möchtest du uns mitteilen?"
                 />
-                <p className="text-right text-[10px] text-white/20 mt-1">
-                  {nachricht.length} / 20 Zeichen
+                <p className={`text-right text-[10px] mt-1 transition-colors ${
+                  nachricht.length === 0 ? "text-white/45" :
+                  nachricht.length < 20 ? "text-amber-400/80" : "text-teal-400/70"
+                }`}>
+                  {nachricht.length === 0
+                    ? "Mindestens 20 Zeichen erforderlich"
+                    : nachricht.length < 20
+                    ? `${nachricht.length} / 20 — noch ${20 - nachricht.length} Zeichen`
+                    : `${nachricht.length} Zeichen ✓`}
                 </p>
               </div>
 

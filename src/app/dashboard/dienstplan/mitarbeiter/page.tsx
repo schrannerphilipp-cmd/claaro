@@ -59,15 +59,15 @@ export default function MitarbeiterPage() {
         <div className="grid grid-cols-3 gap-3">
           <div className="c-card bg-white/5 border border-white/10 rounded-xl px-4 py-3">
             <p className="text-xl font-semibold text-white">{employees.length}</p>
-            <p className="text-xs text-white/40 mt-0.5">Gesamt</p>
+            <p className="text-xs text-white/55 mt-0.5">Gesamt</p>
           </div>
           <div className="c-card bg-white/5 border border-white/10 rounded-xl px-4 py-3">
             <p className="text-xl font-semibold" style={{ color: "var(--c-teal)" }}>{aktive.length}</p>
-            <p className="text-xs text-white/40 mt-0.5">Aktiv</p>
+            <p className="text-xs text-white/55 mt-0.5">Aktiv</p>
           </div>
           <div className="c-card bg-white/5 border border-white/10 rounded-xl px-4 py-3">
-            <p className="text-xl font-semibold text-white/30">{inaktive.length}</p>
-            <p className="text-xs text-white/40 mt-0.5">Deaktiviert</p>
+            <p className="text-xl font-semibold text-white/50">{inaktive.length}</p>
+            <p className="text-xs text-white/55 mt-0.5">Deaktiviert</p>
           </div>
         </div>
 
@@ -84,7 +84,7 @@ export default function MitarbeiterPage() {
               Neuen Mitarbeiter anlegen
             </span>
             <svg
-              className={`w-4 h-4 text-white/30 transition-transform duration-200 ${showForm ? "rotate-180" : ""}`}
+              className={`w-4 h-4 text-white/50 transition-transform duration-200 ${showForm ? "rotate-180" : ""}`}
               fill="none" viewBox="0 0 16 16"
             >
               <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -95,6 +95,7 @@ export default function MitarbeiterPage() {
               <MitarbeiterForm
                 hauptaccountId={HAUPTACCOUNT_ID}
                 onSuccess={(emp) => {
+                  try { localStorage.setItem("claaro-setup-team", "1"); } catch {/* ignore */}
                   setEmployees((prev) => [emp, ...prev]);
                   setShowForm(false);
                 }}
@@ -107,13 +108,26 @@ export default function MitarbeiterPage() {
         {loading ? (
           <div className="space-y-2">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-16 bg-white/5 border border-white/10 rounded-xl animate-pulse" />
+              <div key={i} className="c-skeleton h-16 rounded-xl" />
             ))}
           </div>
         ) : employees.length === 0 ? (
-          <div className="bg-white/5 border border-white/10 rounded-xl py-16 text-center">
-            <p className="text-3xl mb-4">👥</p>
-            <p className="text-sm text-white/40">Noch keine Mitarbeiter angelegt.</p>
+          <div className="bg-white/5 border border-white/10 rounded-xl py-16 px-8 text-center">
+            <p className="text-3xl mb-4" aria-hidden="true">👥</p>
+            <p className="text-sm font-medium text-white mb-1">Noch kein Team angelegt</p>
+            <p className="text-xs text-white/55 mb-5 max-w-xs mx-auto">
+              Füge deinen ersten Mitarbeiter hinzu — dann kannst du Schichtpläne erstellen.
+            </p>
+            <button
+              onClick={() => setShowForm(true)}
+              className="c-btn inline-flex items-center gap-2 text-sm px-4 py-2 rounded-lg font-medium transition-colors"
+              style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.2)", color: "var(--c-teal)", border: "1px solid rgba(var(--c-teal-rgb),0.25)" }}
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16">
+                <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+              Ersten Mitarbeiter hinzufügen
+            </button>
           </div>
         ) : (
           <div className="space-y-2">
@@ -133,17 +147,17 @@ export default function MitarbeiterPage() {
                   <div>
                     <div className="flex items-center gap-2">
                       <p className="text-sm text-white font-medium">{emp.name}</p>
-                      <span className="text-[10px] text-white/30">{LAND_FLAGS[emp.land]} {emp.land}</span>
+                      <span className="text-[10px] text-white/50">{LAND_FLAGS[emp.land]} {emp.land}</span>
                       {emp.rolle === "admin" && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-white/40">Admin</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-white/55">Admin</span>
                       )}
                     </div>
-                    <p className="text-xs text-white/40">{emp.email} · {emp.vertrag_typ} · {emp.stunden_pro_woche}h/Woche</p>
+                    <p className="text-xs text-white/55">{emp.email} · {emp.vertrag_typ} · {emp.stunden_pro_woche}h/Woche</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-white/25">seit {formatDate(emp.created_at)}</span>
+                  <span className="text-xs text-white/45">seit {formatDate(emp.created_at)}</span>
                   <button
                     onClick={() => toggleAktiv(emp)}
                     disabled={toggling === emp.id}

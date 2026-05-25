@@ -73,8 +73,10 @@ export default function AngeboteListe({ onShowForm }: { onShowForm?: () => void 
 
   if (laden) {
     return (
-      <div className="flex justify-center py-8">
-        <div className="w-5 h-5 rounded-full border-2 border-white/20 border-t-white/70 animate-spin" />
+      <div className="mb-10 space-y-2">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="c-skeleton h-16 rounded-xl" />
+        ))}
       </div>
     );
   }
@@ -87,7 +89,7 @@ export default function AngeboteListe({ onShowForm }: { onShowForm?: () => void 
           <span className="text-3xl">📄</span>
         </div>
         <p className="text-base font-medium text-white mb-2">Noch keine Angebote erstellt</p>
-        <p className="text-sm text-white/35 mb-6 max-w-xs">Erstelle dein erstes Angebot und sende es direkt an deine Kunden.</p>
+        <p className="text-sm text-white/50 mb-6 max-w-xs">Erstelle dein erstes Angebot und sende es direkt an deine Kunden.</p>
         <button
           onClick={onShowForm}
           className="c-btn inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all"
@@ -107,7 +109,7 @@ export default function AngeboteListe({ onShowForm }: { onShowForm?: () => void 
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-white">Meine Angebote</h2>
         <div className="flex items-center gap-4">
-          <span className="text-xs text-white/30">{angebote.length} Angebot{angebote.length !== 1 ? "e" : ""}</span>
+          <span className="text-xs text-white/50">{angebote.length} Angebot{angebote.length !== 1 ? "e" : ""}</span>
           <button
             onClick={onShowForm}
             className="c-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
@@ -123,7 +125,7 @@ export default function AngeboteListe({ onShowForm }: { onShowForm?: () => void 
 
       <div className="c-card bg-white/5 rounded-xl border border-white/10 overflow-visible">
         {/* Tabellenkopf (Desktop) */}
-        <div className="hidden md:grid grid-cols-12 gap-4 px-5 py-2.5 text-xs font-medium text-white/25 uppercase tracking-wide border-b border-white/5">
+        <div className="hidden md:grid grid-cols-12 gap-4 px-5 py-2.5 text-xs font-medium text-white/45 uppercase tracking-wide border-b border-white/5">
           <div className="col-span-2">Nummer</div>
           <div className="col-span-2">Datum</div>
           <div className="col-span-4">Kunde</div>
@@ -140,20 +142,20 @@ export default function AngeboteListe({ onShowForm }: { onShowForm?: () => void 
               </div>
               {/* Datum (mobile: rechts oben) */}
               <div className="col-span-5 md:col-span-2 text-right md:text-left">
-                <p className="text-sm text-white/35">{formatDatum(a.angebotsdatum)}</p>
+                <p className="text-sm text-white/50">{formatDatum(a.angebotsdatum)}</p>
               </div>
               {/* Kunde */}
               <div className="col-span-12 md:col-span-4 md:mt-0 -mt-1">
                 <p className="text-sm font-medium text-white">{a.kunde_firma}</p>
                 {a.kunde_email && (
-                  <p className="text-xs text-white/30 mt-0.5 truncate">{a.kunde_email}</p>
+                  <p className="text-xs text-white/50 mt-0.5 truncate">{a.kunde_email}</p>
                 )}
               </div>
               {/* Betrag */}
               <div className="col-span-5 md:col-span-2 md:text-right">
                 <p className="text-sm font-semibold text-white">{formatEuro(a.brutto)} €</p>
                 {a.rabatt > 0 && (
-                  <p className="text-xs text-white/25 mt-0.5">{a.rabatt} % Rabatt</p>
+                  <p className="text-xs text-white/45 mt-0.5">{a.rabatt} % Rabatt</p>
                 )}
               </div>
               {/* Status */}
@@ -180,7 +182,7 @@ export default function AngeboteListe({ onShowForm }: { onShowForm?: () => void 
                         >
                           <span className={`w-2 h-2 rounded-full shrink-0 ${STATUS[s].dot}`} />
                           {STATUS[s].label}
-                          {a.status === s && <span className="ml-auto text-white/30 text-[10px]">✓</span>}
+                          {a.status === s && <span className="ml-auto text-white/50 text-[10px]">✓</span>}
                         </button>
                       ))}
                     </div>

@@ -8,7 +8,7 @@ const sans = { fontFamily: "var(--font-dm-sans)" } as const;
 
 const inputClass =
   "w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-white/30 transition-colors";
-const labelClass = "block text-xs text-white/40 mb-1";
+const labelClass = "block text-xs text-white/55 mb-1";
 
 const LAND_PREFIXES: Record<Land, string> = { DE: "+49", AT: "+43", CH: "+41" };
 
@@ -113,7 +113,7 @@ export default function MitarbeiterForm({ onSuccess, hauptaccountId }: Props) {
         <div className="sm:col-span-2">
           <label className={labelClass}>Telefonnummer *</label>
           <div className="flex gap-2 items-center">
-            <span className="text-xs text-white/40 bg-white/5 border border-white/15 rounded-lg px-3 py-2 flex-shrink-0">
+            <span className="text-xs text-white/55 bg-white/5 border border-white/15 rounded-lg px-3 py-2 flex-shrink-0">
               {LAND_PREFIXES[land]}
             </span>
             <input

@@ -66,7 +66,7 @@ export default function TemplateCard({
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-white truncate">{template.title}</p>
           {template.role && (
-            <p className="mt-0.5 text-xs text-white/40 bg-white/5 border border-white/10 rounded-full px-2 py-0.5 inline-block">
+            <p className="mt-0.5 text-xs text-white/55 bg-white/5 border border-white/10 rounded-full px-2 py-0.5 inline-block">
               {template.role}
             </p>
           )}
@@ -75,7 +75,7 @@ export default function TemplateCard({
           className={`shrink-0 text-[10px] font-medium px-2 py-0.5 rounded-full border ${
             template.isPublished
               ? "border-[var(--c-teal)]/30 text-[var(--c-teal)] bg-[var(--c-teal)]/10"
-              : "border-white/10 text-white/30 bg-white/5"
+              : "border-white/10 text-white/50 bg-white/5"
           }`}
         >
           {template.isPublished ? "Veröffentlicht" : "Entwurf"}
@@ -84,7 +84,7 @@ export default function TemplateCard({
 
       {/* Description */}
       {template.description && (
-        <p className="text-xs text-white/40 leading-relaxed line-clamp-2">
+        <p className="text-xs text-white/55 leading-relaxed line-clamp-2">
           {template.description}
         </p>
       )}
@@ -95,7 +95,7 @@ export default function TemplateCard({
           {(Object.entries(stepTypeCounts) as [StepType, number][]).map(([type, count]) => (
             <span
               key={type}
-              className="flex items-center gap-1 text-[10px] text-white/40 bg-white/5 border border-white/10 rounded-full px-2 py-0.5"
+              className="flex items-center gap-1 text-[10px] text-white/55 bg-white/5 border border-white/10 rounded-full px-2 py-0.5"
             >
               {TYPE_ICON[type]}
               {count}× {TYPE_LABEL[type]}
@@ -103,11 +103,11 @@ export default function TemplateCard({
           ))}
         </div>
       ) : (
-        <p className="text-xs text-white/20">Keine Schritte</p>
+        <p className="text-xs text-white/45">Keine Schritte</p>
       )}
 
       {/* Meta */}
-      <div className="flex items-center gap-3 text-xs text-white/30">
+      <div className="flex items-center gap-3 text-xs text-white/50">
         <span>{template.steps.length} Schritte</span>
         <span>·</span>
         <span>

@@ -42,8 +42,8 @@ export default function RunPage() {
 
   if (!aLoaded || !tLoaded || !assignment || !template) {
     return (
-      <div className="min-h-screen bg-[#1a1814] flex items-center justify-center" style={sans}>
-        <p className="text-sm text-white/30">Lädt…</p>
+      <div className="min-h-screen bg-[#241c14] flex items-center justify-center" style={sans}>
+        <p className="text-sm text-white/50">Lädt…</p>
       </div>
     );
   }
@@ -100,7 +100,7 @@ export default function RunPage() {
     }));
 
     return (
-      <div className="min-h-screen bg-[#1a1814] flex items-center justify-center px-6 relative overflow-hidden" style={sans}>
+      <div className="min-h-screen bg-[#241c14] flex items-center justify-center px-6 relative overflow-hidden" style={sans}>
         <style>{`
           @keyframes claaro-confetti-fall {
             0%   { transform: translateY(-40px) rotate(0deg); opacity: 1; }
@@ -130,7 +130,7 @@ export default function RunPage() {
 
           {avgScore !== null && (
             <div className="mb-6 px-5 py-3 bg-[var(--c-teal)]/10 border border-[var(--c-teal)]/20 rounded-xl">
-              <p className="text-xs text-white/40 mb-1">Quiz-Ergebnis (Ø)</p>
+              <p className="text-xs text-white/55 mb-1">Quiz-Ergebnis (Ø)</p>
               <p className="text-2xl font-bold" style={{ color: "var(--c-teal)" }}>
                 {avgScore}%
               </p>
@@ -155,23 +155,23 @@ export default function RunPage() {
 
   // ── Run screen ──────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-[#1a1814] flex flex-col c-fade-up" style={sans}>
+    <div className="min-h-screen bg-[#241c14] flex flex-col c-fade-up" style={sans}>
       <style>{`
         @keyframes claaro-page-fade { from { opacity: 0; } to { opacity: 1; } }
         .step-appear { animation: claaro-page-fade 300ms ease-out both; }
       `}</style>
 
       {/* ── Top bar ──────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-20 bg-[#1a1814] border-b border-white/10">
+      <header className="sticky top-0 z-20 bg-[#241c14] border-b border-white/10">
         <div className="max-w-2xl mx-auto px-5 py-3 flex items-center gap-4">
           <button
             onClick={() => router.push("/dashboard/onboarding")}
-            className="text-sm text-white/40 hover:text-white transition-colors shrink-0"
+            className="text-sm text-white/55 hover:text-white transition-colors shrink-0"
           >
             ✕
           </button>
           <div className="flex-1">
-            <p className="text-xs text-white/40 mb-1 truncate">{template.title}</p>
+            <p className="text-xs text-white/55 mb-1 truncate">{template.title}</p>
             <div className="h-1 bg-white/10 rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-500"
@@ -179,10 +179,10 @@ export default function RunPage() {
               />
             </div>
           </div>
-          <p className="text-xs text-white/40 shrink-0">{totalPct}%</p>
+          <p className="text-xs text-white/55 shrink-0">{totalPct}%</p>
           <button
             onClick={() => setShowSidebar((v) => !v)}
-            className="text-white/40 hover:text-white transition-colors shrink-0"
+            className="text-white/55 hover:text-white transition-colors shrink-0"
             title="Fortschritt"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16">
@@ -200,7 +200,7 @@ export default function RunPage() {
             <div key={stepIdx} className="step-appear space-y-5">
               {/* Step header */}
               <div>
-                <p className="text-xs text-white/30 mb-1">
+                <p className="text-xs text-white/50 mb-1">
                   Schritt {stepIdx + 1} von {steps.length}
                   {step.isRequired && <span className="ml-2 text-[var(--c-accent)]/60">Pflicht</span>}
                 </p>
@@ -263,7 +263,7 @@ export default function RunPage() {
               </div>
             </div>
           ) : (
-            <p className="text-white/30 text-sm">Kein Schritt gefunden.</p>
+            <p className="text-white/50 text-sm">Kein Schritt gefunden.</p>
           )}
         </div>
 
@@ -318,7 +318,7 @@ function ChecklistStep({
           </div>
           <input type="checkbox" className="sr-only" checked={done.has(item.id)} onChange={() => toggle(item.id)} />
           <div className="flex-1">
-            <p className={`text-sm transition-colors ${done.has(item.id) ? "text-white/40 line-through" : "text-white"}`}>
+            <p className={`text-sm transition-colors ${done.has(item.id) ? "text-white/55 line-through" : "text-white"}`}>
               {item.label}
             </p>
             {item.required && <p className="text-[10px] text-[var(--c-accent)]/60 mt-0.5">Pflichtaufgabe</p>}
@@ -354,7 +354,7 @@ function VideoStep({
         </div>
       ) : (
         <div className="rounded-xl border border-white/10 bg-white/5 aspect-video flex items-center justify-center">
-          <p className="text-white/30 text-sm">Kein Video hinterlegt.</p>
+          <p className="text-white/50 text-sm">Kein Video hinterlegt.</p>
         </div>
       )}
       {content.description && (
@@ -362,7 +362,7 @@ function VideoStep({
       )}
       <button
         onClick={onWatched}
-        className="flex items-center gap-2 text-sm text-white/40 hover:text-white transition-colors"
+        className="flex items-center gap-2 text-sm text-white/55 hover:text-white transition-colors"
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16">
           <path d="M3 8l4 4 6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -402,7 +402,7 @@ function DocumentStep({
       )}
       <button
         onClick={onRead}
-        className="flex items-center gap-2 text-sm text-white/40 hover:text-white transition-colors"
+        className="flex items-center gap-2 text-sm text-white/55 hover:text-white transition-colors"
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16">
           <path d="M3 8l4 4 6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>

@@ -204,7 +204,7 @@ export default function PendingTasksWidget({ userPlan, displayAvatar }: Props) {
       >
         {/* Panel header */}
         <div className="px-4 py-2.5 border-b border-white/10 flex items-center justify-between">
-          <p className="text-[11px] font-semibold text-white/50 uppercase tracking-wider">
+          <p className="text-[11px] font-semibold text-white/55 uppercase tracking-wider">
             {allDone ? "Alles erledigt" : "Ausstehende Aufgaben"}
           </p>
           {allDone && (
@@ -226,7 +226,7 @@ export default function PendingTasksWidget({ userPlan, displayAvatar }: Props) {
         <div className="overflow-y-auto" style={{ maxHeight: 272 }}>
           {allDone ? (
             <div className="px-4 py-6 text-center">
-              <p className="text-sm text-white/35">Keine offenen Aufgaben.</p>
+              <p className="text-sm text-white/50">Keine offenen Aufgaben.</p>
             </div>
           ) : (
             tasks.map((task) => (
@@ -241,7 +241,7 @@ export default function PendingTasksWidget({ userPlan, displayAvatar }: Props) {
                   <p className="text-sm text-white/75 group-hover:text-white transition-colors truncate">
                     {task.title}
                   </p>
-                  <p className="text-xs text-white/30 truncate mt-0.5">{task.description}</p>
+                  <p className="text-xs text-white/50 truncate mt-0.5">{task.description}</p>
                 </div>
                 <svg
                   className="w-3 h-3 text-white/20 group-hover:text-white/50 transition-colors mt-1 flex-none"

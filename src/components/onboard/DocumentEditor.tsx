@@ -4,7 +4,7 @@ import { DocumentContent } from "@/types/onboard";
 
 const inputClass =
   "w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-white/30 transition-colors";
-const labelClass = "block text-xs text-white/40 mb-1";
+const labelClass = "block text-xs text-white/55 mb-1";
 
 interface DocumentEditorProps {
   content: DocumentContent;

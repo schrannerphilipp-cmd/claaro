@@ -16,6 +16,11 @@ export default function AngebotePage() {
     setTimeout(() => document.getElementById("angebot-formular")?.scrollIntoView({ behavior: "smooth" }), 50);
   }
 
+  function handleSaved() {
+    try { localStorage.setItem("claaro-setup-angebot", "1"); } catch {/* ignore */}
+    setRefreshKey(k => k + 1);
+  }
+
   return (
     <FeatureLayout
       name="Angebote"
@@ -26,7 +31,7 @@ export default function AngebotePage() {
       {showForm && (
         <div id="angebot-formular" className="border-t border-white/8 pt-10">
           <h2 className="text-2xl text-white mb-8" style={serif}>Neues Angebot</h2>
-          <AngebotFormular onSaved={() => setRefreshKey(k => k + 1)} />
+          <AngebotFormular onSaved={handleSaved} />
         </div>
       )}
     </FeatureLayout>

@@ -21,7 +21,7 @@ const sans = { fontFamily: "var(--font-dm-sans)" } as const;
 
 const inputClass =
   "w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-white/30 transition-colors";
-const labelClass = "block text-xs text-white/40 mb-1";
+const labelClass = "block text-xs text-white/55 mb-1";
 
 function genId(): string {
   return typeof crypto !== "undefined" && crypto.randomUUID
@@ -144,7 +144,7 @@ export default function StepBuilder({ template, onUpdate }: StepBuilderProps) {
         <div className="flex-1 overflow-y-auto p-2 space-y-0.5">
           {steps.length === 0 && !addingStep && (
             <div className="py-10 text-center">
-              <p className="text-xs text-white/25 leading-relaxed">
+              <p className="text-xs text-white/45 leading-relaxed">
                 Noch keine Schritte.<br />Klicke oben, um anzufangen.
               </p>
             </div>
@@ -187,7 +187,7 @@ export default function StepBuilder({ template, onUpdate }: StepBuilderProps) {
                 <p className={`text-xs font-medium truncate ${selectedId === step.id ? "text-white" : "text-white/60"}`}>
                   {step.title || `Schritt ${step.order}`}
                 </p>
-                <p className="text-[10px] text-white/25">{TYPE_LABEL[step.type]}</p>
+                <p className="text-[10px] text-white/45">{TYPE_LABEL[step.type]}</p>
               </div>
 
               {step.isRequired && (
@@ -196,7 +196,7 @@ export default function StepBuilder({ template, onUpdate }: StepBuilderProps) {
 
               <button
                 onClick={(e) => { e.stopPropagation(); removeStep(step.id); }}
-                className="shrink-0 opacity-0 group-hover:opacity-100 text-white/30 hover:text-white/70 transition-all"
+                className="shrink-0 opacity-0 group-hover:opacity-100 text-white/50 hover:text-white/70 transition-all"
                 title="Schritt entfernen"
               >
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 12 12">
@@ -225,7 +225,7 @@ export default function StepBuilder({ template, onUpdate }: StepBuilderProps) {
           <div className="h-full flex items-center justify-center">
             <div className="text-center">
               <p className="text-3xl mb-3">👈</p>
-              <p className="text-sm text-white/40">
+              <p className="text-sm text-white/55">
                 Schritt auswählen oder neu anlegen.
               </p>
             </div>
@@ -291,7 +291,7 @@ function StepEditorPanel({ step, onUpdate }: StepEditorPanelProps) {
                 )}
               </div>
             </div>
-            <span className="text-xs text-white/40">Pflichtschritt</span>
+            <span className="text-xs text-white/55">Pflichtschritt</span>
           </label>
         </div>
       </div>

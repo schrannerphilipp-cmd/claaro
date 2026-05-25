@@ -51,7 +51,7 @@ function PasswordField({
 }) {
   return (
     <div>
-      <label className="block text-xs text-white/40 mb-1">{label}</label>
+      <label className="block text-xs text-white/55 mb-1">{label}</label>
       <div className="relative">
         <input
           autoFocus={autoFocus}
@@ -66,7 +66,7 @@ function PasswordField({
           type="button"
           onClick={onToggle}
           tabIndex={-1}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/60 transition-colors"
         >
           <EyeIcon open={show} />
         </button>
@@ -191,7 +191,7 @@ function PasswortSection() {
   return (
     <div className="max-w-sm space-y-6">
       <div>
-        <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">Passwort & Sicherheit</p>
+        <p className="text-[10px] text-white/50 uppercase tracking-widest mb-1">Passwort & Sicherheit</p>
         <p className="text-sm text-white/45">Aktuelles Passwort bestätigen, dann neues vergeben.</p>
       </div>
 
@@ -232,7 +232,7 @@ function PasswortSection() {
             <button
               type="button"
               onClick={openResetModal}
-              className="text-xs text-white/35 hover:text-white/60 transition-colors underline underline-offset-2"
+              className="text-xs text-white/50 hover:text-white/60 transition-colors underline underline-offset-2"
             >
               Passwort vergessen?
             </button>
@@ -286,7 +286,7 @@ function PasswortSection() {
               <button
                 type="button"
                 onClick={() => { setVerified(false); setAltPass(""); setVerifyError(null); }}
-                className="text-xs text-white/35 hover:text-white/60 transition-colors"
+                className="text-xs text-white/50 hover:text-white/60 transition-colors"
               >
                 Zurück
               </button>
@@ -301,13 +301,13 @@ function PasswortSection() {
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
           onClick={(e) => { if (e.target === e.currentTarget) setShowResetModal(false); }}
         >
-          <div className="w-full max-w-sm bg-[#1a1814] border border-white/15 rounded-2xl shadow-2xl overflow-hidden" style={sans}>
+          <div className="w-full max-w-sm bg-[#241c14] border border-white/15 rounded-2xl shadow-2xl overflow-hidden" style={sans}>
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
               <p className="text-sm font-semibold text-white">Passwort zurücksetzen</p>
               <button
                 onClick={() => setShowResetModal(false)}
-                className="text-white/30 hover:text-white transition-colors"
+                className="text-white/50 hover:text-white transition-colors"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16">
                   <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
@@ -319,7 +319,7 @@ function PasswortSection() {
               <div className="px-6 py-12 text-center">
                 <p className="text-4xl mb-3">📧</p>
                 <p className="text-sm font-medium text-white mb-1">Reset-Link gesendet</p>
-                <p className="text-xs text-white/40 mt-1">Bitte prüfe dein E-Mail-Postfach.</p>
+                <p className="text-xs text-white/55 mt-1">Bitte prüfe dein E-Mail-Postfach.</p>
               </div>
             ) : (
               <form onSubmit={handleReset} className="p-6 space-y-4">
@@ -327,7 +327,7 @@ function PasswortSection() {
                   Wir senden dir einen Link zum Zurücksetzen des Passworts.
                 </p>
                 <div>
-                  <label className="block text-xs text-white/40 mb-1">E-Mail-Adresse</label>
+                  <label className="block text-xs text-white/55 mb-1">E-Mail-Adresse</label>
                   <input
                     autoFocus
                     type="email"
@@ -391,6 +391,13 @@ export default function KontoPage() {
     } else if (params.get("cancelled") === "1") {
       router.refresh();
       history.replaceState(null, "", `/dashboard/konto${hash ? `#${hash}` : ""}`);
+    } else {
+      // ?tab=abo (oder anderer Tab) – gesetzt z.B. vom Trial-Gate-Middleware-Redirect
+      const tabParam = params.get("tab") as Tab | null;
+      if (tabParam && TABS.some((t) => t.id === tabParam)) {
+        setActiveTab(tabParam);
+        history.replaceState(null, "", `/dashboard/konto#${tabParam}`);
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -406,13 +413,14 @@ export default function KontoPage() {
       description="Profil, Abonnement und Teamkommunikation verwalten."
     >
       <div className="space-y-6" style={sans}>
-        {/* Tab bar */}
-        <div className="flex gap-2 overflow-x-auto pb-1">
+        {/* Tab bar — overflow-x-auto mit Fade-Mask als Scrollhinweis */}
+        <div className="relative">
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
           {TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => handleTabChange(tab.id)}
-              className="flex-shrink-0 text-sm px-4 py-2 rounded-xl border transition-all duration-150"
+              className="flex-shrink-0 text-sm px-4 py-2.5 min-h-[44px] rounded-xl border transition-all duration-150"
               style={
                 activeTab === tab.id
                   ? {
@@ -430,6 +438,13 @@ export default function KontoPage() {
               {tab.label}
             </button>
           ))}
+          </div>
+          {/* Fade-Mask rechts: signalisiert weitere Tabs beim Scrollen */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute right-0 top-0 h-full w-8"
+            style={{ background: "linear-gradient(to right, transparent, #241c14)" }}
+          />
         </div>
 
         {/* Content card */}
@@ -438,7 +453,7 @@ export default function KontoPage() {
 
           {activeTab === "firmendaten" && (
             <div className="space-y-4">
-              <p className="text-[10px] text-white/30 uppercase tracking-widest">Firmendaten</p>
+              <p className="text-[10px] text-white/50 uppercase tracking-widest">Firmendaten</p>
               <div className="flex items-start gap-4 bg-white/5 border border-white/10 rounded-xl p-5">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
                   style={{ backgroundColor: "rgba(var(--c-accent-rgb),0.15)" }}>
@@ -475,8 +490,8 @@ export default function KontoPage() {
           {activeTab === "benachrichtigungen" && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <p className="text-[10px] text-white/30 uppercase tracking-widest">Team-Chat</p>
-                <p className="text-xs text-white/25">Echtzeit · nur für Ihr Team</p>
+                <p className="text-[10px] text-white/50 uppercase tracking-widest">Team-Chat</p>
+                <p className="text-xs text-white/45">Echtzeit · nur für Ihr Team</p>
               </div>
               <FirmenChat />
             </div>

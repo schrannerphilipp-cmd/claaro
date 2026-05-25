@@ -9,7 +9,7 @@ import { triggerZeitersparnisToast } from "@/lib/zeitersparnis";
 const sans = { fontFamily: "var(--font-dm-sans)" } as const;
 const inputClass =
   "w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-white/30 transition-colors";
-const labelClass = "block text-xs text-white/40 mb-1";
+const labelClass = "block text-xs text-white/55 mb-1";
 
 interface AssignModalProps {
   template: OnboardTemplate;
@@ -46,11 +46,11 @@ export default function AssignModal({ template, onClose }: AssignModalProps) {
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
-        className="w-full max-w-sm bg-[#1a1814] border border-white/15 rounded-2xl p-6 shadow-2xl"
+        className="w-full max-w-sm bg-[#241c14] border border-white/15 rounded-2xl p-6 shadow-2xl"
         style={sans}
       >
         <h2 className="text-base font-semibold text-white mb-1">Einarbeitung zuweisen</h2>
-        <p className="text-xs text-white/40 mb-5">
+        <p className="text-xs text-white/55 mb-5">
           Template: <span className="text-white/70">{template.title}</span>
         </p>
 

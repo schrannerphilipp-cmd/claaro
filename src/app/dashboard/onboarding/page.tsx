@@ -13,7 +13,7 @@ const STATUS_LABEL: Record<string, string> = {
   completed: "Abgeschlossen",
 };
 const STATUS_COLOR: Record<string, string> = {
-  not_started: "text-white/30",
+  not_started: "text-white/50",
   in_progress: "text-[var(--c-amber)]",
   completed: "text-[var(--c-teal)]",
 };
@@ -34,8 +34,19 @@ export default function OnboardingOverviewPage() {
       description="Strukturierte Einarbeitungspläne erstellen und Mitarbeitern zuweisen — alles an einem Ort."
     >
       {!tLoaded || !aLoaded ? (
-        <div className="py-20 text-center text-white/30 text-sm" style={sans}>
-          Lädt…
+        <div className="space-y-6" style={sans}>
+          {/* Skeleton für Stats */}
+          <div className="grid grid-cols-3 gap-3">
+            {[1, 2, 3].map((i) => <div key={i} className="c-skeleton rounded-xl h-20" />)}
+          </div>
+          {/* Skeleton für Aktionen */}
+          <div className="flex gap-3">
+            {[1, 2, 3].map((i) => <div key={i} className="c-skeleton rounded-lg h-10 w-32" />)}
+          </div>
+          {/* Skeleton für Liste */}
+          <div className="space-y-2">
+            {[1, 2, 3].map((i) => <div key={i} className="c-skeleton rounded-xl h-14" />)}
+          </div>
         </div>
       ) : (
         <div className="space-y-8" style={sans}>
@@ -57,7 +68,7 @@ export default function OnboardingOverviewPage() {
                   {value}
                 </p>
                 <p className="text-xs font-medium text-white/60">{label}</p>
-                <p className="text-[10px] text-white/30">{sub}</p>
+                <p className="text-[10px] text-white/50">{sub}</p>
               </div>
             ))}
           </div>
@@ -90,20 +101,23 @@ export default function OnboardingOverviewPage() {
 
           {/* Recent assignments */}
           <div>
-            <p className="text-xs font-medium text-white/40 uppercase tracking-wider mb-3">
+            <p className="text-xs font-medium text-white/55 uppercase tracking-wider mb-3">
               Letzte Einarbeitungen
             </p>
             {recent.length === 0 ? (
-              <div className="bg-white/5 border border-white/10 rounded-xl py-10 text-center">
-                <p className="text-sm text-white/30">
-                  Noch keine Einarbeitungen —{" "}
-                  <Link
-                    href="/dashboard/onboarding/assignments"
-                    className="underline hover:text-white/60 transition-colors"
-                  >
-                    jetzt zuweisen
-                  </Link>
+              <div className="bg-white/5 border border-white/10 rounded-xl py-12 text-center">
+                <p className="text-2xl mb-3" aria-hidden="true">🤝</p>
+                <p className="text-sm font-medium text-white mb-1">Noch keine Einarbeitungen gestartet</p>
+                <p className="text-xs text-white/55 mb-4 max-w-xs mx-auto">
+                  Weise ein Template einem Mitarbeiter zu — der Fortschritt erscheint hier.
                 </p>
+                <Link
+                  href="/dashboard/onboarding/assignments"
+                  className="inline-flex items-center gap-1.5 text-sm px-4 py-2 rounded-lg font-medium transition-colors"
+                  style={{ backgroundColor: "rgba(var(--c-teal-rgb),0.2)", color: "var(--c-teal)" }}
+                >
+                  Erste Zuweisung erstellen
+                </Link>
               </div>
             ) : (
               <div className="border border-white/10 rounded-xl overflow-hidden">
@@ -121,7 +135,7 @@ export default function OnboardingOverviewPage() {
                     >
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-white font-medium truncate">{a.employeeName}</p>
-                        <p className="text-xs text-white/40 truncate">
+                        <p className="text-xs text-white/55 truncate">
                           {tpl?.title ?? "Gelöschtes Template"}
                         </p>
                       </div>
@@ -136,14 +150,14 @@ export default function OnboardingOverviewPage() {
                             }}
                           />
                         </div>
-                        <p className="text-[10px] text-white/30 mt-0.5 text-right">{pct}%</p>
+                        <p className="text-[10px] text-white/50 mt-0.5 text-right">{pct}%</p>
                       </div>
                       <span className={`text-xs shrink-0 ${STATUS_COLOR[a.status]}`}>
                         {STATUS_LABEL[a.status]}
                       </span>
                       <Link
                         href={`/dashboard/onboarding/run/${a.id}`}
-                        className="shrink-0 text-xs text-white/40 hover:text-white transition-colors border border-white/10 rounded-lg px-3 py-1 hover:bg-white/5"
+                        className="shrink-0 text-xs text-white/55 hover:text-white transition-colors border border-white/10 rounded-lg px-3 py-1 hover:bg-white/5"
                       >
                         Öffnen
                       </Link>

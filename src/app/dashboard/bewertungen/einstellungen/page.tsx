@@ -10,7 +10,7 @@ import { Channel, AutoSendTrigger } from "@/types/bewertung";
 const sans = { fontFamily: "var(--font-dm-sans)" } as const;
 const inputClass =
   "w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-white/30 transition-colors";
-const labelClass = "block text-xs text-white/40 mb-1";
+const labelClass = "block text-xs text-white/55 mb-1";
 const cardClass = "c-card bg-white/5 border border-white/10 rounded-xl p-5 space-y-4";
 
 export default function EinstellungenPage() {
@@ -73,7 +73,7 @@ export default function EinstellungenPage() {
               placeholder="Mein Betrieb GmbH"
               className={inputClass}
             />
-            <p className="text-[10px] text-white/25 mt-1">
+            <p className="text-[10px] text-white/45 mt-1">
               Wird in Nachrichten als {"{betrieb}"} eingesetzt.
             </p>
           </div>
@@ -96,7 +96,7 @@ export default function EinstellungenPage() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-xs font-semibold text-white/60">Automatischer Versand</p>
-              <p className="text-[10px] text-white/30 mt-0.5">
+              <p className="text-[10px] text-white/50 mt-0.5">
                 Sendet Bewertungsanfragen automatisch nach Auftragsabschluss.
               </p>
             </div>
@@ -234,7 +234,7 @@ export default function EinstellungenPage() {
                 : "Testnachricht senden"}
             </button>
           </div>
-          <p className="text-[10px] text-white/25">
+          <p className="text-[10px] text-white/45">
             Sendet eine Testnachricht an die angegebene Nummer. Erfordert TWILIO_ACCOUNT_SID,
             TWILIO_AUTH_TOKEN und TWILIO_PHONE_NUMBER in .env.local.
           </p>

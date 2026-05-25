@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import ZeitersparnisToast from "./ZeitersparnisToast";
@@ -8,26 +8,54 @@ import FeedbackModal from "@/components/feedback/FeedbackModal";
 
 const sans = { fontFamily: "var(--font-dm-sans)" } as const;
 
+/** Direction-aware slide variants — iOS-style */
+function makeVariants(dir: "forward" | "back") {
+  const enterX = dir === "back" ? "-100%" : "100%";
+  const exitX = dir === "back" ? "100%" : "-100%";
+  return {
+    initial: { opacity: 0, x: enterX },
+    animate: { opacity: 1, x: 0 },
+    exit:    { opacity: 0, x: exitX },
+  };
+}
+
 export default function ClientProviders({ children }: { children: React.ReactNode }) {
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const pathname = usePathname();
   const reduced = useReducedMotion();
+  const [direction, setDirection] = useState<"forward" | "back">("forward");
+  const prevPathname = useRef(pathname);
+
+  // Detect navigation direction from sessionStorage flag set by back buttons
+  useEffect(() => {
+    if (pathname === prevPathname.current) return;
+    prevPathname.current = pathname;
+
+    const isBack = sessionStorage.getItem("claaro-nav-back") === "1";
+    sessionStorage.removeItem("claaro-nav-back");
+    setDirection(isBack ? "back" : "forward");
+  }, [pathname]);
+
+  const variants = makeVariants(direction);
 
   return (
     <>
-      {/* Route-level fade transition — subtle, 200ms, no layout shift */}
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div
-          key={pathname}
-          initial={reduced ? { opacity: 0 } : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={reduced ? {} : { opacity: 0 }}
-          transition={{ duration: 0.18, ease: "easeInOut" }}
-          style={{ flex: 1, display: "flex", flexDirection: "column" }}
-        >
-          {children}
-        </motion.div>
-      </AnimatePresence>
+      {/* Route-level slide transition — iOS-style, 280ms */}
+      {/* backgroundColor matches every page's bg-[#241c14] so no flash ever shows between slides */}
+      <div style={{ position: "relative", overflow: "hidden", flex: 1, display: "flex", flexDirection: "column", backgroundColor: "#241c14" }}>
+        <AnimatePresence mode="popLayout" initial={false}>
+          <motion.div
+            key={pathname}
+            initial={reduced ? { opacity: 0 } : variants.initial}
+            animate={variants.animate}
+            exit={reduced ? { opacity: 0 } : variants.exit}
+            transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+            style={{ flex: 1, display: "flex", flexDirection: "column", width: "100%" }}
+          >
+            {children}
+          </motion.div>
+        </AnimatePresence>
+      </div>
 
       {/* Feedback-Button — global auf allen Seiten */}
       <motion.button

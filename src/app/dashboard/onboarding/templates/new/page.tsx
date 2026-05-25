@@ -18,10 +18,10 @@ export default function NewTemplatePage() {
 
   return (
     <div
-      className="min-h-screen bg-[#1a1814] flex items-center justify-center"
+      className="min-h-screen bg-[#241c14] flex items-center justify-center"
       style={sans}
     >
-      <p className="text-sm text-white/30">Template wird erstellt…</p>
+      <p className="text-sm text-white/50">Template wird erstellt…</p>
     </div>
   );
 }

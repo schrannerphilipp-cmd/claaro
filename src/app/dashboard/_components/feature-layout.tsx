@@ -35,7 +35,9 @@ export default function FeatureLayout({
   const router = useRouter();
 
   function handleBack() {
-    sessionStorage.setItem("claaro-nav-back", "1");
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("claaro-nav-back", "1");
+    }
     router.push(backHref ?? "/dashboard");
   }
 

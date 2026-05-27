@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getBrowserClient, supabaseConfigured } from "@/lib/supabase";
@@ -354,12 +354,18 @@ export default function DashboardPage() {
         if (HAUPTACCOUNT_ID) {
           supabase
             .from("company_settings")
-            .select("abo_plan, firmenname")
+            .select("abo_plan, abo_seit, firmenname")
             .eq("hauptaccount_id", HAUPTACCOUNT_ID)
             .maybeSingle()
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .then(({ data }: { data: any }) => {
-              if (data?.abo_plan) setUserPlan(data.abo_plan as Plan);
+              if (data?.abo_plan) {
+                setUserPlan(data.abo_plan as Plan);
+              } else if (data?.abo_seit) {
+                // Abo aktiv (abo_seit gesetzt) aber abo_plan noch nicht in DB →
+                // Webhook-Verzögerung oder fehlender Eintrag: "profi" als sicherer Fallback
+                setUserPlan("profi");
+              }
               if (data?.firmenname) {
                 setSetupSteps((prev) => {
                   if (prev[0]) return prev; // already marked
@@ -545,7 +551,7 @@ export default function DashboardPage() {
     }
   }
 
-  function trackModuleVisit(id: string) {
+  const trackModuleVisit = useCallback((id: string) => {
     try {
       // Save last used feature for personalized greeting
       const tile = tiles.find((t) => t.id === id);
@@ -568,7 +574,7 @@ export default function DashboardPage() {
         }
       }
     } catch {/* ignore */}
-  }
+  }, [isTrialState]);
 
   function selectAnleitungTool(idx: number) {
     setAnleitungTool(idx); setAnleitungStep(0); setAnleitungDir("fwd"); setAnleitungKey((k) => k + 1);
@@ -853,7 +859,13 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {tiles.map(({ id, icon, name, description }, i) => {
             // Trial = vollständige 30-Tage-Testversion → alle 6 Module freigeschaltet
-            const accessible = isTrialState || canAccess(userPlan, id, starterModules);
+            // (isPaidState && userPlan === null): Plan lädt noch aus DB (Race-Condition
+            // zwischen useTrial und dem separaten abo_plan-Query) → nicht sperren
+            const accessible =
+              effectiveStatus === "loading" ||
+              isTrialState ||
+              (isPaidState && userPlan === null) ||
+              canAccess(userPlan, id, starterModules);
             const reqPlan = requiredPlan(id);
             const minPlan = PLAN_NAMES[reqPlan];
             // Locked because user is on Starter but didn't select this module

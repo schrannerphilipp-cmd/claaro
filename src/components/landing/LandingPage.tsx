@@ -20,7 +20,7 @@ const serif = { fontFamily: "var(--font-dm-serif)" } as const;
 const sans  = { fontFamily: "var(--font-dm-sans)" }  as const;
 
 // ─── Micro-copy ──────────────────────────────────────────────────────────────
-const CTA_MICRO = "Keine Kreditkarte · Jederzeit kündbar · DSGVO-konform";
+const CTA_MICRO = "Keine Kreditkarte erforderlich · Endet automatisch nach 30 Tagen · Keine versteckten Kosten";
 
 // ─── Features – spezifisch mit Zeitangabe ────────────────────────────────────
 const FEATURES = [
@@ -86,7 +86,7 @@ const TESTIMONIALS = [
     role:     "Geschäftsführer, Handwerk & Service GmbH",
     initials: "TK",
     color:    "#7a5a2a",
-    result:   "80 % schnelleres Onboarding",
+    result:   "deutlich schnelleres Onboarding",
   },
 ];
 
@@ -607,7 +607,7 @@ export default function LandingPage() {
                         <span className="text-sm text-white/25 line-through mr-0.5">{fullPrice} €</span>
                       )}
                       <span className="text-2xl font-bold text-white">{price} €</span>
-                      <span className="text-xs text-white/38">/Monat</span>
+                      <span className="text-xs text-white/38">/Monat zzgl. MwSt.</span>
                     </div>
                     {yearly && (
                       <p className="text-[10px] text-white/28 mt-0.5">jährlich abgerechnet</p>
@@ -650,7 +650,7 @@ export default function LandingPage() {
           </div>
 
           <p className="text-center text-xs text-white/22 mt-7">
-            Keine Kreditkarte für den Testzeitraum · 14 Tage Geld-zurück-Garantie · Preise zzgl. MwSt.
+            Keine Kreditkarte für den Testzeitraum · 14 Tage Geld-zurück-Garantie · Alle Preise zzgl. gesetzl. MwSt.
           </p>
         </div>
       </section>
@@ -699,8 +699,9 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between text-sm text-white/42 flex-wrap gap-3">
           <span>© 2026 claaro</span>
           <div className="flex items-center gap-6">
-            <a href="/impressum" target="_blank" rel="noopener noreferrer" className="hover:text-white/70 transition-colors">Impressum</a>
-            <a href="/datenschutz" target="_blank" rel="noopener noreferrer" className="hover:text-white/70 transition-colors">Datenschutz</a>
+            <a href="/impressum" className="hover:text-white/70 transition-colors">Impressum</a>
+            <a href="/datenschutz" className="hover:text-white/70 transition-colors">Datenschutz</a>
+            <a href="/agb" className="hover:text-white/70 transition-colors">AGB</a>
           </div>
         </div>
       </footer>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import FadeIn from "@/components/ui/FadeIn";
 
 const serif = { fontFamily: "var(--font-dm-serif)" } as const;
@@ -79,6 +80,18 @@ export default function FeatureLayout({
           {children}
         </FadeIn>
       </main>
+
+      {/* Legal footer */}
+      <footer className="border-t border-white/8 mt-auto">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-2 text-xs text-white/28">
+          <span>© 2026 claaro</span>
+          <div className="flex items-center gap-4">
+            <Link href="/impressum" className="hover:text-white/50 transition-colors">Impressum</Link>
+            <Link href="/datenschutz" className="hover:text-white/50 transition-colors">Datenschutz</Link>
+            <Link href="/agb" className="hover:text-white/50 transition-colors">AGB</Link>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

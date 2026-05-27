@@ -1071,7 +1071,7 @@ export default function DashboardPage() {
                           <span className="text-2xl font-bold text-white">
                             {plansYearly ? priceYearly : priceMonthly} €
                           </span>
-                          <span className="text-xs text-white/40">/Monat</span>
+                          <span className="text-xs text-white/40">/Monat zzgl. MwSt.</span>
                         </div>
                         {plansYearly && (
                           <p className="text-[10px] text-white/28 mt-0.5">
@@ -1107,7 +1107,7 @@ export default function DashboardPage() {
               </div>
 
               <p className="text-center text-xs text-white/25 mt-6">
-                Keine Kreditkarte für den Testzeitraum erforderlich · Jederzeit kündbar
+                Keine Kreditkarte · Endet automatisch nach 30 Tagen · Alle Preise zzgl. gesetzl. MwSt.
               </p>
             </div>
           </div>
@@ -1178,8 +1178,9 @@ export default function DashboardPage() {
         <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between text-sm text-white/55">
           <span>© 2026 claaro</span>
           <div className="flex items-center gap-6">
-            <a href="/impressum" target="_blank" rel="noopener noreferrer" className="hover:text-white/80 transition-colors">Impressum</a>
-            <a href="/datenschutz" target="_blank" rel="noopener noreferrer" className="hover:text-white/80 transition-colors">Datenschutz</a>
+            <a href="/impressum" className="hover:text-white/80 transition-colors">Impressum</a>
+            <a href="/datenschutz" className="hover:text-white/80 transition-colors">Datenschutz</a>
+            <a href="/agb" className="hover:text-white/80 transition-colors">AGB</a>
             <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-white/8 text-white/60 border border-white/10">v0.1</span>
           </div>
         </div>

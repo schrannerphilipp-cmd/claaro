@@ -590,7 +590,7 @@ export default function AboAbrechnung({ showSuccess: showSuccessProp = false, on
                       >
                         {price} €
                       </span>
-                      <span className="text-sm text-white/55">/ Monat</span>
+                      <span className="text-sm text-white/55">/ Monat zzgl. MwSt.</span>
                     </div>
                     {interval === "jaehrlich" && (
                       <p className="text-xs text-white/50 mt-1">jährlich abgerechnet</p>

@@ -54,6 +54,15 @@ export default function ImpressumPage() {
             <p>82256 Fürstenfeldbruck</p>
           </div>
         </div>
+
+        {/* Footer links */}
+        <div className="border-t border-white/8 mt-12 pt-6 flex flex-wrap items-center justify-between gap-3 text-xs text-white/30">
+          <span>© 2026 claaro</span>
+          <div className="flex gap-4">
+            <a href="/datenschutz" className="hover:text-white/50 transition-colors">Datenschutz</a>
+            <a href="/agb" className="hover:text-white/50 transition-colors">AGB</a>
+          </div>
+        </div>
       </div>
     </div>
   );

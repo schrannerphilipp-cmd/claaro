@@ -276,6 +276,7 @@ export default function DashboardPage() {
   const [starterModules,    setStarterModules]    = useState<ModuleId[]>([]);
   const [showStarterModal,  setShowStarterModal]  = useState(false);
   const [lockedModal,    setLockedModal]    = useState<{ name: string; minPlan: string; isStarterChoice?: boolean } | null>(null);
+  const [infoTile,       setInfoTile]       = useState<typeof tiles[0] | null>(null);
   const [supportOpen,    setSupportOpen]    = useState(false);
   const [anleitungOpen,  setAnleitungOpen]  = useState(false);
   const [anleitungTool,  setAnleitungTool]  = useState<number | null>(null);
@@ -860,17 +861,34 @@ export default function DashboardPage() {
 
             if (accessible) {
               return (
-                <Link
+                <div
                   key={id}
-                  href={`/dashboard/${id}`}
-                  ref={(el) => { tileRefs.current[i] = el; }}
-                  onClick={() => trackModuleVisit(id)}
-                  className="claaro-tile c-card relative text-left rounded-xl border p-6 transition-all bg-white/5 border-white/10 hover:bg-white/[0.08] hover:border-white/20"
+                  ref={(el) => { tileRefs.current[i] = el as unknown as HTMLAnchorElement; }}
+                  className="relative group/tile"
                 >
-                  <span className="claaro-tile-icon inline-block text-2xl mb-3">{icon}</span>
-                  <h3 className="font-semibold text-sm mb-1.5 text-white">{name}</h3>
-                  <p className="text-xs leading-relaxed text-white/50">{description}</p>
-                </Link>
+                  <Link
+                    href={`/dashboard/${id}`}
+                    onClick={() => trackModuleVisit(id)}
+                    className="claaro-tile c-card block relative text-left rounded-xl border p-6 transition-all bg-white/5 border-white/10 hover:bg-white/[0.08] hover:border-white/20"
+                  >
+                    <span className="claaro-tile-icon inline-block text-2xl mb-3">{icon}</span>
+                    <h3 className="font-semibold text-sm mb-1.5 text-white">{name}</h3>
+                    <p className="text-xs leading-relaxed text-white/50">{description}</p>
+                  </Link>
+                  {/* Per-Tile Info-Button */}
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setInfoTile({ id, icon, name, description }); }}
+                    className="absolute top-2.5 right-2.5 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border transition-all z-10 opacity-0 group-hover/tile:opacity-100"
+                    style={{
+                      backgroundColor: "rgba(255,255,255,0.05)",
+                      borderColor:     "rgba(255,255,255,0.14)",
+                      color:           "rgba(255,255,255,0.40)",
+                    }}
+                    aria-label={`Info zu ${name}`}
+                  >
+                    ?
+                  </button>
+                </div>
               );
             }
 
@@ -1301,7 +1319,7 @@ export default function DashboardPage() {
             <div>
               <p className="text-base font-semibold text-white" style={serif}>Du hast 3 Module entdeckt!</p>
               <p className="text-sm leading-relaxed mt-1.5" style={{ color: "rgba(255,255,255,0.52)" }}>
-                Die meisten Nutzer sparen ab jetzt über 3 Stunden Papierkram pro Woche.
+                Die meisten Nutzer sparen ab jetzt bis zu 6 Stunden Papierkram pro Woche.
               </p>
             </div>
             <button
@@ -1318,6 +1336,57 @@ export default function DashboardPage() {
       {/* ═══════════════════════════════════════════════════════════════════ */}
       {/* MODALS                                                              */}
       {/* ═══════════════════════════════════════════════════════════════════ */}
+
+      {/* Feature-Info Overlay (? Klick auf Tile) */}
+      {infoTile && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ backgroundColor: "rgba(0,0,0,0.65)", backdropFilter: "blur(6px)" }}
+          onClick={() => setInfoTile(null)}
+        >
+          <div
+            className="relative w-full max-w-sm bg-[#241c14] border border-white/15 rounded-2xl shadow-2xl p-7 text-center"
+            style={sans}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close */}
+            <button
+              onClick={() => setInfoTile(null)}
+              className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors"
+            >
+              <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4">
+                <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+            </button>
+
+            <div className="text-4xl mb-4">{infoTile.icon}</div>
+            <h3 className="text-base font-semibold text-white mb-2" style={serif}>{infoTile.name}</h3>
+            <p className="text-sm text-white/55 leading-relaxed mb-6">{infoTile.description}</p>
+
+            <div className="flex gap-2">
+              <Link
+                href={`/dashboard/${infoTile.id}`}
+                onClick={() => setInfoTile(null)}
+                className="flex-1 text-sm py-2.5 rounded-xl font-medium text-white text-center transition-colors"
+                style={{ backgroundColor: "var(--c-accent)" }}
+              >
+                Modul öffnen →
+              </Link>
+              <button
+                onClick={() => {
+                  setInfoTile(null);
+                  setAnleitungOpen(true);
+                  const idx = anleitungTools.findIndex((t) => t.name === infoTile.name);
+                  if (idx >= 0) selectAnleitungTool(idx);
+                }}
+                className="flex-1 text-sm py-2.5 rounded-xl border border-white/15 text-white/60 hover:text-white transition-colors"
+              >
+                Kurzanleitung
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Starter-Onboarding: Modul-Auswahl */}
       {showStarterModal && (

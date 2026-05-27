@@ -4,11 +4,11 @@
  * Claaro Landingpage – Verkaufspsychologie nach Apple/Amazon-Standard
  *
  * Prinzipien:
- *   - Nutzen vor Funktion (4h Zeitersparnis als roter Faden)
+ *   - Nutzen vor Funktion (bis zu 6 h Zeitersparnis als roter Faden)
  *   - Spezifität schlägt Allgemeines (Zahlen, Zeitangaben)
  *   - Social Proof: Breite (150+ KMU) + Tiefe (3 Testimonials mit Ergebnis)
  *   - Anchoring: Jahrespreis als Default, Team als Preisanker
- *   - Loss Aversion: Exit-Intent + "du verlässt 4h Zeitersparnis"
+ *   - Loss Aversion: Exit-Intent + "du verlässt bis zu 6h Zeitersparnis"
  *   - Frictionless: 1 primäre Aktion, Einwände vorweggenommen
  *   - Reziprozität: 30 Tage kostenlos ohne Kreditkarte
  */
@@ -65,12 +65,12 @@ const FEATURES = [
 // ─── Testimonials – ergebnisorientiert ───────────────────────────────────────
 const TESTIMONIALS = [
   {
-    quote:    "Seit claaro spare ich 4 Stunden pro Woche. Die Zeit gehört jetzt meinen Kunden.",
+    quote:    "Seit claaro spare ich bis zu 6 Stunden pro Woche. Die Zeit gehört jetzt meinen Kunden.",
     name:     "Markus B.",
     role:     "Inhaber, Elektrobetrieb München",
     initials: "MB",
     color:    "var(--c-accent)",
-    result:   "4 h / Woche gespart",
+    result:   "bis zu 6 h / Woche gespart",
   },
   {
     quote:    "Unsere Compliance-Fristen haben wir nie wieder verpasst. Einfach.",
@@ -149,6 +149,7 @@ export default function LandingPage() {
   // Jährlich als Default (Anchoring – Nutzer sieht sofort günstigeren Preis)
   const [yearly,       setYearly]       = useState(true);
   const [exitVisible,  setExitVisible]  = useState(false);
+  const [featureInfo,  setFeatureInfo]  = useState<typeof FEATURES[0] | null>(null);
   const exitDismissed                   = useRef(false);
 
   // Refs für Scroll-Animationen
@@ -302,7 +303,7 @@ export default function LandingPage() {
           className="lp-hero-animate text-white/55 text-base sm:text-lg leading-relaxed max-w-lg mx-auto mb-3"
           style={{ animationDelay: "120ms" }}
         >
-          Spare <strong className="text-white">4 Stunden Papierkram pro Woche</strong> — ab dem ersten Tag.
+          Spare <strong className="text-white">bis zu 6 Stunden Papierkram pro Woche</strong> — ab dem ersten Tag.
         </p>
         <p
           className="lp-hero-animate text-white/35 text-sm mb-10"
@@ -337,7 +338,7 @@ export default function LandingPage() {
       >
         <div className="max-w-4xl mx-auto px-4 sm:px-6 flex items-center justify-center flex-wrap gap-x-5 sm:gap-x-8 gap-y-2">
           {[
-            { icon: "⚡", label: "4 h Zeitersparnis/Woche" },
+            { icon: "⚡", label: "bis zu 6 h/Woche gespart" },
             { icon: "🔒", label: "DSGVO-konform" },
             { icon: "🏭", label: "Für KMU gebaut" },
             { icon: "🇩🇪", label: "Hosted in Deutschland" },
@@ -365,33 +366,61 @@ export default function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {FEATURES.map(({ icon, name, stat, desc }, i) => (
-              <div
-                key={name}
-                ref={(el) => { featureRefs.current[i] = el; }}
-                className="lp-tile rounded-xl p-6 border border-white/10 flex flex-col gap-3"
-                style={{ backgroundColor: "rgba(255,255,255,0.03)" }}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <span className="text-2xl" aria-hidden="true">{icon}</span>
-                  {/* Stat-Chip – Spezifität erzeugt Glaubwürdigkeit */}
-                  <span
-                    className="text-[10px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap mt-0.5"
-                    style={{
-                      backgroundColor: "rgba(var(--c-accent-rgb),0.12)",
-                      color:           "rgba(var(--c-accent-rgb),0.90)",
-                      border:          "1px solid rgba(var(--c-accent-rgb),0.22)",
-                    }}
+            {FEATURES.map((feature, i) => {
+              const { icon, name, stat, desc } = feature;
+              return (
+                <div
+                  key={name}
+                  ref={(el) => { featureRefs.current[i] = el; }}
+                  className="relative group/tile"
+                >
+                  {/* Clicking the card = CTA → Registrierung */}
+                  <Link
+                    href="/login?tab=register"
+                    className="lp-tile block rounded-xl p-6 border border-white/10 flex flex-col gap-3"
+                    style={{ backgroundColor: "rgba(255,255,255,0.03)" }}
+                    aria-label={`${name} – Jetzt 30 Tage kostenlos testen`}
                   >
-                    {stat}
-                  </span>
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="text-2xl" aria-hidden="true">{icon}</span>
+                      {/* Stat-Chip */}
+                      <span
+                        className="text-[10px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap mt-0.5"
+                        style={{
+                          backgroundColor: "rgba(var(--c-accent-rgb),0.12)",
+                          color:           "rgba(var(--c-accent-rgb),0.90)",
+                          border:          "1px solid rgba(var(--c-accent-rgb),0.22)",
+                        }}
+                      >
+                        {stat}
+                      </span>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-sm text-white mb-1">{name}</h3>
+                      <p className="text-xs text-white/50 leading-relaxed">{desc}</p>
+                    </div>
+                    {/* Subtle CTA hint */}
+                    <p className="text-[10px] text-white/20 group-hover/tile:text-white/38 transition-colors">
+                      Kostenlos testen →
+                    </p>
+                  </Link>
+
+                  {/* (?) Info-Button – öffnet Overlay, stoppt Propagation zum Link */}
+                  <button
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setFeatureInfo(feature); }}
+                    className="absolute bottom-3 right-3 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border transition-all z-10 opacity-0 group-hover/tile:opacity-100"
+                    style={{
+                      backgroundColor: "rgba(255,255,255,0.06)",
+                      borderColor:     "rgba(255,255,255,0.15)",
+                      color:           "rgba(255,255,255,0.45)",
+                    }}
+                    aria-label={`Info zu ${name}`}
+                  >
+                    ?
+                  </button>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-sm text-white mb-1">{name}</h3>
-                  <p className="text-xs text-white/50 leading-relaxed">{desc}</p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -506,7 +535,7 @@ export default function LandingPage() {
               Weniger als ein Mittagessen pro Tag.
             </p>
             <p className="text-white/30 text-xs mb-6">
-              Dafür 4 Stunden weniger Papierkram pro Woche — dauerhaft.
+              Bis zu 6 Stunden weniger Papierkram pro Woche — dauerhaft.
             </p>
 
             {/* Toggle – Jährlich als Default */}
@@ -677,6 +706,60 @@ export default function LandingPage() {
       </footer>
 
       {/* ════════════════════════════════════════════════════════════════════ */}
+      {/* FEATURE-INFO OVERLAY                                                 */}
+      {/* ════════════════════════════════════════════════════════════════════ */}
+      {featureInfo && (
+        <div
+          className="fixed inset-0 z-[90] flex items-center justify-center p-4"
+          style={{ backgroundColor: "rgba(0,0,0,0.70)", backdropFilter: "blur(6px)" }}
+          onClick={() => setFeatureInfo(null)}
+        >
+          <div
+            className="relative w-full max-w-sm rounded-2xl p-7 text-center"
+            style={{ backgroundColor: "#2a2218", border: "1px solid rgba(255,255,255,0.13)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => setFeatureInfo(null)}
+              className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors"
+            >
+              <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4">
+                <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+            </button>
+
+            <div className="text-4xl mb-4" aria-hidden="true">{featureInfo.icon}</div>
+
+            <h3 className="text-xl text-white mb-2" style={serif}>{featureInfo.name}</h3>
+
+            <span
+              className="inline-block text-[11px] font-semibold px-2.5 py-1 rounded-full mb-4"
+              style={{
+                backgroundColor: "rgba(var(--c-accent-rgb),0.12)",
+                color:           "rgba(var(--c-accent-rgb),0.90)",
+                border:          "1px solid rgba(var(--c-accent-rgb),0.22)",
+              }}
+            >
+              {featureInfo.stat}
+            </span>
+
+            <p className="text-sm text-white/58 leading-relaxed mb-6">{featureInfo.desc}</p>
+
+            <Link
+              href="/login?tab=register"
+              className="lp-btn block w-full py-3 rounded-xl text-white font-semibold text-sm"
+              style={{ backgroundColor: "var(--c-accent)" }}
+              onClick={() => setFeatureInfo(null)}
+            >
+              Jetzt 30 Tage kostenlos testen →
+            </Link>
+            <p className="text-white/25 text-xs mt-2">{CTA_MICRO}</p>
+          </div>
+        </div>
+      )}
+
+      {/* ════════════════════════════════════════════════════════════════════ */}
       {/* EXIT-INTENT OVERLAY (Desktop, dezent)                               */}
       {/* ════════════════════════════════════════════════════════════════════ */}
       {exitVisible && (
@@ -697,7 +780,7 @@ export default function LandingPage() {
               Kurz warten —
             </h3>
             <p className="text-white/55 text-sm leading-relaxed mb-5">
-              Du verlässt gerade <strong className="text-white">4 Stunden gesparte Arbeit pro Woche</strong>.<br />
+              Du verlässt gerade <strong className="text-white">bis zu 6 Stunden gesparte Arbeit pro Woche</strong>.<br />
               30 Tage kostenlos testen — kein Risiko.
             </p>
 

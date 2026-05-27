@@ -40,16 +40,18 @@ export default function ClientProviders({ children }: { children: React.ReactNod
 
   return (
     <>
-      {/* Route-level slide transition — iOS-style, 280ms */}
-      {/* backgroundColor matches every page's bg-[#241c14] so no flash ever shows between slides */}
+      {/* Route-level fade transition — React 19 + Turbopack safe                    */}
+      {/* mode="wait": only one page in DOM at a time → no layout/height issues        */}
+      {/* backgroundColor prevents white flash during the brief gap between pages      */}
+      {/* direction state kept for future slide implementation (sessionStorage-based)  */}
       <div style={{ position: "relative", overflow: "hidden", flex: 1, display: "flex", flexDirection: "column", backgroundColor: "#241c14" }}>
-        <AnimatePresence mode="popLayout" initial={false}>
+        <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={pathname}
-            initial={reduced ? { opacity: 0 } : variants.initial}
-            animate={variants.animate}
-            exit={reduced ? { opacity: 0 } : variants.exit}
-            transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18, ease: "easeInOut" }}
             style={{ flex: 1, display: "flex", flexDirection: "column", width: "100%" }}
           >
             {children}

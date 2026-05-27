@@ -32,6 +32,16 @@ const tiles: { id: ModuleId; icon: string; name: string; description: string }[]
   { id: "dienstplan", icon: "📅", name: "Dienstplan",  description: "Schichten planen & Team koordinieren" },
 ];
 
+// ─── setup steps (Fortschrittsbalken) ────────────────────────────────────────
+
+const SETUP_STEPS: { label: string; shortLabel: string; href: string }[] = [
+  { label: "Firmendaten hinterlegt",  shortLabel: "Firmendaten",    href: "/dashboard/einstellungen" },
+  { label: "Erstes Angebot erstellt", shortLabel: "Erstes Angebot", href: "/dashboard/angebote" },
+  { label: "Erste Mahnung gesendet",  shortLabel: "Erste Mahnung",  href: "/dashboard/mahnungen" },
+  { label: "Profilbild hinzugefügt",  shortLabel: "Profilbild",     href: "/dashboard/konto" },
+  { label: "Team eingeladen",         shortLabel: "Team einladen",  href: "/dashboard/dienstplan/mitarbeiter" },
+];
+
 // ─── account menu ────────────────────────────────────────────────────────────
 
 const accountLinks: { label: string; href?: string; danger?: boolean }[] = [
@@ -722,12 +732,11 @@ export default function DashboardPage() {
             : "Hier ist deine Übersicht für heute."}
         </p>
 
-        {/* ── Setup-Fortschrittsbalken (nur Trial) ─────────────────────── */}
-        {isTrialState && (() => {
+        {/* ── Setup-Fortschrittsbalken (Trial UND Bestandskunden) ──────── */}
+        {(isTrialState || isPaidState) && (() => {
           const completedCount = setupSteps.filter(Boolean).length;
           if (completedCount === setupSteps.length) return null;
           const pct = Math.round((completedCount / setupSteps.length) * 100);
-          const STEP_LABELS = ["Firmendaten", "Erstes Angebot", "Erste Mahnung", "Profilbild", "Team einladen"];
           return (
             <div className="mt-4 max-w-md">
               <div className="flex items-center justify-between mb-1.5">
@@ -740,19 +749,32 @@ export default function DashboardPage() {
                   style={{ width: `${pct}%`, backgroundColor: "var(--c-accent)" }}
                 />
               </div>
+              {/* Chips: erledigte = plain span; offen = klickbarer Link */}
               <div className="flex flex-wrap gap-1.5 mt-2.5">
-                {STEP_LABELS.map((label, i) => (
-                  <span
-                    key={label}
-                    className="text-[10px] px-2 py-0.5 rounded-full border"
-                    style={setupSteps[i]
-                      ? { backgroundColor: "rgba(255,255,255,0.05)", borderColor: "rgba(255,255,255,0.10)", color: "rgba(255,255,255,0.38)", textDecoration: "line-through" }
-                      : { backgroundColor: "transparent",            borderColor: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.28)" }
-                    }
-                  >
-                    {setupSteps[i] ? "✓ " : ""}{label}
-                  </span>
-                ))}
+                {SETUP_STEPS.map(({ shortLabel, href }, i) => {
+                  const done = setupSteps[i];
+                  const chipStyle = done
+                    ? { backgroundColor: "rgba(255,255,255,0.05)", borderColor: "rgba(255,255,255,0.10)", color: "rgba(255,255,255,0.38)", textDecoration: "line-through" as const }
+                    : { backgroundColor: "rgba(var(--c-accent-rgb),0.08)", borderColor: "rgba(var(--c-accent-rgb),0.22)", color: "rgba(255,255,255,0.60)", cursor: "pointer" as const };
+                  const chipClass = "text-[10px] px-2 py-0.5 rounded-full border transition-colors";
+                  if (done) {
+                    return (
+                      <span key={shortLabel} className={chipClass} style={chipStyle}>
+                        ✓ {shortLabel}
+                      </span>
+                    );
+                  }
+                  return (
+                    <Link
+                      key={shortLabel}
+                      href={href}
+                      className={chipClass + " hover:bg-white/10"}
+                      style={chipStyle}
+                    >
+                      → {shortLabel}
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           );
@@ -765,7 +787,8 @@ export default function DashboardPage() {
       <section id="features" className="max-w-6xl mx-auto px-4 pt-4 pb-10 sm:px-6 sm:pb-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {tiles.map(({ id, icon, name, description }, i) => {
-            const accessible = canAccess(userPlan, id);
+            // Trial = vollständige 30-Tage-Testversion → alle 6 Module freigeschaltet
+            const accessible = isTrialState || canAccess(userPlan, id);
             const minPlan = PLAN_NAMES[requiredPlan(id)];
 
             if (accessible) {
@@ -1077,7 +1100,7 @@ export default function DashboardPage() {
         </div>
       </footer>
 
-      <PendingTasksWidget userPlan={userPlan} displayAvatar={displayAvatar} />
+      <PendingTasksWidget userPlan={userPlan} displayAvatar={displayAvatar} isTrialState={isTrialState} />
 
       {/* ═══════════════════════════════════════════════════════════════════ */}
       {/* HELP WIDGET (bottom-right)                                         */}

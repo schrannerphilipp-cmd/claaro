@@ -66,7 +66,7 @@ export default function ProfilBearbeiten() {
 
       supabase
         .from("profiles")
-        .select("name, username, avatar_url, avatar_path, company_name")
+        .select("username, avatar_url, avatar_path, company_name")
         .eq("id", res.data.user.id)
         .maybeSingle()
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -77,8 +77,7 @@ export default function ProfilBearbeiten() {
           }
           const p = res.data;
           if (!p) return;
-          // name hat Vorrang; fallback auf username (Legacy)
-          const n = (p.name as string) || (p.username as string) || "";
+          const n = (p.username as string) || "";
           const av = (p.avatar_url as string | null) ?? null;
           const cn = (p.company_name as string) || "";
           setName(n);
@@ -171,8 +170,7 @@ export default function ProfilBearbeiten() {
       const supabase = getBrowserClient()!;
       const { error: dbErr } = await supabase.from("profiles").upsert({
         id: userId,
-        name: trimmedName,
-        username: trimmedName,        // Legacy-Feld beibehalten
+        username: trimmedName,
         company_name: trimmedCompany || null,
         avatar_url: newAvatarUrl,
         avatar_path: newAvatarPath,

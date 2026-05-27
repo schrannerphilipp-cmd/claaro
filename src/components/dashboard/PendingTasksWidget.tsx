@@ -20,9 +20,10 @@ interface PendingTask {
 interface Props {
   userPlan: Plan | null;
   displayAvatar: string | null;
+  isTrialState?: boolean;
 }
 
-export default function PendingTasksWidget({ userPlan, displayAvatar }: Props) {
+export default function PendingTasksWidget({ userPlan, displayAvatar, isTrialState = false }: Props) {
   const [tasks, setTasks] = useState<PendingTask[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
@@ -54,7 +55,9 @@ export default function PendingTasksWidget({ userPlan, displayAvatar }: Props) {
         });
       }
 
-      if (!userPlan) {
+      // "Kein aktives Abo" nur bei abgelaufenem/bezahltem Zustand anzeigen,
+      // nicht während des aktiven Trials (da Trial = vollständige Testversion)
+      if (!userPlan && !isTrialState) {
         pending.push({
           id: "abo",
           title: "Kein aktives Abo",

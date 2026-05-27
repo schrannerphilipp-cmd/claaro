@@ -1,6 +1,12 @@
 import FeatureLayout from "../_components/feature-layout";
 import LogoUpload from "@/components/settings/LogoUpload";
 import FirmendatenForm from "@/components/settings/FirmendatenForm";
+import dynamic from "next/dynamic";
+
+const StarterModulesSettings = dynamic(
+  () => import("@/components/settings/StarterModulesSettings"),
+  { ssr: false },
+);
 
 const sans = { fontFamily: "var(--font-dm-sans)" } as const;
 
@@ -20,6 +26,9 @@ export default function EinstellungenPage() {
         <div className="c-card bg-white/5 border border-white/10 rounded-xl p-6">
           <FirmendatenForm />
         </div>
+
+        {/* Starter: 3-Modul-Auswahl (nur für Starter-Kunden sichtbar) */}
+        <StarterModulesSettings />
       </div>
     </FeatureLayout>
   );

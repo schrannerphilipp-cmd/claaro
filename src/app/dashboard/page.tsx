@@ -5,7 +5,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getBrowserClient, supabaseConfigured } from "@/lib/supabase";
 import emailjs from "@emailjs/browser";
-import { canAccess, requiredPlan, PLAN_NAMES, type Plan, type ModuleId } from "@/lib/plan-gate";
+import {
+  canAccess,
+  requiredPlan,
+  PLAN_NAMES,
+  STARTER_MODULES_LS_KEY,
+  STARTER_ONBOARDING_DONE_KEY,
+  type Plan,
+  type ModuleId,
+} from "@/lib/plan-gate";
+import StarterOnboardingModal from "@/components/dashboard/StarterOnboardingModal";
 import { triggerZeitersparnisToast } from "@/lib/zeitersparnis";
 import PendingTasksWidget from "@/components/dashboard/PendingTasksWidget";
 import dynamic from "next/dynamic";
@@ -264,7 +273,9 @@ export default function DashboardPage() {
   const [displayAvatar,  setDisplayAvatar]  = useState<string | null>(null);
   const [chatUnread,     setChatUnread]     = useState(0);
   const [userPlan,       setUserPlan]       = useState<Plan | null>(null);
-  const [lockedModal,    setLockedModal]    = useState<{ name: string; minPlan: string } | null>(null);
+  const [starterModules,    setStarterModules]    = useState<ModuleId[]>([]);
+  const [showStarterModal,  setShowStarterModal]  = useState(false);
+  const [lockedModal,    setLockedModal]    = useState<{ name: string; minPlan: string; isStarterChoice?: boolean } | null>(null);
   const [supportOpen,    setSupportOpen]    = useState(false);
   const [anleitungOpen,  setAnleitungOpen]  = useState(false);
   const [anleitungTool,  setAnleitungTool]  = useState<number | null>(null);
@@ -302,6 +313,15 @@ export default function DashboardPage() {
       }
     } catch {/* ignore */}
 
+    // ── Starter-Module aus localStorage laden ─────────────────────────────
+    try {
+      const raw = localStorage.getItem(STARTER_MODULES_LS_KEY);
+      if (raw) {
+        const mods = JSON.parse(raw) as ModuleId[];
+        if (Array.isArray(mods) && mods.length > 0) setStarterModules(mods);
+      }
+    } catch {/* ignore */}
+
     const stored = parseInt(localStorage.getItem("claaro-chat-unread") ?? "0", 10);
     if (stored > 0) setChatUnread(stored);
 
@@ -326,32 +346,58 @@ export default function DashboardPage() {
       }
     } catch {/* ignore */}
 
-    if (HAUPTACCOUNT_ID && supabaseConfigured) {
+    if (supabaseConfigured) {
       const supabase = getBrowserClient();
-      supabase
-        ?.from("company_settings")
-        .select("abo_plan, firmenname")
-        .eq("hauptaccount_id", HAUPTACCOUNT_ID)
-        .maybeSingle()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .then(({ data }: { data: any }) => {
-          if (data?.abo_plan) setUserPlan(data.abo_plan as Plan);
-          if (data?.firmenname) {
-            setSetupSteps((prev) => {
-              if (prev[0]) return prev; // already marked
-              const next = [...prev];
-              next[0] = true;
-              try {
-                const celebrated: number[] = JSON.parse(localStorage.getItem("claaro-setup-celebrated") ?? "[]");
-                if (!celebrated.includes(0)) {
-                  localStorage.setItem("claaro-setup-celebrated", JSON.stringify([...celebrated, 0]));
-                  setTimeout(() => triggerZeitersparnisToast("Firmendaten hinterlegt", 5), 200);
-                }
-              } catch {/* ignore */}
-              return next;
+      if (supabase) {
+        // Load plan + firmenname from company_settings
+        if (HAUPTACCOUNT_ID) {
+          supabase
+            .from("company_settings")
+            .select("abo_plan, firmenname")
+            .eq("hauptaccount_id", HAUPTACCOUNT_ID)
+            .maybeSingle()
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .then(({ data }: { data: any }) => {
+              if (data?.abo_plan) setUserPlan(data.abo_plan as Plan);
+              if (data?.firmenname) {
+                setSetupSteps((prev) => {
+                  if (prev[0]) return prev; // already marked
+                  const next = [...prev];
+                  next[0] = true;
+                  try {
+                    const celebrated: number[] = JSON.parse(localStorage.getItem("claaro-setup-celebrated") ?? "[]");
+                    if (!celebrated.includes(0)) {
+                      localStorage.setItem("claaro-setup-celebrated", JSON.stringify([...celebrated, 0]));
+                      setTimeout(() => triggerZeitersparnisToast("Firmendaten hinterlegt", 5), 200);
+                    }
+                  } catch {/* ignore */}
+                  return next;
+                });
+              }
             });
-          }
+        }
+
+        // Load starter_modules from profiles
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        supabase.auth.getUser().then(({ data }: { data: any }) => {
+          if (!data?.user) return;
+          supabase
+            .from("profiles")
+            .select("starter_modules")
+            .eq("id", data.user.id)
+            .maybeSingle()
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .then(({ data: p }: { data: any }) => {
+              if (!p?.starter_modules) return;
+              const mods = p.starter_modules as ModuleId[];
+              if (Array.isArray(mods) && mods.length > 0) {
+                setStarterModules(mods);
+                // Keep localStorage in sync
+                try { localStorage.setItem(STARTER_MODULES_LS_KEY, JSON.stringify(mods)); } catch {/* ignore */}
+              }
+            });
         });
+      }
     }
 
     function onProfilUpdate(e: Event) {
@@ -362,11 +408,17 @@ export default function DashboardPage() {
     function onChatUnread(e: Event) {
       setChatUnread((e as CustomEvent).detail.count ?? 0);
     }
+    function onStarterModulesUpdated(e: Event) {
+      const mods = (e as CustomEvent).detail?.modules as ModuleId[] | undefined;
+      if (Array.isArray(mods) && mods.length > 0) setStarterModules(mods);
+    }
     window.addEventListener("claaro:profil-updated", onProfilUpdate);
     window.addEventListener("claaro:chat-unread", onChatUnread);
+    window.addEventListener("claaro:starter-modules-updated", onStarterModulesUpdated);
     return () => {
       window.removeEventListener("claaro:profil-updated", onProfilUpdate);
       window.removeEventListener("claaro:chat-unread", onChatUnread);
+      window.removeEventListener("claaro:starter-modules-updated", onStarterModulesUpdated);
     };
   }, []);
 
@@ -455,6 +507,18 @@ export default function DashboardPage() {
       }
     } catch {/* ignore */}
   }, [isTrialState]);
+
+  // ── Starter-Modal: show once when Starter plan + no modules chosen yet ──────
+  useEffect(() => {
+    if (!isPaidState || userPlan !== "starter") return;
+    if (starterModules.length > 0) return; // already chosen
+    try {
+      if (localStorage.getItem(STARTER_ONBOARDING_DONE_KEY) === "1") return;
+    } catch {/* ignore */}
+    // Small delay so the dashboard renders first
+    const t = setTimeout(() => setShowStarterModal(true), 600);
+    return () => clearTimeout(t);
+  }, [isPaidState, userPlan, starterModules]);
 
   // ── handlers ────────────────────────────────────────────────────────────────
   async function handleSupportSubmit(e: React.FormEvent) {
@@ -788,8 +852,11 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {tiles.map(({ id, icon, name, description }, i) => {
             // Trial = vollständige 30-Tage-Testversion → alle 6 Module freigeschaltet
-            const accessible = isTrialState || canAccess(userPlan, id);
-            const minPlan = PLAN_NAMES[requiredPlan(id)];
+            const accessible = isTrialState || canAccess(userPlan, id, starterModules);
+            const reqPlan = requiredPlan(id);
+            const minPlan = PLAN_NAMES[reqPlan];
+            // Locked because user is on Starter but didn't select this module
+            const isStarterChoice = userPlan === "starter" && reqPlan === "starter" && !accessible;
 
             if (accessible) {
               return (
@@ -811,7 +878,7 @@ export default function DashboardPage() {
               <button
                 key={id}
                 ref={(el) => { tileRefs.current[i] = el as unknown as HTMLAnchorElement; }}
-                onClick={() => setLockedModal({ name, minPlan })}
+                onClick={() => setLockedModal({ name, minPlan, isStarterChoice })}
                 className="claaro-tile relative text-left rounded-xl border p-6 transition-all bg-white/[0.02] border-white/[0.06] hover:bg-white/5 hover:border-white/10 w-full"
               >
                 <svg className="absolute top-3 right-3 w-3.5 h-3.5 text-white/45" fill="none" viewBox="0 0 16 16">
@@ -1252,6 +1319,19 @@ export default function DashboardPage() {
       {/* MODALS                                                              */}
       {/* ═══════════════════════════════════════════════════════════════════ */}
 
+      {/* Starter-Onboarding: Modul-Auswahl */}
+      {showStarterModal && (
+        <StarterOnboardingModal
+          initialModules={starterModules.length > 0 ? starterModules : undefined}
+          allowDismiss={starterModules.length > 0}
+          onConfirm={(mods) => {
+            setStarterModules(mods);
+            setShowStarterModal(false);
+          }}
+          onDismiss={() => setShowStarterModal(false)}
+        />
+      )}
+
       {/* Locked-Feature Modal */}
       {lockedModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -1268,15 +1348,45 @@ export default function DashboardPage() {
             <h3 className="text-base font-semibold text-white mb-2" style={serif}>
               {lockedModal.name} nicht verfügbar
             </h3>
-            <p className="text-sm text-white/50 leading-relaxed mb-6">
-              Für dieses Feature benötigst du mindestens den{" "}
-              <span className="text-white font-medium">{lockedModal.minPlan}-Plan</span>.
-            </p>
-            <Link href="/dashboard/konto" onClick={() => setLockedModal(null)}
-              className="block w-full text-sm py-2.5 rounded-xl font-medium text-white mb-3 transition-colors"
-              style={{ backgroundColor: "var(--c-accent)" }}>
-              Plan upgraden →
-            </Link>
+            {lockedModal.isStarterChoice ? (
+              <>
+                <p className="text-sm text-white/50 leading-relaxed mb-6">
+                  Dieses Modul gehört nicht zu deinen{" "}
+                  <span className="text-white font-medium">3 gewählten Features</span>.
+                  Passe deine Auswahl an oder upgrade auf Profi für alle 6 Module.
+                </p>
+                <button
+                  onClick={() => { setLockedModal(null); setShowStarterModal(true); }}
+                  className="block w-full text-sm py-2.5 rounded-xl font-medium text-white mb-3 transition-colors"
+                  style={{ backgroundColor: "var(--c-accent)" }}
+                >
+                  Module neu wählen →
+                </button>
+                <Link
+                  href="/dashboard/konto?tab=abo"
+                  onClick={() => setLockedModal(null)}
+                  className="block w-full text-sm py-2 rounded-xl border border-white/15 text-white/60 hover:text-white text-center mb-3 transition-colors"
+                >
+                  Auf Profi upgraden →
+                </Link>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-white/50 leading-relaxed mb-6">
+                  Nur im{" "}
+                  <span className="text-white font-medium">{lockedModal.minPlan}-Plan</span>{" "}
+                  verfügbar — upgrade um dieses Feature freizuschalten.
+                </p>
+                <Link
+                  href="/dashboard/konto?tab=abo"
+                  onClick={() => setLockedModal(null)}
+                  className="block w-full text-sm py-2.5 rounded-xl font-medium text-white mb-3 transition-colors text-center"
+                  style={{ backgroundColor: "var(--c-accent)" }}
+                >
+                  Upgrade →
+                </Link>
+              </>
+            )}
             <button onClick={() => setLockedModal(null)} className="text-sm text-white/55 hover:text-white/70 transition-colors">
               Schließen
             </button>

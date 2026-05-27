@@ -1,14 +1,18 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 const sans  = { fontFamily: "var(--font-dm-sans)" } as const;
 const serif = { fontFamily: "var(--font-dm-serif)" } as const;
 
 export default function ImpressumPage() {
+  const router = useRouter();
+
   return (
     <div className="min-h-screen bg-[#241c14] text-white c-fade-up" style={sans}>
       <div className="max-w-2xl mx-auto px-6 py-12">
         <button
-          onClick={() => window.history.back()}
+          onClick={() => router.back()}
           className="c-btn flex items-center gap-1.5 text-sm text-white/55 hover:text-white/70 transition-colors mb-10"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16">

@@ -2,22 +2,19 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import FadeIn from "@/components/ui/FadeIn";
 
 const serif = { fontFamily: "var(--font-dm-serif)" } as const;
 const sans = { fontFamily: "var(--font-dm-sans)" } as const;
 
 export function ComingSoon() {
   return (
-    <FadeIn>
-      <div className="bg-white/5 border border-white/10 rounded-xl py-20 px-8 text-center">
-        <p className="text-4xl mb-5">🔧</p>
-        <p className="text-white font-semibold mb-2">In Entwicklung</p>
-        <p className="text-white/55 text-sm max-w-sm mx-auto leading-relaxed">
-          Dieses Feature wird gerade gebaut und ist bald verfügbar.
-        </p>
-      </div>
-    </FadeIn>
+    <div className="bg-white/5 border border-white/10 rounded-xl py-20 px-8 text-center">
+      <p className="text-4xl mb-5">🔧</p>
+      <p className="text-white font-semibold mb-2">In Entwicklung</p>
+      <p className="text-white/55 text-sm max-w-sm mx-auto leading-relaxed">
+        Dieses Feature wird gerade gebaut und ist bald verfügbar.
+      </p>
+    </div>
   );
 }
 
@@ -69,18 +66,18 @@ export default function FeatureLayout({
       </header>
 
       {/* Description + content */}
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <FadeIn className="mb-10">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 c-fade-up">
+        <div className="mb-10">
           <h1 className="text-3xl lg:text-4xl text-white mb-4" style={serif}>
             {name}
           </h1>
           <p className="text-white/60 text-base leading-relaxed max-w-2xl">
             {description}
           </p>
-        </FadeIn>
-        <FadeIn delay={0.05}>
+        </div>
+        <div>
           {children}
-        </FadeIn>
+        </div>
       </main>
 
       {/* Legal footer */}

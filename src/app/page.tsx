@@ -11,6 +11,7 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import LandingPage from "@/components/landing/LandingPage";
+import { getPublicTestimonials } from "@/lib/testimonials";
 
 export default async function RootPage() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL     ?? "";
@@ -20,6 +21,8 @@ export default async function RootPage() {
   if (!supabaseUrl || supabaseUrl.includes("placeholder") || !supabaseKey) {
     return <LandingPage />;
   }
+
+  const testimonials = await getPublicTestimonials();
 
   const cookieStore = await cookies();
 
@@ -43,5 +46,5 @@ export default async function RootPage() {
     redirect("/dashboard");
   }
 
-  return <LandingPage />;
+  return <LandingPage testimonials={testimonials} />;
 }

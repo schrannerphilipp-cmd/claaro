@@ -1,5 +1,7 @@
 "use client";
 
+import type { PublicTestimonial } from "@/lib/testimonials";
+
 /**
  * Claaro Landingpage – Verkaufspsychologie nach Apple/Amazon-Standard
  *
@@ -145,7 +147,22 @@ function Stars() {
 }
 
 // ─── Hauptkomponente ──────────────────────────────────────────────────────────
-export default function LandingPage() {
+interface LandingPageProps {
+  testimonials?: PublicTestimonial[];
+}
+
+export default function LandingPage({ testimonials = [] }: LandingPageProps) {
+  const useRealTestimonials = testimonials.length >= 3;
+  const activeTestimonials = useRealTestimonials
+    ? testimonials.map((t) => ({
+        quote:    t.quote,
+        name:     t.customer_name,
+        role:     t.role ?? "",
+        initials: t.initials ?? t.customer_name.slice(0, 2).toUpperCase(),
+        color:    t.color ?? "#2a7a6a",
+        result:   t.result ?? "",
+      }))
+    : TESTIMONIALS;
   // Jährlich als Default (Anchoring – Nutzer sieht sofort günstigeren Preis)
   const [yearly,       setYearly]       = useState(true);
   const [exitVisible,  setExitVisible]  = useState(false);
@@ -471,7 +488,7 @@ export default function LandingPage() {
 
           {/* Testimonials – Ergebnis prominent, Quote darunter */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {TESTIMONIALS.map(({ quote, name, role, initials, color, result }, i) => (
+            {activeTestimonials.map(({ quote, name, role, initials, color, result }, i) => (
               <figure
                 key={name}
                 ref={(el) => { testimonialRefs.current[i] = el; }}
@@ -514,6 +531,11 @@ export default function LandingPage() {
               </figure>
             ))}
           </div>
+          {!useRealTestimonials && (
+            <p className="text-center text-xs text-white/30 mt-4">
+              * Beispielhafte Erfahrungsberichte. Namen wurden anonymisiert.
+            </p>
+          )}
         </div>
       </section>
 

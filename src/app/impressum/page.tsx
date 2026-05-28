@@ -31,10 +31,21 @@ export default function ImpressumPage() {
           <p>
             E-Mail:{" "}
             <a
-              href="mailto:schranner.philipp@gmail.com"
+              href="mailto:hallo@getclaaro.de"
               className="text-white/60 hover:text-white transition-colors underline underline-offset-2"
             >
-              schranner.philipp@gmail.com
+              hallo@getclaaro.de
+            </a>
+          </p>
+          <p>
+            Website:{" "}
+            <a
+              href="https://getclaaro.de"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white/60 hover:text-white transition-colors underline underline-offset-2"
+            >
+              getclaaro.de
             </a>
           </p>
         </div>

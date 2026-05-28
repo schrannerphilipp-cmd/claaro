@@ -44,10 +44,10 @@ export default function DatenschutzPage() {
               <p>
                 E-Mail:{" "}
                 <a
-                  href="mailto:schranner.philipp@gmail.com"
+                  href="mailto:hallo@getclaaro.de"
                   className="text-white/60 hover:text-white transition-colors underline underline-offset-2"
                 >
-                  schranner.philipp@gmail.com
+                  hallo@getclaaro.de
                 </a>
               </p>
             </div>
@@ -162,10 +162,10 @@ export default function DatenschutzPage() {
             <p className="text-sm text-white/55 leading-relaxed mt-3">
               Für alle Anfragen wenden Sie sich per E-Mail an:{" "}
               <a
-                href="mailto:schranner.philipp@gmail.com"
+                href="mailto:hallo@getclaaro.de"
                 className="text-white/60 hover:text-white transition-colors underline underline-offset-2"
               >
-                schranner.philipp@gmail.com
+                hallo@getclaaro.de
               </a>
             </p>
           </Section>
@@ -175,10 +175,10 @@ export default function DatenschutzPage() {
             <p className="text-sm text-white/55 leading-relaxed">
               Nutzer können jederzeit die vollständige Löschung ihres Accounts und aller damit verbundenen personenbezogenen Daten per E-Mail an{" "}
               <a
-                href="mailto:schranner.philipp@gmail.com"
+                href="mailto:hallo@getclaaro.de"
                 className="text-white/60 hover:text-white transition-colors underline underline-offset-2"
               >
-                schranner.philipp@gmail.com
+                hallo@getclaaro.de
               </a>{" "}
               beantragen. Die Löschung erfolgt binnen 30 Tagen, soweit keine gesetzlichen Aufbewahrungspflichten entgegenstehen (z.&thinsp;B. steuerrechtliche Aufbewahrungsfristen für Rechnungsdaten gemäß § 147 AO: 10 Jahre).
             </p>

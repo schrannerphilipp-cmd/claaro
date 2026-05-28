@@ -33,7 +33,7 @@ export default function AgbPage() {
         <h1 className="text-4xl text-white mb-2" style={serif}>Allgemeine Geschäftsbedingungen</h1>
         <p className="text-white/55 text-sm mb-2">Claaro SaaS-Dienst — Stand: Mai 2026</p>
         <p className="text-white/40 text-xs mb-10">
-          Anbieter: Philipp Schranner, Ferdinand-Miller-Str. 30, 82256 Fürstenfeldbruck
+          Anbieter: Philipp Schranner, Ferdinand-Miller-Str. 30, 82256 Fürstenfeldbruck · hallo@getclaaro.de · getclaaro.de
         </p>
 
         <div className="space-y-8">
@@ -95,7 +95,7 @@ export default function AgbPage() {
               Abonnements werden auf monatlicher oder jährlicher Basis abgeschlossen. Monatliche Abonnements sind <strong className="text-white/70">jederzeit zum Ende des laufenden Kalendermonats kündbar</strong>. Jährliche Abonnements können zum Ende des Abonnementjahres mit einer Frist von 30 Tagen gekündigt werden.
             </p>
             <p className="text-sm text-white/55 leading-relaxed mt-2">
-              Die Kündigung erfolgt durch Abbestellung im Dashboard (Bereich „Mein Konto → Abo & Abrechnung") oder per E-Mail an schranner.philipp@gmail.com. Nach Vertragsende werden alle Kundendaten innerhalb von 30 Tagen unwiderruflich gelöscht.
+              Die Kündigung erfolgt durch Abbestellung im Dashboard (Bereich „Mein Konto → Abo & Abrechnung") oder per E-Mail an hallo@getclaaro.de. Nach Vertragsende werden alle Kundendaten innerhalb von 30 Tagen unwiderruflich gelöscht.
             </p>
           </Section>
 
@@ -127,7 +127,7 @@ export default function AgbPage() {
             <p className="text-sm text-white/55 leading-relaxed">
               Die Verarbeitung personenbezogener Daten erfolgt gemäß der Datenschutzerklärung, abrufbar unter{" "}
               <a href="/datenschutz" className="text-white/60 hover:text-white underline underline-offset-2">
-                claaro.de/datenschutz
+                getclaaro.de/datenschutz
               </a>.
             </p>
           </Section>

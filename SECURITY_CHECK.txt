@@ -1,0 +1,143 @@
+CLAARO – SECURITY CHECK (Stand: 2026-06-05)
+===========================================
+
+Erstellt im Rahmen von PROMPT 4 — Sicherheitsrisiken absichern.
+
+
+══════════════════════════════════════════════════════════════
+1. ROW LEVEL SECURITY (RLS) – Status aller Tabellen
+══════════════════════════════════════════════════════════════
+
+Zum Prüfen im Supabase Dashboard → SQL Editor:
+
+  SELECT tablename, rowsecurity
+  FROM pg_tables
+  WHERE schemaname = 'public'
+  ORDER BY tablename;
+
+Erwartetes Ergebnis (alle müssen "t" = true haben):
+
+  Tabelle               | RLS  | Migration | Policy
+  ─────────────────────────────────────────────────────────────
+  angebote              | ✓ ON | 004       | own_angebote (user_id = auth.uid())
+  availability          | ✓ ON | 001       | employee_own_availability
+  chat_messages         | ✓ ON | 004       | chat_read (auth), chat_insert (own sender)
+  chat_read_status      | ✓ ON | 004       | read_status_own (user_id = auth.uid())
+  company_settings      | ✓ ON | 002       | own_company_settings (hauptaccount_id = auth.uid())
+  employees             | ✓ ON | 001       | hauptaccount_employees
+  feedback              | ✓ ON | 002       | insert_feedback (public), own_feedback (select)
+  kunden                | ✓ ON | 003       | own_kunden (user_id = auth.uid())
+  notifications_log     | ✓ ON | 001       | hauptaccount_notifications
+  profiles              | ✓ ON | 004       | profiles_read (select all auth), profiles_write (own)
+  public_testimonials   | ✓ ON | 006       | public_read_approved (is_approved + rating >= 4)
+  shift_plans           | ✓ ON | 001       | hauptaccount_shift_plans
+  shift_swaps           | ✓ ON | 001       | employee_own_swaps
+  shifts                | ✓ ON | 001       | hauptaccount_shifts + employee_own_shifts
+  vacations             | ✓ ON | 001       | employee_own_vacations
+
+Hinweis: Alle Tabellen haben RLS aktiviert. Explizite GRANTs wurden
+in Migration 008 (supabase/migrations/008_explicit_grants.sql) gesetzt.
+
+
+══════════════════════════════════════════════════════════════
+2. ENVIRONMENT VARIABLES – Sicherheitsprüfung
+══════════════════════════════════════════════════════════════
+
+  Variable                          | Typ           | Status
+  ──────────────────────────────────────────────────────────────────
+  NEXT_PUBLIC_SUPABASE_URL          | Public (OK)   | ✓ Anon-sicher
+  NEXT_PUBLIC_SUPABASE_ANON_KEY     | Public (OK)   | ✓ Anon-sicher, RLS schützt
+  SUPABASE_SERVICE_ROLE_KEY         | Server-only   | ✓ Kein NEXT_PUBLIC_-Prefix
+  RESEND_API_KEY                    | Server-only   | ✓ Kein NEXT_PUBLIC_-Prefix
+  STRIPE_SECRET_KEY                 | Server-only   | ✓ Kein NEXT_PUBLIC_-Prefix
+  STRIPE_WEBHOOK_SECRET             | Server-only   | ✓ Kein NEXT_PUBLIC_-Prefix
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY| Public (OK)   | ✓ Publishable key, kein Risiko
+  NEXT_PUBLIC_SUPABASE_HAUPTACCOUNT | Public        | ⚠ UUID ist öffentlich sichtbar
+                                    |               |   → akzeptabel, da UUID nicht
+                                    |               |     ausreichend als Secret gilt
+  NEXT_PUBLIC_DEV_TOGGLE            | Public        | ⚠ Nur in .env.local setzen!
+                                    |               |   NIEMALS in Vercel Prod-Env
+  NEXT_PUBLIC_BASE_URL              | Public (OK)   | ✓ Domain, kein Secret
+
+  .gitignore: .env* — ✓ Alle .env-Dateien sind gitignored
+
+
+══════════════════════════════════════════════════════════════
+3. API-ROUTEN – Auth & Rate Limiting (nach Absicherung)
+══════════════════════════════════════════════════════════════
+
+  Route                              | Auth | Rate Limit | Fix
+  ─────────────────────────────────────────────────────────────
+  POST /api/feedback                 | Nein | 10/min/IP  | Honeypot, HTML-Escape
+  POST /api/bewertung/send           | ✓ Ja | 10/min/User| Phone-Validierung
+  GET  /api/bewertung/track/[token]  | Nein | –          | Open-Redirect-Fix
+  GET  /api/stripe/checkout          | ✓ Ja | –          | Schon OK
+  POST /api/stripe/webhook           | Stripe-Sig | –   | Schon OK
+  POST /api/dienstplan/mitarbeiter   | ✓ Ja | 20/min/User| IDOR-Fix
+  GET  /api/dienstplan/mitarbeiter   | ✓ Ja | –          | IDOR-Fix
+  PATCH/DELETE /api/.../mitarbeiter/[id]| ✓ Ja | –      | Ownership-Check
+  GET/POST/DELETE /api/.../verfueg.  | ✓ Ja | –          | Auth hinzugefügt
+  GET/POST /api/dienstplan/urlaub    | ✓ Ja | –          | Auth hinzugefügt
+  PATCH /api/dienstplan/urlaub/[id]  | ✓ Ja | –          | Auth hinzugefügt
+  GET/POST /api/dienstplan/tausch    | ✓ Ja | –          | Auth hinzugefügt
+  POST /api/dienstplan/whatsapp-senden| Intern/Auth | –  | Internal-Origin-Check
+  POST /api/dienstplan/ki-erstellen  | –    | –          | Gibt 503 (deaktiviert)
+  GET  /api/payment/[token]          | Nein | –          | Token-basiert (OK)
+
+
+══════════════════════════════════════════════════════════════
+4. BEHOBENE SICHERHEITSLÜCKEN (PROMPT 4)
+══════════════════════════════════════════════════════════════
+
+[KRITISCH] IDOR in /api/dienstplan/mitarbeiter
+  → GET akzeptierte beliebige hauptaccount_id aus URL-Params
+  → Fix: user.id aus Session muss === hauptaccount_id sein
+
+[KRITISCH] Fehlende Auth auf 7 API-Routen
+  → verfuegbarkeit, urlaub, urlaub/[id], tausch, whatsapp-senden,
+    bewertung/send, mitarbeiter/[id]
+  → Fix: getRequestUser() + 401/403 Guards in allen Routen
+
+[HOCH] Open Redirect in /api/bewertung/track/[token]
+  → platformUrl wurde ohne Validierung als Redirect-Ziel genutzt
+  → Fix: URL-Schema-Prüfung (nur http/https erlaubt)
+
+[HOCH] XSS in Feedback-E-Mail
+  → name, email, kategorie wurden unescaped in HTML-E-Mail eingefügt
+  → Fix: escapeHtml() für alle user-supplied Felder
+
+[MITTEL] Kein Rate Limiting auf öffentlichen Endpunkten
+  → Fix: In-Memory-Limiter (src/lib/rate-limit.ts), 10 req/min/IP
+
+[MITTEL] Kein Middleware-Schutz für /dashboard/*
+  → Ohne Middleware war serverseitiger Auth-Check nur auf / vorhanden
+  → Fix: src/middleware.ts — Session-Check vor allen /dashboard-Routen
+
+[NIEDRIG] Honeypot fehlt in öffentlichen Formularen
+  → Fix: Server-seitiger Honeypot-Check in /api/feedback (_honeypot-Feld)
+  → Manuell: <input type="text" name="_honeypot" style="display:none"
+             tabindex="-1" autocomplete="off"> in öffentliche Formulare
+
+
+══════════════════════════════════════════════════════════════
+5. OFFENE PUNKTE / EMPFEHLUNGEN
+══════════════════════════════════════════════════════════════
+
+[ ] NEXT_PUBLIC_DEV_TOGGLE=true aus Vercel Production-Env entfernen
+    (Überprüfen: Vercel Dashboard → Settings → Environment Variables)
+
+[ ] Stripe Publishable Key: Regelmäßig rotieren falls kompromittiert
+
+[ ] Rate Limiter für Multi-Region: Bei Skalierung auf mehrere
+    Vercel-Instanzen In-Memory-Limiter durch Upstash Redis ersetzen
+    (src/lib/rate-limit.ts ist dafür vorbereitet)
+
+[ ] Honeypot in Login-Formular: src/app/login/page.tsx prüfen
+    und ggf. _honeypot-Hidden-Field hinzufügen
+
+[ ] Content Security Policy (CSP): next.config Headers erweitern
+    mit frame-ancestors, script-src Direktiven
+
+[ ] SUPABASE_SERVICE_ROLE_KEY in API-Routen: createServerClient()
+    nutzt Service Role (umgeht RLS). Langfristig: User-Context-Client
+    für Routen verwenden, wo RLS greifen soll.

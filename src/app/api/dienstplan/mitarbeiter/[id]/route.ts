@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
+import { getRequestUser, unauthorized } from "@/lib/api-auth";
 
 // PATCH /api/dienstplan/mitarbeiter/[id]
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const user = await getRequestUser(req);
+  if (!user) return unauthorized();
+
   const { id } = await params;
   let body: Record<string, unknown>;
   try {
@@ -15,14 +19,26 @@ export async function PATCH(
   }
 
   const allowed = [
-    "name","email","telefon","rolle","land",
-    "stunden_pro_woche","vertrag_typ","aktiv","urlaub_tage_jahr",
+    "name", "email", "telefon", "rolle", "land",
+    "stunden_pro_woche", "vertrag_typ", "aktiv", "urlaub_tage_jahr",
   ];
   const update = Object.fromEntries(
     Object.entries(body).filter(([k]) => allowed.includes(k))
   );
 
   const supabase = createServerClient();
+
+  // Verify the employee belongs to the authenticated user's account
+  const { data: emp } = await supabase
+    .from("employees")
+    .select("hauptaccount_id")
+    .eq("id", id)
+    .single();
+
+  if (!emp || emp.hauptaccount_id !== user.id) {
+    return NextResponse.json({ error: "Nicht autorisiert" }, { status: 403 });
+  }
+
   const { data, error } = await supabase
     .from("employees")
     .update(update)
@@ -36,11 +52,26 @@ export async function PATCH(
 
 // DELETE /api/dienstplan/mitarbeiter/[id] — deaktiviert statt löscht
 export async function DELETE(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const user = await getRequestUser(req);
+  if (!user) return unauthorized();
+
   const { id } = await params;
   const supabase = createServerClient();
+
+  // Verify the employee belongs to the authenticated user's account
+  const { data: emp } = await supabase
+    .from("employees")
+    .select("hauptaccount_id")
+    .eq("id", id)
+    .single();
+
+  if (!emp || emp.hauptaccount_id !== user.id) {
+    return NextResponse.json({ error: "Nicht autorisiert" }, { status: 403 });
+  }
+
   const { error } = await supabase
     .from("employees")
     .update({ aktiv: false })

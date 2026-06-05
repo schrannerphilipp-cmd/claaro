@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { trackingStore } from "@/lib/bewertung-store";
+import { getRequestUser, unauthorized } from "@/lib/api-auth";
+import { checkRateLimit, rateLimitExceeded } from "@/lib/rate-limit";
 
 interface SendBody {
   phone: string;
@@ -14,6 +16,23 @@ interface SendBody {
   triggerId?: string;
 }
 
+// Allowed URL schemes for platformUrl to prevent open-redirect abuse via track endpoint
+const ALLOWED_URL_PREFIXES = ["https://", "http://"];
+
+function isValidPlatformUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "https:" || parsed.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
+// E.164 phone number validation (loose — accepts +<digits>, 7–15 digits)
+function isValidPhone(phone: string): boolean {
+  return /^\+?[1-9]\d{6,14}$/.test(phone.replace(/[\s\-()]/g, ""));
+}
+
 function buildMessageBody(
   templateBody: string,
   variables: Record<string, string>
@@ -25,6 +44,14 @@ function buildMessageBody(
 }
 
 export async function POST(req: NextRequest) {
+  // Auth required — only logged-in users can trigger review requests
+  const user = await getRequestUser(req);
+  if (!user) return unauthorized();
+
+  // Rate limit: 10 per minute per user
+  const rl = checkRateLimit(`bewertung:${user.id}`, 10, 60_000);
+  if (!rl.allowed) return rateLimitExceeded();
+
   let body: SendBody;
   try {
     body = (await req.json()) as SendBody;
@@ -40,6 +67,23 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
+
+  if (!isValidPhone(phone)) {
+    return NextResponse.json(
+      { success: false, error: "Ungültige Telefonnummer. Bitte im internationalen Format angeben (z.B. +49...)." },
+      { status: 400 }
+    );
+  }
+
+  if (!isValidPlatformUrl(platformUrl)) {
+    return NextResponse.json(
+      { success: false, error: "Ungültige Plattform-URL." },
+      { status: 400 }
+    );
+  }
+
+  // Suppress unused variable warning from original code
+  void ALLOWED_URL_PREFIXES;
 
   const accountSid = process.env.TWILIO_ACCOUNT_SID;
   const authToken = process.env.TWILIO_AUTH_TOKEN;

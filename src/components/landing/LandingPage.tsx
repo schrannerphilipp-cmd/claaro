@@ -532,8 +532,8 @@ export default function LandingPage({ testimonials = [] }: LandingPageProps) {
             ))}
           </div>
           {!useRealTestimonials && (
-            <p className="text-center text-xs text-white/30 mt-4">
-              * Beispielhafte Erfahrungsberichte. Namen wurden anonymisiert.
+            <p className="text-center text-sm text-gray-400 mt-4">
+              * Beispielhafte Erfahrungsberichte. Namen und Details wurden anonymisiert.
             </p>
           )}
         </div>

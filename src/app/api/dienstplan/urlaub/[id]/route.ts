@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
+import { getRequestUser, unauthorized } from "@/lib/api-auth";
 
 // PATCH /api/dienstplan/urlaub/[id] — genehmigen oder ablehnen
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const user = await getRequestUser(req);
+  if (!user) return unauthorized();
+
   const { id } = await params;
   let body: { status: "genehmigt" | "abgelehnt"; ablehngrund?: string };
   try {
@@ -27,7 +31,6 @@ export async function PATCH(
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  // WhatsApp-Benachrichtigung auslösen
   const emp = (data as { employees?: { name: string; telefon: string } }).employees;
   if (emp?.telefon) {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";

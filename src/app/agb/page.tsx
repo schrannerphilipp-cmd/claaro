@@ -33,14 +33,15 @@ export default function AgbPage() {
         <h1 className="text-4xl text-white mb-2" style={serif}>Allgemeine Geschäftsbedingungen</h1>
         <p className="text-white/55 text-sm mb-2">Claaro SaaS-Dienst — Stand: Mai 2026</p>
         <p className="text-white/40 text-xs mb-10">
-          Anbieter: Philipp Schranner, Ferdinand-Miller-Str. 30, 82256 Fürstenfeldbruck · hallo@getclaaro.de · getclaaro.de
+          Anbieter: claaro · hallo@getclaaro.de · getclaaro.de
+          {/* Vollständige Anbieterangaben: siehe Impressum (§5 TMG) */}
         </p>
 
         <div className="space-y-8">
 
           <Section num="1" title="Geltungsbereich">
             <p className="text-sm text-white/55 leading-relaxed">
-              Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für alle Verträge zwischen Philipp Schranner (nachfolgend „Anbieter") und gewerblichen Nutzern (nachfolgend „Kunde") über die Nutzung der Software-as-a-Service-Plattform claaro. Entgegenstehende oder abweichende Bedingungen des Kunden werden nicht anerkannt, sofern der Anbieter ihrer Geltung nicht ausdrücklich schriftlich zugestimmt hat.
+              Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für alle Verträge zwischen claaro (Inhaber: Philipp Schranner, vollständige Anbieterangaben im Impressum, nachfolgend „Anbieter") und gewerblichen Nutzern (nachfolgend „Kunde") über die Nutzung der Software-as-a-Service-Plattform claaro. Entgegenstehende oder abweichende Bedingungen des Kunden werden nicht anerkannt, sofern der Anbieter ihrer Geltung nicht ausdrücklich schriftlich zugestimmt hat.
             </p>
           </Section>
 
@@ -140,7 +141,7 @@ export default function AgbPage() {
 
           <Section num="11" title="Gerichtsstand und anwendbares Recht">
             <p className="text-sm text-white/55 leading-relaxed">
-              Es gilt das Recht der Bundesrepublik Deutschland unter Ausschluss des UN-Kaufrechts (CISG). Gerichtsstand für alle Streitigkeiten aus diesem Vertragsverhältnis ist, soweit gesetzlich zulässig, Fürstenfeldbruck, Deutschland.
+              Es gilt das Recht der Bundesrepublik Deutschland unter Ausschluss des UN-Kaufrechts (CISG). Gerichtsstand für alle Streitigkeiten aus diesem Vertragsverhältnis ist, soweit gesetzlich zulässig, der Sitz des Anbieters in Deutschland (gemäß Impressum).
             </p>
           </Section>
 

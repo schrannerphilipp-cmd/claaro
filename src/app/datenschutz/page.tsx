@@ -36,6 +36,8 @@ export default function DatenschutzPage() {
         <div className="space-y-8">
 
           {/* 1 – Verantwortlicher */}
+          {/* Verantwortlicher nach Art. 4 Nr. 7 DSGVO — Namens- und Adresspflicht.
+              GESCHAEFTSADRESSE_EINTRAGEN sobald verfügbar — siehe PRIVACY_TODO.md */}
           <Section title="1. Verantwortlicher">
             <div className="text-sm text-white/55 space-y-1">
               <p>Philipp Schranner</p>

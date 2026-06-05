@@ -8,15 +8,17 @@ import FeatureLayout from "../_components/feature-layout";
 import ProfilBearbeiten from "@/components/konto/ProfilBearbeiten";
 import AboAbrechnung from "@/components/konto/AboAbrechnung";
 import FirmenChat from "@/components/konto/FirmenChat";
+import LoyaltySection from "@/components/konto/LoyaltySection";
 
 const sans = { fontFamily: "var(--font-dm-sans)" } as const;
 
-type Tab = "profil" | "firmendaten" | "abo" | "benachrichtigungen" | "sicherheit";
+type Tab = "profil" | "firmendaten" | "abo" | "benachrichtigungen" | "sicherheit" | "treue";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "profil", label: "Profil" },
   { id: "firmendaten", label: "Firmendaten" },
   { id: "abo", label: "Abo & Abrechnung" },
+  { id: "treue", label: "🏅 Treue-Programm" },
   { id: "benachrichtigungen", label: "Benachrichtigungen" },
   { id: "sicherheit", label: "Passwort & Sicherheit" },
 ];
@@ -449,6 +451,8 @@ export default function KontoPage() {
 
         {/* Content card */}
         <div className="bg-white/5 border border-white/10 rounded-2xl p-6 min-h-[300px]">
+          {activeTab === "treue" && <LoyaltySection />}
+
           {activeTab === "profil" && <ProfilBearbeiten />}
 
           {activeTab === "firmendaten" && (

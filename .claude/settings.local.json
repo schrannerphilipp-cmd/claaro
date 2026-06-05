@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx prisma *)"
+      "Bash(npx prisma *)",
+      "Bash(npx vercel *)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(npm audit *)",
+      "Bash(node -e \"const d=require\\('fs'\\).readFileSync\\('/dev/stdin','utf8'\\);try{const j=JSON.parse\\(d\\);const s=j.metadata?.vulnerabilities||{};console.log\\('critical:',s.critical||0,'high:',s.high||0,'moderate:',s.moderate||0,'low:',s.low||0\\);}catch{console.log\\(d.slice\\(0,500\\)\\);}\")",
+      "Bash(del \"src\\\\middleware.ts\")"
     ]
   }
 }

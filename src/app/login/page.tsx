@@ -95,14 +95,18 @@ function LoginForm() {
   const router       = useRouter();
   const searchParams = useSearchParams();
   const next         = searchParams.get("next") ?? "/dashboard";
+  const refCode      = searchParams.get("ref") ?? null;
 
-  const [mode, setMode]         = useState<"login" | "register">("login");
-  const [email, setEmail]       = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState<string | null>(null);
-  const [info, setInfo]         = useState<string | null>(null);
-  const [shakeKey, setShakeKey] = useState(0);
+  const [mode, setMode]         = useState<"login" | "register">(
+    searchParams.get("tab") === "register" ? "register" : "login"
+  );
+  const [email, setEmail]               = useState("");
+  const [password, setPassword]         = useState("");
+  const [marketingConsent, setMarketingConsent] = useState(false);
+  const [loading, setLoading]           = useState(false);
+  const [error, setError]               = useState<string | null>(null);
+  const [info, setInfo]                 = useState<string | null>(null);
+  const [shakeKey, setShakeKey]         = useState(0);
   const [emailTouched, setEmailTouched]       = useState(false);
   const [passwordTouched, setPasswordTouched] = useState(false);
 
@@ -127,8 +131,27 @@ function LoginForm() {
 
     try {
       if (mode === "register") {
-        const { error: err } = await supabase.auth.signUp({ email, password });
+        const { data: signUpData, error: err } = await supabase.auth.signUp({ email, password });
         if (err) throw err;
+
+        // Persist marketing consent in profiles (after email confirmation triggers profile creation)
+        if (signUpData?.user && marketingConsent) {
+          try { localStorage.setItem("claaro-marketing-consent", "1"); } catch {/* ignore */}
+        }
+
+        // Record referral asynchronously — fire-and-forget
+        if (refCode) {
+          fetch("/api/loyalty/referral", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ref_code: refCode, referred_email: email }),
+          }).catch(() => {});
+        }
+
+        // Welcome email is sent after first login (once the session is established).
+        // Store intent in localStorage so the dashboard picks it up.
+        try { localStorage.setItem("claaro-send-welcome", "1"); } catch {/* ignore */}
+
         setInfo("Registrierung erfolgreich – bitte E-Mail bestätigen, dann einloggen.");
         setMode("login");
       } else {
@@ -289,6 +312,23 @@ function LoginForm() {
               </motion.p>
             )}
           </AnimatePresence>
+
+          {/* Marketing consent — only shown during registration, DSGVO required, not pre-checked */}
+          {mode === "register" && (
+            <label className="flex items-start gap-2.5 cursor-pointer group mt-1">
+              <input
+                type="checkbox"
+                checked={marketingConsent}
+                onChange={(e) => setMarketingConsent(e.target.checked)}
+                className="mt-0.5 w-3.5 h-3.5 accent-[var(--c-accent)] shrink-0"
+              />
+              <span className="text-[11px] text-white/40 leading-relaxed group-hover:text-white/55 transition-colors">
+                Ich möchte Tipps, Updates und Angebote von Claaro per E-Mail erhalten.
+                (Optional · jederzeit widerrufbar · gemäß{" "}
+                <a href="/datenschutz" className="underline hover:text-white/60">Datenschutz</a>)
+              </span>
+            </label>
+          )}
 
           <motion.button
             type="submit"

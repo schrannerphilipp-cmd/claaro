@@ -82,7 +82,6 @@ const UPGRADE_TARGET: Record<Plan, Plan | null> = {
 
 const ADD_ONS = [
   { name: "Zusatz-Standort", detail: "19 €/Monat ab Profi" },
-  { name: "Einzel-Onboarding", detail: "149 € einmalig" },
 ];
 
 const SHARED_STYLES = `
@@ -660,13 +659,6 @@ export default function AboAbrechnung({ showSuccess: showSuccessProp = false, on
               </div>
               <CopyEmailButton />
             </div>
-            <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10 mt-2">
-              <div>
-                <p className="text-white text-sm font-medium">Einzel-Onboarding</p>
-                <p className="text-white/50 text-xs">149 € einmalig — persönliche Einführung</p>
-              </div>
-              <CopyEmailButton />
-            </div>
           </div>
         </div>
       </>
@@ -779,13 +771,6 @@ export default function AboAbrechnung({ showSuccess: showSuccessProp = false, on
             <div>
               <p className="text-white text-sm font-medium">Zusatz-Standort</p>
               <p className="text-white/50 text-xs">19 €/Monat — ab Profi-Plan</p>
-            </div>
-            <CopyEmailButton />
-          </div>
-          <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10 mt-2">
-            <div>
-              <p className="text-white text-sm font-medium">Einzel-Onboarding</p>
-              <p className="text-white/50 text-xs">149 € einmalig — persönliche Einführung</p>
             </div>
             <CopyEmailButton />
           </div>

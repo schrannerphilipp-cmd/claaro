@@ -4,7 +4,6 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getBrowserClient, supabaseConfigured } from "@/lib/supabase";
-import emailjs from "@emailjs/browser";
 import {
   canAccess,
   requiredPlan,
@@ -534,11 +533,20 @@ export default function DashboardPage() {
     setSupportError(null);
     setSupportLoading(true);
     try {
-      await emailjs.send(
-        "service_8b5ibjd", "template_emiu248",
-        { email: supportEmail, nachricht: `[Support] ${supportName}: ${supportMsg}`, kategorie: "Support", sterne: "" },
-        "EfcnQ7wc4gnfWtpt5",
-      );
+      const res = await fetch("/api/support/auto-reply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name:     supportName,
+          email:    supportEmail,
+          betreff:  "Support-Anfrage über Dashboard",
+          nachricht: supportMsg,
+        }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(j.error ?? "Fehler beim Senden.");
+      }
       setSupportSuccess(true);
       setTimeout(() => {
         setSupportOpen(false); setSupportSuccess(false);

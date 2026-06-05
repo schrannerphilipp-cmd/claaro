@@ -99,6 +99,34 @@ export function useTrial(): TrialState {
       }
 
       setState({ status, daysLeft, trialEndsAt });
+
+      // ── E-Mail-Automatisierungen (fire-and-forget) ────────────────────────
+      try {
+        // Welcome email: send once after first login (flag set during registration)
+        if (localStorage.getItem("claaro-send-welcome") === "1") {
+          localStorage.removeItem("claaro-send-welcome");
+          fetch("/api/email/welcome", { method: "POST" }).catch(() => {});
+        }
+
+        // Trial reminder: 3-day specific window (send once in the 3-day window)
+        if (status === "expiring") {
+          const lastKey = "claaro-trial-reminder-sent";
+          const last = parseInt(localStorage.getItem(lastKey) ?? "0", 10);
+          if (Date.now() - last > 24 * 60 * 60 * 1000) {
+            localStorage.setItem(lastKey, Date.now().toString());
+            fetch("/api/email/trial-reminder", { method: "POST" }).catch(() => {});
+          }
+        }
+
+        // Trial expired: fire once
+        if (status === "expired") {
+          const expKey = "claaro-trial-expired-sent";
+          if (!localStorage.getItem(expKey)) {
+            localStorage.setItem(expKey, "1");
+            fetch("/api/email/trial-expired", { method: "POST" }).catch(() => {});
+          }
+        }
+      } catch {/* localStorage may be unavailable in private mode */}
     } catch {
       // Bei Fehler → permissiv (lieber offen lassen als User sperren)
       setState({ status: "trial", daysLeft: TRIAL_DAYS, trialEndsAt: null });

@@ -1,15 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
+import { getRequestUser, unauthorized } from "@/lib/api-auth";
 
 // GET /api/dienstplan/tausch?hauptaccount_id=...
 export async function GET(req: NextRequest) {
+  const user = await getRequestUser(req);
+  if (!user) return unauthorized();
+
   const hauptaccountId = req.nextUrl.searchParams.get("hauptaccount_id");
   const employeeId = req.nextUrl.searchParams.get("employee_id");
 
   const supabase = createServerClient();
 
   if (hauptaccountId) {
-    // Admin: alle offenen Tauschangebote seines Unternehmens
     const { data: empIds } = await supabase
       .from("employees")
       .select("id")
@@ -34,7 +37,6 @@ export async function GET(req: NextRequest) {
   }
 
   if (employeeId) {
-    // Mitarbeiter: eigene + offene Tauschangebote
     const { data, error } = await supabase
       .from("shift_swaps")
       .select(`
@@ -56,6 +58,9 @@ export async function GET(req: NextRequest) {
 
 // POST /api/dienstplan/tausch — Tausch anbieten oder Gegenangebot machen
 export async function POST(req: NextRequest) {
+  const user = await getRequestUser(req);
+  if (!user) return unauthorized();
+
   let body: {
     aktion: "anbieten" | "gegenangebot" | "genehmigen" | "ablehnen";
     shift_id_original: string;
@@ -101,7 +106,6 @@ export async function POST(req: NextRequest) {
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-    // Anfragenden per WhatsApp benachrichtigen
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
     await fetch(`${baseUrl}/api/dienstplan/whatsapp-senden`, {
       method: "POST",
@@ -113,7 +117,6 @@ export async function POST(req: NextRequest) {
   }
 
   if (body.aktion === "genehmigen" && body.swap_id) {
-    // Schichten tauschen
     const { data: swap, error: swapError } = await supabase
       .from("shift_swaps")
       .select("*, shifts_orig:shifts!shift_id_original(*), shifts_ang:shifts!shift_id_angebot(*)")
@@ -124,7 +127,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Tausch nicht gefunden." }, { status: 404 });
     }
 
-    // Mitarbeiter-IDs der Schichten tauschen
     if (swap.shift_id_angebot) {
       await supabase
         .from("shifts")
@@ -146,7 +148,6 @@ export async function POST(req: NextRequest) {
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-    // Beide Mitarbeiter benachrichtigen
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
     const notifIds = [swap.employee_id_anfrage, swap.employee_id_angebot].filter(Boolean);
     await fetch(`${baseUrl}/api/dienstplan/whatsapp-senden`, {

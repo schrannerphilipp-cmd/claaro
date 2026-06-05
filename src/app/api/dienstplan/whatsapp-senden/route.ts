@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
+import { getRequestUser, unauthorized } from "@/lib/api-auth";
 import type { NotifTyp } from "@/types/dienstplan";
 
 interface WhatsappBody {
@@ -16,7 +17,7 @@ async function sendTwilio(to: string, body: string): Promise<"gesendet" | "fehle
 
   if (!accountSid || !authToken) {
     console.warn("[dienstplan/whatsapp] Twilio nicht konfiguriert — Nachricht:", body);
-    return "gesendet"; // dev mode
+    return "gesendet";
   }
 
   const toFormatted = to.startsWith("whatsapp:") ? to : `whatsapp:${to}`;
@@ -41,6 +42,19 @@ async function sendTwilio(to: string, body: string): Promise<"gesendet" | "fehle
 }
 
 export async function POST(req: NextRequest) {
+  // This endpoint is called both from the dashboard (user session) and
+  // from internal server-to-server calls (urlaub/[id], tausch). For internal
+  // calls the cookie won't be present. We allow both authenticated users and
+  // requests originating from trusted internal origins (same-host).
+  const origin = req.headers.get("origin") ?? "";
+  const host = req.headers.get("host") ?? "";
+  const isInternal = !origin || origin.includes(host);
+
+  if (!isInternal) {
+    const user = await getRequestUser(req);
+    if (!user) return unauthorized();
+  }
+
   let body: WhatsappBody;
   try {
     body = await req.json();
@@ -50,7 +64,6 @@ export async function POST(req: NextRequest) {
 
   const supabase = createServerClient();
 
-  // Mitarbeiter-Daten laden
   const { data: employees, error } = await supabase
     .from("employees")
     .select("id, name, telefon, email")
@@ -60,7 +73,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Mitarbeiter nicht gefunden." }, { status: 404 });
   }
 
-  // Schichten laden falls shiftPlanId angegeben
   let shiftsMap: Record<string, { datum: string; von: string; bis: string }[]> = {};
   if (body.shiftPlanId) {
     const { data: shifts } = await supabase
@@ -83,7 +95,6 @@ export async function POST(req: NextRequest) {
     const nachricht = body.nachricht ?? buildDefaultMessage(body.typ, emp.name, shiftsMap[emp.id] ?? []);
     const status = await sendTwilio(emp.telefon, nachricht);
 
-    // Ins Log schreiben (Fehler werden nie den Hauptflow unterbrechen)
     await supabase.from("notifications_log").insert({
       employee_id: emp.id,
       typ: body.typ,

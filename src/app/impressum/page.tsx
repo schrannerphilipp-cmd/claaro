@@ -24,8 +24,18 @@ export default function ImpressumPage() {
         <h1 className="text-4xl text-white mb-2" style={serif}>Impressum</h1>
         <p className="text-white/55 text-sm mb-10">Angaben gemäß § 5 TMG</p>
 
+        {/* ── Pflichtangaben §5 TMG ──────────────────────────────────────────
+            Name:    Pflicht nach §5 TMG — echter Name der natürl./jur. Person.
+            Adresse: Pflicht — ggf. durch Geschäftsadresse / virtuelles Büro ersetzen.
+                     Siehe PRIVACY_TODO.md für Anbieterempfehlungen.
+            Telefon: Optional (kein Pflichtfeld nach §5 TMG).
+                     GESCHAEFTSNUMMER_EINTRAGEN — bei sipgate.de einrichten.
+        ────────────────────────────────────────────────────────────────────── */}
         <div className="space-y-2 text-white/80 text-sm mb-10">
           <p>Philipp Schranner</p>
+          {/* GESCHAEFTSADRESSE_EINTRAGEN — aktuell Privatadresse.
+              Empfehlung: Virtuelles Büro (Clevver.io, Regus) ~10–30 €/Monat.
+              Siehe PRIVACY_TODO.md */}
           <p>Ferdinand-Miller-Str. 30</p>
           <p>82256 Fürstenfeldbruck</p>
           <p>
@@ -37,6 +47,7 @@ export default function ImpressumPage() {
               hallo@getclaaro.de
             </a>
           </p>
+          {/* GESCHAEFTSNUMMER_EINTRAGEN — Sipgate.de (Basic kostenlos) einrichten */}
           <p>
             Website:{" "}
             <a
@@ -65,6 +76,7 @@ export default function ImpressumPage() {
           </h2>
           <div className="text-sm text-white/55 space-y-1">
             <p>Philipp Schranner</p>
+            {/* GESCHAEFTSADRESSE_EINTRAGEN — siehe oben */}
             <p>Ferdinand-Miller-Str. 30</p>
             <p>82256 Fürstenfeldbruck</p>
           </div>

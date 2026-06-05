@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
+import { getRequestUser, unauthorized } from "@/lib/api-auth";
 
 // GET /api/dienstplan/verfuegbarkeit?employee_id=...&woche=2026-W21
 export async function GET(req: NextRequest) {
+  const user = await getRequestUser(req);
+  if (!user) return unauthorized();
+
   const employeeId = req.nextUrl.searchParams.get("employee_id");
   const woche = req.nextUrl.searchParams.get("woche");
 
@@ -22,12 +26,11 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ availability: data });
 }
 
-// GET all employees for a week (Hauptaccount)
-// GET /api/dienstplan/verfuegbarkeit?hauptaccount_id=...&woche=2026-W21
-// handled via same route with different query params
-
 // POST /api/dienstplan/verfuegbarkeit — upsert one day's availability
 export async function POST(req: NextRequest) {
+  const user = await getRequestUser(req);
+  if (!user) return unauthorized();
+
   let body: {
     employee_id: string;
     woche: string;
@@ -68,6 +71,9 @@ export async function POST(req: NextRequest) {
 
 // DELETE /api/dienstplan/verfuegbarkeit?employee_id=...&woche=...
 export async function DELETE(req: NextRequest) {
+  const user = await getRequestUser(req);
+  if (!user) return unauthorized();
+
   const employeeId = req.nextUrl.searchParams.get("employee_id");
   const woche = req.nextUrl.searchParams.get("woche");
 

@@ -1,12 +1,9 @@
+"use client";
+
 import FeatureLayout from "../_components/feature-layout";
 import LogoUpload from "@/components/settings/LogoUpload";
 import FirmendatenForm from "@/components/settings/FirmendatenForm";
-import dynamic from "next/dynamic";
-
-const StarterModulesSettings = dynamic(
-  () => import("@/components/settings/StarterModulesSettings"),
-  { ssr: false },
-);
+import StarterModulesSettings from "@/components/settings/StarterModulesSettings";
 
 const sans = { fontFamily: "var(--font-dm-sans)" } as const;
 

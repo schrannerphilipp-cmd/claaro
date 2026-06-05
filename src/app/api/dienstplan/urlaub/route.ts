@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
+import { getRequestUser, unauthorized } from "@/lib/api-auth";
 
 // GET /api/dienstplan/urlaub?hauptaccount_id=... (alle) oder ?employee_id=... (eigene)
 export async function GET(req: NextRequest) {
+  const user = await getRequestUser(req);
+  if (!user) return unauthorized();
+
   const hauptaccountId = req.nextUrl.searchParams.get("hauptaccount_id");
   const employeeId = req.nextUrl.searchParams.get("employee_id");
   const supabase = createServerClient();
@@ -44,6 +48,9 @@ export async function GET(req: NextRequest) {
 
 // POST /api/dienstplan/urlaub — Antrag stellen
 export async function POST(req: NextRequest) {
+  const user = await getRequestUser(req);
+  if (!user) return unauthorized();
+
   let body: { employee_id: string; von: string; bis: string; notiz?: string };
   try {
     body = await req.json();

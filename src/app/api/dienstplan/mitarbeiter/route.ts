@@ -1,11 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
+import { getRequestUser, unauthorized } from "@/lib/api-auth";
+import { checkRateLimit, rateLimitExceeded } from "@/lib/rate-limit";
 
 // GET  /api/dienstplan/mitarbeiter?hauptaccount_id=...
 export async function GET(req: NextRequest) {
+  const user = await getRequestUser(req);
+  if (!user) return unauthorized();
+
   const hauptaccountId = req.nextUrl.searchParams.get("hauptaccount_id");
   if (!hauptaccountId) {
     return NextResponse.json({ error: "hauptaccount_id fehlt." }, { status: 400 });
+  }
+
+  // IDOR guard: only the account owner may query their own employees
+  if (user.id !== hauptaccountId) {
+    return NextResponse.json({ error: "Nicht autorisiert" }, { status: 403 });
   }
 
   const supabase = createServerClient();
@@ -21,6 +31,13 @@ export async function GET(req: NextRequest) {
 
 // POST /api/dienstplan/mitarbeiter — Mitarbeiter anlegen & einladen
 export async function POST(req: NextRequest) {
+  const user = await getRequestUser(req);
+  if (!user) return unauthorized();
+
+  // Rate limit for invite actions: 20 per minute per user
+  const rl = checkRateLimit(`mitarbeiter:${user.id}`, 20, 60_000);
+  if (!rl.allowed) return rateLimitExceeded();
+
   let body: {
     hauptaccount_id: string;
     name: string;
@@ -39,13 +56,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Ungültige Anfrage." }, { status: 400 });
   }
 
+  // IDOR guard: ignore client-supplied hauptaccount_id, use verified session user
+  if (user.id !== body.hauptaccount_id) {
+    return NextResponse.json({ error: "Nicht autorisiert" }, { status: 403 });
+  }
+
   const supabase = createServerClient();
 
-  // 1. Mitarbeiter in employees eintragen
   const { data: employee, error: insertError } = await supabase
     .from("employees")
     .insert({
-      hauptaccount_id: body.hauptaccount_id,
+      hauptaccount_id: user.id,
       name: body.name,
       email: body.email,
       telefon: body.telefon,
@@ -61,13 +82,12 @@ export async function POST(req: NextRequest) {
 
   if (insertError) return NextResponse.json({ error: insertError.message }, { status: 500 });
 
-  // 2. Supabase Auth Invite — sendet Einladungs-E-Mail
   const { data: inviteData, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(
     body.email,
     {
       data: {
         employee_id: employee.id,
-        hauptaccount_id: body.hauptaccount_id,
+        hauptaccount_id: user.id,
         rolle: body.rolle,
       },
       redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/dienstplan/verfuegbarkeit`,
@@ -77,7 +97,6 @@ export async function POST(req: NextRequest) {
   if (inviteError) {
     console.warn("[dienstplan/mitarbeiter] Invite fehlgeschlagen:", inviteError.message);
   } else if (inviteData?.user) {
-    // auth_user_id hinterlegen
     await supabase
       .from("employees")
       .update({ auth_user_id: inviteData.user.id })

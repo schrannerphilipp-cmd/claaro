@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import ZeitersparnisToast from "./ZeitersparnisToast";
 import FeedbackModal from "@/components/feedback/FeedbackModal";
+import CookieBanner from "./CookieBanner";
+import AnalyticsScripts from "./AnalyticsScripts";
 
 const sans = { fontFamily: "var(--font-dm-sans)" } as const;
 
@@ -86,6 +88,8 @@ export default function ClientProviders({ children }: { children: React.ReactNod
 
       <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
       <ZeitersparnisToast />
+      <CookieBanner />
+      <AnalyticsScripts />
     </>
   );
 }

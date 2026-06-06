@@ -93,6 +93,23 @@ function Stars({ count = 5 }: { count?: number }) {
   );
 }
 
+function checkForgotRateLimit(email: string): boolean {
+  const key = `claaro-reset-rl:${email.toLowerCase()}`;
+  const now = Date.now();
+  const windowMs = 60 * 60 * 1000;
+  try {
+    const stored = localStorage.getItem(key);
+    const attempts: number[] = stored ? JSON.parse(stored) : [];
+    const recent = attempts.filter((t) => now - t < windowMs);
+    if (recent.length >= 3) return false;
+    recent.push(now);
+    localStorage.setItem(key, JSON.stringify(recent));
+    return true;
+  } catch {
+    return true;
+  }
+}
+
 // ── Main form ─────────────────────────────────────────────────────────────────
 function LoginForm() {
   const router       = useRouter();
@@ -100,7 +117,7 @@ function LoginForm() {
   const next         = searchParams.get("next") ?? "/dashboard";
   const refCode      = searchParams.get("ref") ?? null;
 
-  const [mode, setMode]         = useState<"login" | "register">(
+  const [mode, setMode]         = useState<"login" | "register" | "forgot">(
     searchParams.get("tab") === "register" ? "register" : "login"
   );
   const [email, setEmail]               = useState("");
@@ -132,6 +149,23 @@ function LoginForm() {
     setError(null);
     setInfo(null);
     setLoading(true);
+
+    // ── Passwort vergessen ─────────────────────────────────────────────────
+    if (mode === "forgot") {
+      if (!checkForgotRateLimit(email)) {
+        setError("Zu viele Versuche — bitte warte eine Stunde.");
+        setLoading(false);
+        return;
+      }
+      const supabase = getBrowserClient()!;
+      await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/reset-password`,
+      });
+      setInfo("Falls diese E-Mail registriert ist, bekommst du gleich einen Link.");
+      setLoading(false);
+      return;
+    }
+    // ─────────────────────────────────────────────────────────────────────
 
     const supabase = getBrowserClient()!;
 
@@ -242,12 +276,14 @@ function LoginForm() {
               transition={{ duration: 0.2, ease: "easeOut" }}
             >
               <h1 className="text-3xl text-white mt-3" style={serif}>
-                {mode === "login" ? "Willkommen zurück" : "Konto erstellen"}
+                {mode === "login" ? "Willkommen zurück" : mode === "register" ? "Konto erstellen" : "Passwort zurücksetzen"}
               </h1>
               <p className="text-white/55 text-sm mt-2">
                 {mode === "login"
                   ? "Mit deinem Claaro-Konto einloggen"
-                  : "Starte deinen 30-Tage-Test — kostenlos"}
+                  : mode === "register"
+                  ? "Starte deinen 30-Tage-Test — kostenlos"
+                  : "Gib deine E-Mail ein — wir schicken dir einen Link."}
               </p>
             </motion.div>
           </AnimatePresence>
@@ -281,25 +317,27 @@ function LoginForm() {
             )}
           </div>
 
-          <div>
-            <label className="block text-xs text-white/55 mb-1.5">
-              Passwort <span className="text-[var(--c-accent)]/70">*</span>
-            </label>
-            <input
-              required
-              type="password"
-              className={`${inputClass}${passwordFieldError ? " border-red-500/50" : ""}`}
-              value={password}
-              onChange={(e) => { setPassword(e.target.value); setError(null); }}
-              onBlur={() => setPasswordTouched(true)}
-              placeholder="••••••••"
-              autoComplete={mode === "login" ? "current-password" : "new-password"}
-              minLength={6}
-            />
-            {passwordFieldError && (
-              <p className="text-xs text-red-400 mt-1">{passwordFieldError}</p>
-            )}
-          </div>
+          {mode !== "forgot" && (
+            <div>
+              <label className="block text-xs text-white/55 mb-1.5">
+                Passwort <span className="text-[var(--c-accent)]/70">*</span>
+              </label>
+              <input
+                required
+                type="password"
+                className={`${inputClass}${passwordFieldError ? " border-red-500/50" : ""}`}
+                value={password}
+                onChange={(e) => { setPassword(e.target.value); setError(null); }}
+                onBlur={() => setPasswordTouched(true)}
+                placeholder="••••••••"
+                autoComplete={mode === "login" ? "current-password" : "new-password"}
+                minLength={6}
+              />
+              {passwordFieldError && (
+                <p className="text-xs text-red-400 mt-1">{passwordFieldError}</p>
+              )}
+            </div>
+          )}
 
           {/* Error with shake */}
           <AnimatePresence>
@@ -367,10 +405,48 @@ function LoginForm() {
               </span>
             ) : mode === "login" ? (
               "Einloggen"
-            ) : (
+            ) : mode === "register" ? (
               "Kostenlos starten →"
+            ) : (
+              "Link anfordern"
             )}
           </motion.button>
+
+          {/* Passwort vergessen — only in login mode */}
+          {mode === "login" && (
+            <div className="text-center -mt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setMode("forgot");
+                  setError(null);
+                  setInfo(null);
+                  setEmailTouched(false);
+                }}
+                className="c-btn text-[11px] text-white/30 hover:text-white/50 transition-colors"
+              >
+                Passwort vergessen?
+              </button>
+            </div>
+          )}
+
+          {/* Zurück zum Login — only in forgot mode */}
+          {mode === "forgot" && (
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setMode("login");
+                  setError(null);
+                  setInfo(null);
+                  setEmailTouched(false);
+                }}
+                className="c-btn text-[11px] text-white/30 hover:text-white/50 transition-colors"
+              >
+                ← Zurück zum Login
+              </button>
+            </div>
+          )}
 
           {/* Referral code — only in register mode, only without ?ref= URL param */}
           {mode === "register" && !refCode && (
@@ -451,29 +527,31 @@ function LoginForm() {
         </AnimatePresence>
 
         {/* ── Mode switch ──────────────────────────────────────────────────── */}
-        <motion.p
-          className="text-center text-sm text-white/55 mt-6"
-          initial={reduced ? {} : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
-        >
-          {mode === "login" ? "Noch kein Konto?" : "Bereits registriert?"}{" "}
-          <button
-            onClick={() => {
-              setMode(mode === "login" ? "register" : "login");
-              setError(null);
-              setInfo(null);
-              setEmailTouched(false);
-              setPasswordTouched(false);
-              setRefCodeInput("");
-              setRefCodeOpen(false);
-              setRefCodeError(null);
-            }}
-            className="c-btn text-[var(--c-accent)] hover:text-[#e05a38] font-medium"
+        {mode !== "forgot" && (
+          <motion.p
+            className="text-center text-sm text-white/55 mt-6"
+            initial={reduced ? {} : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
           >
-            {mode === "login" ? "Registrieren" : "Einloggen"}
-          </button>
-        </motion.p>
+            {mode === "login" ? "Noch kein Konto?" : "Bereits registriert?"}{" "}
+            <button
+              onClick={() => {
+                setMode(mode === "login" ? "register" : "login");
+                setError(null);
+                setInfo(null);
+                setEmailTouched(false);
+                setPasswordTouched(false);
+                setRefCodeInput("");
+                setRefCodeOpen(false);
+                setRefCodeError(null);
+              }}
+              className="c-btn text-[var(--c-accent)] hover:text-[#e05a38] font-medium"
+            >
+              {mode === "login" ? "Registrieren" : "Einloggen"}
+            </button>
+          </motion.p>
+        )}
 
         {/* ── Trust badges ─────────────────────────────────────────────────── */}
         <div

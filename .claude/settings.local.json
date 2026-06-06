@@ -7,7 +7,20 @@
       "Bash(npm run *)",
       "Bash(npm audit *)",
       "Bash(node -e \"const d=require\\('fs'\\).readFileSync\\('/dev/stdin','utf8'\\);try{const j=JSON.parse\\(d\\);const s=j.metadata?.vulnerabilities||{};console.log\\('critical:',s.critical||0,'high:',s.high||0,'moderate:',s.moderate||0,'low:',s.low||0\\);}catch{console.log\\(d.slice\\(0,500\\)\\);}\")",
-      "Bash(del \"src\\\\middleware.ts\")"
+      "Bash(del \"src\\\\middleware.ts\")",
+      "Bash(npm install *)",
+      "Bash(node *)",
+      "Bash(vercel --version)",
+      "Bash(npm i *)",
+      "Bash(vercel whoami *)",
+      "Bash(vercel ls *)",
+      "Bash(vercel project *)",
+      "Bash(vercel link *)",
+      "Bash(vercel env *)",
+      "Bash(vercel deploy *)",
+      "Bash(vercel logs *)",
+      "Bash(vercel inspect *)",
+      "Bash(git add *)"
     ]
   }
 }

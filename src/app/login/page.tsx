@@ -30,6 +30,9 @@ function translateSupabaseError(msg: string): string {
 const inputClass =
   "c-btn w-full bg-white/5 border border-white/15 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder-white/25 focus:outline-none focus:border-white/30";
 
+const refInputClass =
+  "c-btn w-full bg-white/3 border border-white/10 rounded-md px-3 py-2 text-xs text-white/60 placeholder-white/20 focus:outline-none focus:border-white/20 font-mono tracking-wide";
+
 // ── Social proof data ─────────────────────────────────────────────────────────
 const AVATARS = [
   { initials: "SM", color: "#b54a2a" },
@@ -109,6 +112,9 @@ function LoginForm() {
   const [shakeKey, setShakeKey]         = useState(0);
   const [emailTouched, setEmailTouched]       = useState(false);
   const [passwordTouched, setPasswordTouched] = useState(false);
+  const [refCodeInput, setRefCodeInput]       = useState("");
+  const [refCodeOpen, setRefCodeOpen]         = useState(false);
+  const [refCodeError, setRefCodeError]       = useState<string | null>(null);
 
   const emailFieldError =
     emailTouched && email.length > 0 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
@@ -131,6 +137,18 @@ function LoginForm() {
 
     try {
       if (mode === "register") {
+        // Validate manual referral code before registration
+        const manualCode = refCodeInput.trim();
+        if (manualCode && !refCode) {
+          const res = await fetch(`/api/loyalty/referral?code=${encodeURIComponent(manualCode)}`);
+          const { valid } = await res.json() as { valid: boolean };
+          if (!valid) {
+            setRefCodeError("Dieser Code ist leider nicht gültig.");
+            setLoading(false);
+            return;
+          }
+        }
+
         const { data: signUpData, error: err } = await supabase.auth.signUp({ email, password });
         if (err) throw err;
 
@@ -140,11 +158,12 @@ function LoginForm() {
         }
 
         // Record referral asynchronously — fire-and-forget
-        if (refCode) {
+        const activeRefCode = refCode ?? (manualCode || null);
+        if (activeRefCode) {
           fetch("/api/loyalty/referral", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ref_code: refCode, referred_email: email }),
+            body: JSON.stringify({ ref_code: activeRefCode, referred_email: email }),
           }).catch(() => {});
         }
 
@@ -352,6 +371,52 @@ function LoginForm() {
               "Kostenlos starten →"
             )}
           </motion.button>
+
+          {/* Referral code — only in register mode, only without ?ref= URL param */}
+          {mode === "register" && !refCode && (
+            <div className="pt-0.5">
+              {!refCodeOpen && (
+                <button
+                  type="button"
+                  onClick={() => setRefCodeOpen(true)}
+                  className="c-btn text-[11px] text-white/25 hover:text-white/45 transition-colors"
+                >
+                  Hast du einen Empfehlungscode?
+                </button>
+              )}
+              <AnimatePresence>
+                {refCodeOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2, ease: "easeInOut" }}
+                    className="overflow-hidden"
+                  >
+                    <label className="block text-[11px] text-white/35 mb-1.5">
+                      Empfehlungscode (optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={refCodeInput}
+                      onChange={(e) => {
+                        setRefCodeInput(e.target.value.toUpperCase());
+                        setRefCodeError(null);
+                      }}
+                      placeholder="z.B. CLR-XXXX"
+                      className={`${refInputClass}${refCodeError ? " border-red-500/40" : ""}`}
+                      maxLength={8}
+                      autoComplete="off"
+                      spellCheck={false}
+                    />
+                    {refCodeError && (
+                      <p className="text-[11px] text-red-400/70 mt-1">{refCodeError}</p>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
         </motion.form>
 
         {/* ── Register USPs (slide in when registering) ───────────────────── */}
@@ -400,6 +465,9 @@ function LoginForm() {
               setInfo(null);
               setEmailTouched(false);
               setPasswordTouched(false);
+              setRefCodeInput("");
+              setRefCodeOpen(false);
+              setRefCodeError(null);
             }}
             className="c-btn text-[var(--c-accent)] hover:text-[#e05a38] font-medium"
           >

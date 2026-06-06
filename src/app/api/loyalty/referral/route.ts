@@ -2,6 +2,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
 import { checkRateLimit, rateLimitExceeded } from "@/lib/rate-limit";
 
+export async function GET(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
+  const rl = checkRateLimit(`referral-validate:${ip}`, 20, 60_000);
+  if (!rl.allowed) return rateLimitExceeded();
+
+  const code = req.nextUrl.searchParams.get("code")?.toUpperCase().trim();
+  if (!code) return NextResponse.json({ valid: false });
+
+  const supabase = createServerClient();
+  const { data } = await supabase
+    .from("loyalty_status")
+    .select("id")
+    .eq("referral_code", code)
+    .maybeSingle();
+
+  return NextResponse.json({ valid: !!data });
+}
+
 export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
   const rl = checkRateLimit(`referral:${ip}`, 5, 60_000);

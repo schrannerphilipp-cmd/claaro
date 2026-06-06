@@ -178,7 +178,7 @@ export async function POST(request: NextRequest) {
         console.log("[stripe/webhook] ✓ abo_plan gesetzt:", planId, "für hauptaccount_id:", hauptaccountId);
       }
 
-      // Handle referral conversion
+      // Handle referral conversion (new subscriber was referred by someone)
       const referredEmail =
         session.customer_email ??
         (session.customer_details as { email?: string } | null)?.email ??
@@ -186,6 +186,45 @@ export async function POST(request: NextRequest) {
 
       if (referredEmail) {
         await handleReferralConversion(supabase, referredEmail, hauptaccountId);
+      }
+
+      // Apply pending free month if this subscriber previously earned one as a referrer
+      // (their referral was converted before they had an active subscription)
+      if (stripeSubscriptionId) {
+        const { data: lsPending } = await supabase
+          .from("loyalty_status")
+          .select("free_month_pending")
+          .eq("user_id", hauptaccountId)
+          .maybeSingle();
+
+        if (lsPending?.free_month_pending) {
+          try {
+            const freeCouponId = `FREE_MONTH_DELAYED_${hauptaccountId.slice(0, 8)}_${Date.now()}`;
+            await stripe.coupons.create({
+              id:              freeCouponId,
+              percent_off:     100,
+              duration:        "once",
+              name:            "Empfehlungsbonus — 1 Monat gratis",
+              max_redemptions: 1,
+            });
+            await stripe.subscriptions.update(stripeSubscriptionId, {
+              discounts: [{ coupon: freeCouponId }],
+            } as Parameters<typeof stripe.subscriptions.update>[1]);
+            await supabase
+              .from("loyalty_status")
+              .update({ free_month_pending: false })
+              .eq("user_id", hauptaccountId);
+            // Mark the previously-converted referral as rewarded
+            await supabase
+              .from("referrals")
+              .update({ status: "rewarded" })
+              .eq("referrer_id", hauptaccountId)
+              .eq("status", "converted");
+            console.log("[stripe/webhook] ✓ Ausstehender Gratis-Monat angewendet für:", hauptaccountId);
+          } catch (err) {
+            console.error("[stripe/webhook] Ausstehender Gratis-Monat fehlgeschlagen:", err);
+          }
+        }
       }
 
       // Send payment confirmation email

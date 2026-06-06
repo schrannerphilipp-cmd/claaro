@@ -20,7 +20,9 @@
       "Bash(vercel deploy *)",
       "Bash(vercel logs *)",
       "Bash(vercel inspect *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ]
   }
 }

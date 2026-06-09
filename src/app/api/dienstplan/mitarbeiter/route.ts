@@ -63,6 +63,46 @@ export async function POST(req: NextRequest) {
 
   const supabase = createServerClient();
 
+  // ── Plan-Limit prüfen ────────────────────────────────────────────────────
+  const EMPLOYEE_LIMITS: Record<string, number> = {
+    starter: 3,
+    profi:   15,
+    team:    Infinity,
+  };
+  const NEXT_PLAN: Record<string, string> = {
+    starter: "Profi",
+    profi:   "Team",
+  };
+
+  const { data: settings } = await supabase
+    .from("company_settings")
+    .select("abo_plan")
+    .eq("hauptaccount_id", user.id)
+    .maybeSingle();
+
+  const plan = settings?.abo_plan ?? null;
+  const limit = plan ? (EMPLOYEE_LIMITS[plan] ?? Infinity) : 3; // trial = 3
+
+  if (limit !== Infinity) {
+    const { count } = await supabase
+      .from("employees")
+      .select("id", { count: "exact", head: true })
+      .eq("hauptaccount_id", user.id)
+      .eq("aktiv", true);
+
+    if ((count ?? 0) >= limit) {
+      const next = plan ? (NEXT_PLAN[plan] ?? null) : "Starter";
+      const hint = next
+        ? ` Upgrade auf ${next} für mehr.`
+        : "";
+      return NextResponse.json(
+        { error: `Dein Plan erlaubt maximal ${limit} Mitarbeiter.${hint}` },
+        { status: 403 }
+      );
+    }
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
   const { data: employee, error: insertError } = await supabase
     .from("employees")
     .insert({

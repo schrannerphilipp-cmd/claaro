@@ -175,7 +175,7 @@ export const COMPLIANCE_SEED: ComplianceTask[] = [
   // ─── GASTRONOMIE – Steuer & Buchführung ──────────────────────────────────
   {
     id: "g-013",
-    titel: "Umsatzsteuer-Voranmeldung",
+    titel: "Umsatzsteuer-Voranmeldung – Gastronomie",
     beschreibung:
       "Monatliche USt-Voranmeldung fristgerecht beim Finanzamt einreichen. Vorsteuern sorgfältig belegen. Bei Überschreitung der Dauerfristverlängerung Sondervorauszahlung beachten.",
     kategorie: "Steuer & Buchführung",
@@ -217,7 +217,7 @@ export const COMPLIANCE_SEED: ComplianceTask[] = [
   },
   {
     id: "g-016",
-    titel: "GEZ Rundfunkbeitrag Betriebsstätte melden",
+    titel: "ARD ZDF Deutschlandradio Beitragsservice – Betriebsstätte melden",
     beschreibung:
       "Betriebsstätten, Fahrzeuge und Empfangsgeräte korrekt beim Beitragsservice anmelden. Änderungen (neue Filiale, Fahrzeug, etc.) innerhalb eines Monats melden.",
     kategorie: "Steuer & Buchführung",
@@ -361,7 +361,7 @@ export const COMPLIANCE_SEED: ComplianceTask[] = [
   // ─── HANDWERK – Steuer & Buchführung ─────────────────────────────────────
   {
     id: "h-010",
-    titel: "Umsatzsteuer-Voranmeldung",
+    titel: "Umsatzsteuer-Voranmeldung – Handwerk",
     beschreibung:
       "Monatliche oder quartalsweise USt-Voranmeldung fristgerecht abgeben. Bauleistungen an andere Unternehmer: Reverse-Charge-Verfahren (§ 13b UStG) beachten.",
     kategorie: "Steuer & Buchführung",
@@ -618,7 +618,7 @@ export const COMPLIANCE_SEED: ComplianceTask[] = [
   },
   {
     id: "ges-015",
-    titel: "Praxisbegehung durch Kassenärztliche Vereinigung vorbereiten",
+    titel: "Praxisbegehung KV vorbereiten (Arztpraxis)",
     beschreibung:
       "Alle relevanten Unterlagen (QM-Handbuch, Hygieneplan, Medizinprodukteregister, Datenschutzdokumentation) für die KV-Begehung zusammenstellen und aktualisieren.",
     kategorie: "Qualitätsmanagement",
